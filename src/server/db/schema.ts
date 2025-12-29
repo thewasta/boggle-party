@@ -73,7 +73,7 @@ export interface CreateGameInput {
   grid_size: GridSize;
   duration: number;
   status: GameStatus;
-  created_at: Date;
+  created_at?: Date; // Optional: defaults to NOW() in database
   host_id?: string | null; // Optional: can be set later
   board?: string[][] | null; // Optional: shared board for all players
 }
@@ -89,7 +89,7 @@ export interface CreatePlayerInput {
   final_score?: number;
   words_found?: number;
   unique_words_found?: number;
-  joined_at?: Date;
+  joined_at?: Date; // Optional: defaults to NOW() in database
 }
 
 /**
@@ -103,5 +103,5 @@ export interface CreateWordInput {
   path?: Array<{row: number, col: number}> | null;
   score: number;
   is_unique: boolean;
-  found_at: Date;
+  found_at?: Date; // Optional: defaults to NOW() in database
 }
