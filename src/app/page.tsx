@@ -63,3 +63,4 @@ export default function Home() {
     </div>
   );
 }
+console.log('hot reload test');
