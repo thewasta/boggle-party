@@ -23,6 +23,7 @@ export interface GameRow {
   grid_size: GridSize;
   duration: number; // in seconds
   status: GameStatus;
+  host_id: string | null; // UUID of the host player
   created_at: Date;
   started_at: Date | null;
   ended_at: Date | null;
@@ -37,6 +38,8 @@ export interface GamePlayerRow {
   game_id: string;
   player_name: string;
   avatar: string;
+  is_host: boolean; // true if this player is the host
+  board: string[][] | null; // unique board grid for this player
   final_score: number;
   words_found: number;
   unique_words_found: number;
@@ -51,6 +54,8 @@ export interface GameWordRow {
   game_id: string;
   player_id: string;
   word: string;
+  word_length: number; // length of the word (for scoring analytics)
+  path: Array<{row: number, col: number}> | null; // coordinates path for validation
   score: number;
   is_unique: boolean;
   found_at: Date;

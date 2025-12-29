@@ -50,7 +50,7 @@ export async function runMigrations(): Promise<void> {
   console.log('Checking database migrations...');
 
   const appliedMigrations = await getAppliedMigrations();
-  const migrationFiles = ['001_initial_schema'];
+  const migrationFiles = ['001_initial_schema', '002_add_missing_critical_fields'];
 
   for (const version of migrationFiles) {
     if (appliedMigrations.has(version)) {
