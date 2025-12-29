@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { leaveRoomSchema } from '@/server/validation';
 import { roomsManager } from '@/server/rooms-manager';
-import { handleValidationError, apiSuccess, handleRoomError } from '@/server/api-utils';
+import { handleValidationError, apiSuccess, apiError, handleRoomError } from '@/server/api-utils';
 import { triggerEvent } from '@/server/pusher-client';
 import type { PlayerLeftEvent } from '@/server/types';
 
@@ -17,19 +17,31 @@ export async function POST(
       roomCode: code,
     });
 
+    const room = roomsManager.getRoom(validatedData.roomCode);
+    if (!room) {
+      return apiError('Room not found', 404);
+    }
+
+    const player = room.players.get(validatedData.playerId);
+    if (!player) {
+      return apiError('Player not found in room', 404);
+    }
+
+    const playerName = player.name;
     const result = roomsManager.leaveRoom(validatedData.roomCode, validatedData.playerId);
 
     if (!result) {
       return apiSuccess({ message: 'Player left successfully' });
     }
 
-    await triggerEvent(`presence-game-${result.room.id}`, 'player-left', {
+    await triggerEvent(`presence-game-${result.id}`, 'player-left', {
       playerId: validatedData.playerId,
-      totalPlayers: result.room.players.size,
+      playerName,
+      totalPlayers: result.players.size,
     } satisfies PlayerLeftEvent);
 
     return apiSuccess({
-      room: roomsManager.roomToDTO(result.room),
+      room: roomsManager.roomToDTO(result),
       playerId: validatedData.playerId,
     });
 

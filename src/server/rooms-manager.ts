@@ -8,8 +8,8 @@ import type {
   Player,
   Room,
   RoomStateDTO,
-  GridSize,
 } from './types';
+import type { GridSize } from '@/server/db/schema';
 import { RoomError } from './types';
 
 const ROOM_CODE_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
