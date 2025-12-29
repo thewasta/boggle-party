@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool, PoolClient } from 'pg';
 
 let pool: Pool | null = null;
 
@@ -12,7 +12,7 @@ export function getPool(): Pool {
     });
 
     // Listen for errors on the pool
-    pool.on('error', (err) => {
+    pool.on('error', (err: Error) => {
       console.error('Unexpected error on idle client', err);
       process.exit(-1);
     });

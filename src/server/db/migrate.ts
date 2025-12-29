@@ -20,7 +20,7 @@ async function getAppliedMigrations(): Promise<Set<string>> {
   `);
 
   const result = await pool.query<Migration>('SELECT version FROM schema_migrations');
-  return new Set(result.rows.map((row) => row.version));
+  return new Set(result.rows.map((row: Migration) => row.version));
 }
 
 async function runMigration(version: string, sql: string): Promise<void> {
