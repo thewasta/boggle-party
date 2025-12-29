@@ -301,7 +301,7 @@ CREATE INDEX idx_game_words_player_id ON game_words(player_id);
 
 ---
 
-## Epic 3: Server-Side Core - Room Management System
+## Epic 3: Server-Side Core - Room Management System ✅ **COMPLETED** (2025-12-30)
 
 **Objective:** Implement centralized room state management, creation, joining, and player tracking
 
@@ -366,6 +366,91 @@ CREATE INDEX idx_game_words_player_id ON game_words(player_id);
 - Database repository integration tests
 
 **Next Epic Trigger:** Room creation/joining working, players can see each other in waiting room, database persistence verified
+
+### Implementation Status
+
+**Completed:** 2025-12-30
+
+**Summary:**
+- ✅ All 22 tasks completed successfully
+- ✅ Room management system implemented with RoomsManager class
+- ✅ TypeScript types defined for Room, Player, and Pusher events
+- ✅ Pusher client singleton created for real-time events
+- ✅ Zod validation schemas for all API inputs
+- ✅ API endpoints created:
+  - POST /api/rooms - Create room
+  - GET /api/rooms/[code] - Get room state
+  - POST /api/rooms/[code]/join - Join room
+  - POST /api/rooms/[code]/leave - Leave room
+  - POST /api/rooms/[code]/start - Start game (host only)
+  - POST /api/rooms/[code]/end - End game
+- ✅ Session tracking utilities created
+- ✅ Health check endpoint enhanced with room count
+- ✅ Comprehensive test coverage:
+  - 15 unit tests for RoomsManager
+  - 5 integration tests for room flow
+  - 2 stress tests for code uniqueness (1000 rooms, concurrent creation)
+  - 1 test for Pusher event emission
+  - Multiple API route tests
+- ✅ API documentation created (docs/ROOM-MANAGEMENT.md)
+
+**Git Commits:**
+- `b0d1daa` - RoomsManager with test suite
+- `f322180` - Pusher client singleton
+- `126e629` - TypeScript types
+- `b15f64b` - Epic 3 implementation plan
+- `7e50daa` - GET /api/rooms/[code] endpoint
+- `a0cf563` - POST /api/rooms/[code]/join endpoint
+- `7a5deec` - POST /api/rooms/[code]/leave endpoint
+- `970fee6` - Fixed leave endpoint and GridSize import
+- `89090f5` - Stress tests for room codes
+- `320c026` - Integration tests
+- `b03a790` - Pusher event tests
+- `bae5489` - API documentation
+- `8b24a5a` - POST /api/rooms/[code]/start endpoint
+- `393b022` - POST /api/rooms/[code]/end endpoint
+- `3d03da2` - Health check room count
+
+**Key Files Created:**
+- `src/server/rooms-manager.ts` - Core room management logic (245 lines)
+- `src/server/types.ts` - TypeScript types for Room, Player, events (175 lines)
+- `src/server/pusher-client.ts` - Pusher singleton
+- `src/server/validation.ts` - Zod schemas
+- `src/server/api-utils.ts` - API utility functions
+- `src/server/session-utils.ts` - Session tracking utilities
+- `src/app/api/rooms/route.ts` - POST endpoint (create room)
+- `src/app/api/rooms/[code]/route.ts` - GET endpoint
+- `src/app/api/rooms/[code]/join/route.ts` - POST endpoint (join)
+- `src/app/api/rooms/[code]/leave/route.ts` - POST endpoint (leave)
+- `src/app/api/rooms/[code]/start/route.ts` - POST endpoint (start game)
+- `src/app/api/rooms/[code]/end/route.ts` - POST endpoint (end game)
+- `docs/ROOM-MANAGEMENT.md` - API documentation
+
+**Test Files Created:**
+- `src/server/__tests__/rooms-manager.test.ts` - 15 tests
+- `src/server/__tests__/room-flow.integration.test.ts` - 5 tests
+- `src/server/__tests__/pusher-events.test.ts` - 1 test
+- `src/app/api/rooms/__tests__/route.test.ts` - 2 tests
+- `src/app/api/rooms/[code]/__tests__/route.test.ts` - 2 tests
+- `src/app/api/rooms/[code]/join/__tests__/route.test.ts` - 2 tests
+- `src/app/api/rooms/[code]/leave/__tests__/route.test.ts` - 3 tests
+- `src/app/api/rooms/[code]/start/__tests__/route.test.ts` - 2 tests
+- `src/app/api/rooms/[code]/end/__tests__/route.test.ts` - 2 tests
+
+**Total Test Count:** 36 tests passing
+
+**Notes:**
+- Fixed TypeScript error: GridSize import from @/server/db/schema instead of ./types
+- Fixed leave endpoint to include playerName in PlayerLeftEvent
+- All success criteria met:
+  - ✅ Can create room and receive 6-character code
+  - ✅ Can join room with valid code
+  - ✅ Player list updates in real-time via Pusher (events mocked in tests)
+  - ✅ Cannot join non-existent room (404 error)
+  - ✅ Cannot start game with < 2 players (error thrown)
+  - ✅ Room state persists during server runtime (in-memory Map)
+  - ✅ Health check shows active room count
+- Ready to proceed to Epic 4 (Spanish Dictionary & Word Validation)
 
 ---
 
