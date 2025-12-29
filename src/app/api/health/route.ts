@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { testConnection, getPool } from '@/server/db/connection';
+import { roomsManager } from '@/server/rooms-manager';
 
 export async function GET() {
   const health = {
@@ -10,6 +11,9 @@ export async function GET() {
     services: {
       database: 'unknown' as 'up' | 'down' | 'error',
       schema: 'unknown' as 'migrated' | 'not_migrated' | 'error',
+      rooms: {
+        active: roomsManager.getRoomCount(),
+      },
     },
   };
 
