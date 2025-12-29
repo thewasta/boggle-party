@@ -1,18 +1,57 @@
 import { NextResponse } from 'next/server';
-import { testConnection } from '@/server/db/connection';
+import { testConnection, getPool } from '@/server/db/connection';
 
 export async function GET() {
-  const dbHealthy = await testConnection();
-
-  return NextResponse.json({
-    status: dbHealthy ? 'healthy' : 'degraded',
+  const health = {
+    status: 'ok' as 'ok' | 'degraded' | 'error',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
     services: {
-      database: dbHealthy ? 'up' : 'down',
+      database: 'unknown' as 'up' | 'down' | 'error',
+      schema: 'unknown' as 'migrated' | 'not_migrated' | 'error',
     },
-  }, {
-    status: dbHealthy ? 200 : 503,
-  });
+  };
+
+  try {
+    // Test database connection
+    const dbConnected = await testConnection();
+
+    if (!dbConnected) {
+      health.services.database = 'down';
+      health.status = 'degraded';
+      return NextResponse.json(health, { status: 503 });
+    }
+
+    health.services.database = 'up';
+
+    // Check if schema is migrated
+    const pool = getPool();
+    const schemaCheck = await pool.query(
+      `SELECT EXISTS(
+         SELECT FROM information_schema.tables
+         WHERE table_name = 'games'
+       ) as exists`
+    );
+
+    if (schemaCheck.rows[0].exists) {
+      health.services.schema = 'migrated';
+    } else {
+      health.services.schema = 'not_migrated';
+      health.status = 'degraded';
+    }
+
+    return NextResponse.json(health, { status: health.status === 'ok' ? 200 : 503 });
+  } catch (error) {
+    health.status = 'error';
+    health.services.database = 'error';
+
+    return NextResponse.json(
+      {
+        ...health,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
 }
