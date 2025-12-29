@@ -9,10 +9,16 @@ export class PlayersRepository {
     const pool = getPool();
 
     const result = await pool.query<GamePlayerRow>(
-      `INSERT INTO game_players (game_id, player_name, avatar)
-       VALUES ($1, $2, $3)
+      `INSERT INTO game_players (game_id, player_name, avatar, is_host, board)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [input.game_id, input.player_name, input.avatar]
+      [
+        input.game_id,
+        input.player_name,
+        input.avatar,
+        input.is_host || false,
+        input.board || null,
+      ]
     );
 
     return result.rows[0];
@@ -66,6 +72,42 @@ export class PlayersRepository {
     );
 
     return result.rows[0];
+  }
+
+  /**
+   * Set or update the host flag for a player
+   */
+  async setHost(playerId: string, isHost: boolean): Promise<GamePlayerRow> {
+    const pool = getPool();
+    const result = await pool.query<GamePlayerRow>(
+      'UPDATE game_players SET is_host = $1 WHERE id = $2 RETURNING *',
+      [isHost, playerId]
+    );
+    return result.rows[0];
+  }
+
+  /**
+   * Set or update the board for a player
+   */
+  async setBoard(playerId: string, board: string[][]): Promise<GamePlayerRow> {
+    const pool = getPool();
+    const result = await pool.query<GamePlayerRow>(
+      'UPDATE game_players SET board = $1 WHERE id = $2 RETURNING *',
+      [JSON.stringify(board), playerId]
+    );
+    return result.rows[0];
+  }
+
+  /**
+   * Find the host of a game
+   */
+  async findHostByGameId(gameId: string): Promise<GamePlayerRow | null> {
+    const pool = getPool();
+    const result = await pool.query<GamePlayerRow>(
+      'SELECT * FROM game_players WHERE game_id = $1 AND is_host = true',
+      [gameId]
+    );
+    return result.rows[0] || null;
   }
 }
 

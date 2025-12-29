@@ -8,14 +8,16 @@ export class WordsRepository {
   async create(input: CreateWordInput): Promise<GameWordRow> {
     const pool = getPool();
     const query = `
-      INSERT INTO game_words (id, game_id, player_id, word, score, is_unique, found_at)
-      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6)
+      INSERT INTO game_words (id, game_id, player_id, word, word_length, path, score, is_unique, found_at)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `;
     const values = [
       input.game_id,
       input.player_id,
       input.word,
+      input.word_length,
+      input.path ? JSON.stringify(input.path) : null,
       input.score,
       input.is_unique,
       input.found_at,
@@ -63,6 +65,35 @@ export class WordsRepository {
     const query = 'SELECT EXISTS(SELECT 1 FROM game_words WHERE game_id = $1 AND LOWER(word) = LOWER($2)) as exists';
     const result = await pool.query<{ exists: boolean }>(query, [gameId, word]);
     return result.rows[0].exists;
+  }
+
+  /**
+   * Get words by length for scoring analytics
+   */
+  async findByWordLength(gameId: string, wordLength: number): Promise<GameWordRow[]> {
+    const pool = getPool();
+    const query = 'SELECT * FROM game_words WHERE game_id = $1 AND word_length = $2 ORDER BY found_at ASC';
+    const result = await pool.query<GameWordRow>(query, [gameId, wordLength]);
+    return result.rows;
+  }
+
+  /**
+   * Get scoring analytics by word length
+   */
+  async getScoringAnalytics(gameId: string): Promise<Array<{length: number, count: number, total_score: number}>> {
+    const pool = getPool();
+    const query = `
+      SELECT
+        word_length as length,
+        COUNT(*) as count,
+        SUM(score) as total_score
+      FROM game_words
+      WHERE game_id = $1
+      GROUP BY word_length
+      ORDER BY word_length
+    `;
+    const result = await pool.query(query, [gameId]);
+    return result.rows;
   }
 }
 

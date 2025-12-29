@@ -74,6 +74,7 @@ export interface CreateGameInput {
   duration: number;
   status: GameStatus;
   created_at: Date;
+  host_id?: string | null; // Optional: can be set later
 }
 
 /**
@@ -83,10 +84,12 @@ export interface CreatePlayerInput {
   game_id: string;
   player_name: string;
   avatar: string;
-  final_score: number;
-  words_found: number;
-  unique_words_found: number;
-  joined_at: Date;
+  is_host?: boolean;
+  board?: string[][] | null;
+  final_score?: number;
+  words_found?: number;
+  unique_words_found?: number;
+  joined_at?: Date;
 }
 
 /**
@@ -96,6 +99,8 @@ export interface CreateWordInput {
   game_id: string;
   player_id: string;
   word: string;
+  word_length: number;
+  path?: Array<{row: number, col: number}> | null;
   score: number;
   is_unique: boolean;
   found_at: Date;

@@ -8,8 +8,8 @@ export class GamesRepository {
   async create(input: CreateGameInput): Promise<GameRow> {
     const pool = getPool();
     const query = `
-      INSERT INTO games (id, room_code, grid_size, duration, status, created_at)
-      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5)
+      INSERT INTO games (id, room_code, grid_size, duration, status, created_at, host_id)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
     const values = [
@@ -18,6 +18,7 @@ export class GamesRepository {
       input.duration,
       input.status,
       input.created_at,
+      input.host_id || null,
     ];
 
     const result = await pool.query<GameRow>(query, values);
@@ -83,6 +84,31 @@ export class GamesRepository {
     const pool = getPool();
     const query = 'UPDATE games SET total_words_found = total_words_found + 1 WHERE id = $1';
     await pool.query(query, [id]);
+  }
+
+  /**
+   * Set or update the host of a game
+   */
+  async setHost(gameId: string, hostId: string): Promise<GameRow> {
+    const pool = getPool();
+    const query = 'UPDATE games SET host_id = $1 WHERE id = $2 RETURNING *';
+    const result = await pool.query<GameRow>(query, [hostId, gameId]);
+    return result.rows[0];
+  }
+
+  /**
+   * Get game with host information
+   */
+  async findWithHost(id: string): Promise<GameRow | null> {
+    const pool = getPool();
+    const query = `
+      SELECT g.*, hp.player_name as host_name, hp.avatar as host_avatar
+      FROM games g
+      LEFT JOIN game_players hp ON g.host_id = hp.id
+      WHERE g.id = $1
+    `;
+    const result = await pool.query<GameRow>(query, [id]);
+    return result.rows[0] || null;
   }
 }
 
