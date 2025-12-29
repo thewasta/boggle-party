@@ -23,21 +23,66 @@ Boggle Party is a real-time multiplayer Boggle game in Spanish. Players find wor
 
 ## Development Commands
 
-**Use `pnpm` for all package management - never npm.**
+**IMPORTANT: Use `pnpm` for all package management - never npm.**
 
 ```bash
+# Local development (outside Docker)
 pnpm dev              # Start development server
 pnpm build            # Build for production
 pnpm start            # Start production server
 pnpm lint             # Run Biome linter
 pnpm format           # Format code with Biome
+
+# Database migrations
+pnpm migrate          # Run database migrations (uses tsx)
+
+# Package execution (use pnpm exec instead of npx)
+pnpm exec tsx <file>  # Execute TypeScript files
+pnpm exec <command>   # Run package binaries (instead of npx)
 ```
 
 **Biome is used for linting and formatting**, not ESLint/Prettier. It automatically organizes imports on save.
 
+## Docker Development
+
+The application runs in Docker containers for local development:
+
+```bash
+# Start all services (web + db)
+docker compose up -d
+
+# View logs
+docker compose logs -f web
+docker compose logs -f db
+
+# Stop services
+docker compose down
+
+# Restart web service after code changes
+docker compose up -d --build web
+
+# Run commands in web container
+docker compose exec web pnpm <command>
+docker compose exec web pnpm exec tsx src/server/db/migrate.ts
+
+# Access PostgreSQL directly
+docker compose exec db psql -U boggle_user -d boggle_party
+
+# Clean slate (remove volumes)
+docker compose down -v
+```
+
+**Services:**
+- `web` - Next.js application on port 3000
+- `db` - PostgreSQL 16 on port 5432
+
 ## Package Manager
 
-**ALWAYS use `pnpm`, never npm.** When you encounter `npx` commands, use the pnpm equivalent instead (e.g., `pnpm dlx` instead of `npx`).
+**ALWAYS use `pnpm`, never npm.**
+
+- **Instead of `npx`**, use `pnpm exec` or `pnpm dlx`
+- Example: `pnpm exec tsx file.ts` instead of `npx tsx file.ts`
+- In Docker: Always use `docker compose exec web pnpm <command>`
 
 ## High-Level Architecture
 
@@ -58,6 +103,31 @@ Events:
 - `game-ended`: Transition to results screen
 - `reveal-word`: Individual word reveal during scoring sequence
 - `results-complete`: End of reveal, show final ranking
+
+### Database & Persistence (Epic 1 & 2 - Completed)
+
+**PostgreSQL Database:**
+- Database: `boggle_party` (PostgreSQL 16)
+- Connection pooling configured (max 20 clients)
+- **Active game state**: In-memory on server (Map structure) for performance
+- **Historical data**: Persisted to database for analytics
+
+**Database Tables:**
+- `games` - Game metadata (room_code, grid_size, duration, status, timestamps)
+- `game_players` - Players in each game with final scores
+- `game_words` - All words found during games with scores and uniqueness
+- `schema_migrations` - Migration tracking
+
+**Repository Pattern:**
+All database access goes through repository classes in `src/server/db/repositories/`:
+- `gamesRepository` - CRUD operations for games
+- `playersRepository` - CRUD operations for players
+- `wordsRepository` - CRUD operations for words
+
+**Migrations:**
+- SQL-based migrations in `src/server/db/migrations/`
+- Run with: `pnpm migrate` or `docker compose exec web pnpm migrate`
+- Custom migration runner in `src/server/db/migrate.ts`
 
 ### Word Validation
 
@@ -105,10 +175,19 @@ Letter distribution follows Spanish frequency (E, A, O most common; W, K, X rare
 ## Environment Variables Required
 
 ```env
+# Database
+POSTGRES_DB=boggle_party
+POSTGRES_USER=boggle_user
+POSTGRES_PASSWORD=dev_password_change_me
+DATABASE_URL=postgresql://boggle_user:dev_password_change_me@db:5432/boggle_party
+
+# Pusher
 PUSHER_APP_ID=your_app_id
 PUSHER_KEY=your_key
 PUSHER_SECRET=your_secret
 PUSHER_CLUSTER=your_cluster
+PUSHER_USE_TLS=true
+
 NEXT_PUBLIC_PUSHER_KEY=your_key
 NEXT_PUBLIC_PUSHER_CLUSTER=your_cluster
 ```
@@ -118,18 +197,33 @@ NEXT_PUBLIC_PUSHER_CLUSTER=your_cluster
 ```
 src/
 ├── app/                    # Next.js App Router pages
+│   ├── api/               # API routes
+│   │   ├── health/        # Health check endpoint
+│   │   └── db/            # Database endpoints
+│   └── ...
 ├── components/             # React components
 ├── lib/                    # Shared utilities
+├── server/                 # Server-side code
+│   └── db/                # Database layer
+│       ├── connection.ts   # PostgreSQL connection pool
+│       ├── schema.ts       # TypeScript schema types
+│       ├── migrate.ts      # Migration runner
+│       ├── migrations/     # SQL migration files
+│       └── repositories/   # Repository pattern
+│           ├── games.repository.ts
+│           ├── players.repository.ts
+│           └── words.repository.ts
 ├── types/                  # TypeScript type definitions
 └── styles/                 # Global styles (if needed)
 
-server/                     # Server-side code
-├── dictionary.ts           # Spanish dictionary loader
-├── rooms-manager.ts        # Room state management
-└── board-generator.ts      # Board generation logic
-
 data/
-└── dictionary.json         # Spanish words dictionary
+└── dictionary.json         # Spanish words dictionary (7.9MB)
+
+docs/
+└── plans/                  # Epic implementation plans
+    ├── 2025-12-29-boggle-party-epics.md
+    ├── 2025-12-29-epic-1-docker-infrastructure.md
+    └── 2025-12-29-epic-2-database-schema.md
 ```
 
 ## Important Implementation Notes
@@ -141,14 +235,16 @@ data/
 - **Sequential word reveal**: Server emits `reveal-word` events one by one with 1-2s delay for dramatic effect
 - **Touch interaction**: Touch-drag-release to select letters, visual line shows current selection
 
-## Dependencies to Install
+## Current Implementation Status
 
-The project needs these additional packages (not yet installed):
+**Completed Epics:**
+- ✅ **Epic 1: Docker & Infrastructure** - Docker Compose setup with web and db services, health check endpoint
+- 🔄 **Epic 2: Database Schema** (50% complete) - PostgreSQL schema, migrations, and repositories (in progress)
 
-```bash
-pnpm add pusher pusher-js zod nanoid
-pnpm add -D @types/pusher-js
-```
+**Next Epic:**
+- Epic 3: Server-Side Core - Room Management System
+
+See `docs/plans/2025-12-29-boggle-party-epics.md` for full project roadmap.
 
 ## Path Aliases
 
@@ -157,3 +253,63 @@ pnpm add -D @types/pusher-js
 ## React Compiler
 
 The project uses React Compiler (`reactCompiler: true` in next.config.ts) - optimize for automatic memoization.
+
+## Database Development Workflow
+
+**Running Migrations:**
+```bash
+# Inside Docker container
+docker compose exec web pnpm migrate
+
+# Or via psql directly
+docker compose exec db psql -U boggle_user -d boggle_party -f - < src/server/db/migrations/001_initial_schema.sql
+
+# Check migration status
+docker compose exec db psql -U boggle_user -d boggle_party -c "SELECT * FROM schema_migrations;"
+```
+
+**Direct Database Access:**
+```bash
+# Access psql shell
+docker compose exec db psql -U boggle_user -d boggle_party
+
+# List tables
+\dt
+
+# Describe table
+\d games
+
+# Run query and exit
+docker compose exec db psql -U boggle_user -d boggle_party -c "SELECT * FROM games LIMIT 5;"
+```
+
+**Repository Usage:**
+```typescript
+import { gamesRepository, playersRepository, wordsRepository } from '@/server/db/repositories';
+
+// Create a game
+const game = await gamesRepository.create({
+  room_code: 'ABC123',
+  grid_size: 4,
+  duration: 120,
+  status: 'waiting',
+});
+
+// Add players
+const player = await playersRepository.create({
+  game_id: game.id,
+  player_name: 'Alice',
+  avatar: '🎮',
+});
+
+// Record found words
+await wordsRepository.create({
+  game_id: game.id,
+  player_id: player.id,
+  word: 'HOLA',
+  score: 4,
+  is_unique: true,
+});
+```
+
+**Note:** Active game room state is managed in-memory (server-side Map). The database is only for historical records and analytics after games complete.
