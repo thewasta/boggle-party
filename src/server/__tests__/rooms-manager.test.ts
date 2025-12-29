@@ -2,6 +2,18 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { RoomsManager } from '../rooms-manager';
 import type { Player, Room } from '../types';
 
+function createMockPlayer(id: string, name: string): Player {
+  return {
+    id,
+    name,
+    avatar: '🎮',
+    isHost: true,
+    score: 0,
+    foundWords: [],
+    createdAt: new Date(),
+  };
+}
+
 describe('RoomsManager', () => {
   let manager: RoomsManager;
 
@@ -314,5 +326,40 @@ describe('RoomsManager', () => {
     it('should return 0 for non-existent room', () => {
       expect(manager.playerCount('INVALID')).toBe(0);
     });
+  });
+});
+
+describe('RoomsManager - Stress Tests', () => {
+  it('should generate unique codes even with many rooms', () => {
+    const manager = new RoomsManager();
+    const player = createMockPlayer('player-1', 'Alice');
+    const codes = new Set<string>();
+
+    // Create 1000 rooms
+    for (let i = 0; i < 1000; i++) {
+      const room = manager.createRoom(player, 4);
+      codes.add(room.code);
+    }
+
+    // All codes should be unique
+    expect(codes.size).toBe(1000);
+  });
+
+  it('should handle concurrent room creation', async () => {
+    const manager = new RoomsManager();
+    const codes = new Set<string>();
+
+    // Create rooms concurrently
+    const promises = Array.from({ length: 100 }, async (_, i) => {
+      const player = createMockPlayer(`player-${i}`, `Player${i}`);
+      const room = manager.createRoom(player, 4);
+      return room.code;
+    });
+
+    const results = await Promise.all(promises);
+    results.forEach(code => codes.add(code));
+
+    // All codes should be unique
+    expect(codes.size).toBe(100);
   });
 });
