@@ -8,8 +8,8 @@ export class GamesRepository {
   async create(input: CreateGameInput): Promise<GameRow> {
     const pool = getPool();
     const query = `
-      INSERT INTO games (id, room_code, grid_size, duration, status, created_at, host_id)
-      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6)
+      INSERT INTO games (id, room_code, grid_size, duration, status, created_at, host_id, board)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `;
     const values = [
@@ -19,6 +19,7 @@ export class GamesRepository {
       input.status,
       input.created_at,
       input.host_id || null,
+      input.board ? JSON.stringify(input.board) : null,
     ];
 
     const result = await pool.query<GameRow>(query, values);
@@ -109,6 +110,18 @@ export class GamesRepository {
     `;
     const result = await pool.query<GameRow>(query, [id]);
     return result.rows[0] || null;
+  }
+
+  /**
+   * Set or update the shared board for a game
+   */
+  async setBoard(gameId: string, board: string[][]): Promise<GameRow> {
+    const pool = getPool();
+    const result = await pool.query<GameRow>(
+      'UPDATE games SET board = $1 WHERE id = $2 RETURNING *',
+      [JSON.stringify(board), gameId]
+    );
+    return result.rows[0];
   }
 }
 

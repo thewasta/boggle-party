@@ -62,7 +62,6 @@ type Player = {
   avatar: string;
   score: number;
   foundWords: string[];
-  board: string[][];
 }
 
 type WordSubmission = {
@@ -76,7 +75,7 @@ type WordSubmission = {
 
 - `player-joined`: Nuevo jugador se une a la sala
 - `player-left`: Jugador abandona la sala
-- `game-started`: Juego inicia, incluye startTime, duration, board
+- `game-started`: Juego inicia, incluye startTime, duration (board is shared in Room state)
 - `game-ended`: Tiempo finalizado, transición a resultados
 - `reveal-word`: Palabra revelada individualmente (secuencia)
 - `results-complete`: Fin de revelación, mostrar ranking final
@@ -90,7 +89,7 @@ type WordSubmission = {
 - Distribución de letras según frecuencias del español (similar a Scrabble)
 - Vocales más frecuentes (E, A, O) que consonantes raras (W, K, X)
 - Generación aleatoria ponderada por frecuencia
-- Tablero único por jugador (cada uno tiene su propio tablero)
+- **Tablero compartido por sala** (reglas tradicionales de Boggle) - todos los jugadores ven el mismo tablero
 
 ### Interacción Táctil
 
@@ -153,8 +152,8 @@ type WordSubmission = {
 ### Fase 3: Juego Activo
 
 - Countdown: 3-2-1 sincronizado en todos los clientes
-- Servidor genera tablero único por jugador
-- Evento `game-started` con: `{startTime, duration, board}`
+- Servidor genera tablero compartido para la sala
+- Evento `game-started` con: `{startTime, duration, board}` (mismo board para todos)
 - Todos inician timer simultáneo
 - Jugadores arrastran para formar palabras
 - Cliente envía palabras a `POST /api/games/{roomId}/words`

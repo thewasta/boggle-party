@@ -9,15 +9,14 @@ export class PlayersRepository {
     const pool = getPool();
 
     const result = await pool.query<GamePlayerRow>(
-      `INSERT INTO game_players (game_id, player_name, avatar, is_host, board)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO game_players (game_id, player_name, avatar, is_host)
+       VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [
         input.game_id,
         input.player_name,
         input.avatar,
         input.is_host || false,
-        input.board || null,
       ]
     );
 
@@ -82,18 +81,6 @@ export class PlayersRepository {
     const result = await pool.query<GamePlayerRow>(
       'UPDATE game_players SET is_host = $1 WHERE id = $2 RETURNING *',
       [isHost, playerId]
-    );
-    return result.rows[0];
-  }
-
-  /**
-   * Set or update the board for a player
-   */
-  async setBoard(playerId: string, board: string[][]): Promise<GamePlayerRow> {
-    const pool = getPool();
-    const result = await pool.query<GamePlayerRow>(
-      'UPDATE game_players SET board = $1 WHERE id = $2 RETURNING *',
-      [JSON.stringify(board), playerId]
     );
     return result.rows[0];
   }

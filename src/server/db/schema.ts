@@ -24,6 +24,7 @@ export interface GameRow {
   duration: number; // in seconds
   status: GameStatus;
   host_id: string | null; // UUID of the host player
+  board: string[][] | null; // shared board for all players in this game
   created_at: Date;
   started_at: Date | null;
   ended_at: Date | null;
@@ -39,7 +40,6 @@ export interface GamePlayerRow {
   player_name: string;
   avatar: string;
   is_host: boolean; // true if this player is the host
-  board: string[][] | null; // unique board grid for this player
   final_score: number;
   words_found: number;
   unique_words_found: number;
@@ -75,6 +75,7 @@ export interface CreateGameInput {
   status: GameStatus;
   created_at: Date;
   host_id?: string | null; // Optional: can be set later
+  board?: string[][] | null; // Optional: shared board for all players
 }
 
 /**
@@ -85,7 +86,6 @@ export interface CreatePlayerInput {
   player_name: string;
   avatar: string;
   is_host?: boolean;
-  board?: string[][] | null;
   final_score?: number;
   words_found?: number;
   unique_words_found?: number;

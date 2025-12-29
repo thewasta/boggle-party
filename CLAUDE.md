@@ -17,7 +17,7 @@ Boggle Party is a real-time multiplayer Boggle game in Spanish. Players find wor
 **Key Architecture:**
 - Centralized server with Next.js API routes handling room creation, board generation, and word validation
 - Pusher for real-time events (player joined/left, game started/ended, word reveals)
-- Each player gets a unique board generated from Spanish letter frequency distribution
+- **Shared board per room** (traditional Boggle rules) - all players see the same board and compete to find words
 - Server-side validation prevents cheating
 - Room state stored in server memory (Map structure)
 
@@ -113,7 +113,7 @@ Events:
 - **Historical data**: Persisted to database for analytics
 
 **Database Tables:**
-- `games` - Game metadata (room_code, grid_size, duration, status, timestamps)
+- `games` - Game metadata (room_code, grid_size, duration, status, **shared board**, timestamps)
 - `game_players` - Players in each game with final scores
 - `game_words` - All words found during games with scores and uniqueness
 - `schema_migrations` - Migration tracking
@@ -162,7 +162,6 @@ Player = {
   avatar: string
   score: number
   foundWords: string[]
-  board: string[][]         // Unique grid per player
 }
 ```
 
@@ -229,7 +228,7 @@ docs/
 ## Important Implementation Notes
 
 - **Grid size determines game duration**: 4×4=2min, 5×5=3min, 6×6=6min
-- **Each player has a unique board** - generated when game starts, not shared
+- **Shared board per room** - All players see the same board and compete to find words (traditional Boggle rules)
 - **Minimum 2 players required** to start a game
 - **Word submission includes path**: Array of {row, col} coordinates to validate adjacency
 - **Sequential word reveal**: Server emits `reveal-word` events one by one with 1-2s delay for dramatic effect
