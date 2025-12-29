@@ -227,6 +227,17 @@ export class RoomsManager {
   getRoomCount(): number {
     return this.rooms.size;
   }
+
+  /**
+   * Clear all rooms (TEST ONLY)
+   */
+  clearAllRoomsForTesting(): void {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('clearAllRoomsForTesting should only be called in test environment');
+    }
+
+    this.rooms.clear();
+  }
 }
 
 // Export singleton instance

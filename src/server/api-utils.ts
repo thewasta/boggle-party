@@ -11,7 +11,7 @@ export function apiError(
     {
       success: false,
       error: message,
-      ...(details && { details }),
+      ...(details ? { details } : {}),
     },
     { status }
   );
