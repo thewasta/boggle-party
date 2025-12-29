@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "migrate": "tsx src/server/db/migrate.ts"
+    "migrate": "tsx src/server/db/migrate.ts",
+    "test": "vitest"
   },
   "dependencies": {
     "nanoid": "^5.1.6",
@@ -27,9 +28,11 @@
     "@types/pusher-js": "^5.1.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/ui": "^4.0.16",
     "babel-plugin-react-compiler": "1.0.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.16"
   }
 }
