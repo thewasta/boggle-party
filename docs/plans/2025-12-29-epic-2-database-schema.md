@@ -11,6 +11,12 @@
 - Connection pooling (already configured in src/server/db/connection.ts)
 - Database used for historical records, not active game state (in-memory)
 
+**IMPORTANT - Board Architecture:**
+- **Shared board per room** (traditional Boggle rules) - implemented in Migration 003
+- All players in a room see the SAME board and compete to find words
+- The `board` field is stored in the `games` table (NOT per-player)
+- This aligns with classic Boggle gameplay where players compete on identical boards
+
 **Tech Stack:**
 - PostgreSQL 16 with node-postgres (pg)
 - TypeScript 5
@@ -32,9 +38,29 @@
 ## Implementation Status
 
 **Started:** 2025-12-29
-**Last Updated:** 2025-12-29 22:08
+**Last Updated:** 2025-12-29 22:30
 **Progress:** 7 of 14 tasks completed (50%)
-**Schema Fixes Applied:** Migration 002 - Added missing critical fields
+**Total Migrations:** 3 (001, 002, 003)
+
+### 🔧 Additional Migrations Applied
+
+Beyond the original plan, two additional migrations were created to fix critical design issues:
+
+**Migration 002: add_missing_critical_fields** (2025-12-29 22:08)
+- Added `host_id` to games table (room ownership)
+- Added `is_host` to game_players table (identify host player)
+- Added `board` to game_players table (initially per-player)
+- Added `word_length` to game_words table (scoring analytics)
+- Added `path` to game_words table (word validation coordinates)
+- Created indexes: `idx_game_words_length`, `idx_game_players_game_host`
+
+**Migration 003: move_board_to_games** (2025-12-29 22:30)
+- **CRITICAL DESIGN CHANGE:** Moved `board` from game_players to games table
+- Boggle Party uses **shared boards per room** (traditional Boggle rules)
+- All players in a room see the same board and compete to find words
+- Removed `board` from game_players (no longer needed)
+- Created GIN index: `idx_games_board` for JSONB queries
+- Updated all repositories to reflect shared board architecture
 
 ### ✅ Completed Tasks
 
@@ -65,17 +91,23 @@
    - Status: Completed
    - Files: `src/server/db/repositories/games.repository.ts`
    - Methods: create, findById, findByRoomCode, updateStatus, incrementWordsFound
+   - Updated with Migration 002: setHost(), findWithHost()
+   - Updated with Migration 003: setBoard() (shared board per room)
    - Commit: 1f6c9a0
 
 6. **Task 6: Create Players Repository** ✅
    - Status: Completed
    - Files: `src/server/db/repositories/players.repository.ts`
    - Methods: create, findById, findByGameId, updateScore
+   - Updated with Migration 002: setHost(), findHostByGameId()
+   - Removed with Migration 003: setBoard() (moved to games repository)
 
 7. **Task 7: Create Words Repository** ✅
    - Status: Completed
    - Files: `src/server/db/repositories/words.repository.ts`
    - Methods: create, findByGameId, findByPlayerId, countUniqueWords, wordExistsInGame
+   - Updated with Migration 002: create() supports word_length and path
+   - Added with Migration 002: findByWordLength(), getScoringAnalytics()
 
 ### 📋 Pending Tasks (7 remaining)
 
@@ -89,9 +121,14 @@
 
 ### 📊 Progress Summary
 
-- **Database Schema:** ✅ Complete (all tables and indexes created)
-- **Migration System:** ✅ Complete (runner script + SQL migration)
-- **Repositories:** ✅ Complete (games, players, words)
+- **Database Schema:** ✅ Complete (3 migrations applied - 001, 002, 003)
+- **Migration System:** ✅ Complete (runner script + 3 SQL migrations)
+- **Repositories:** ✅ Complete (games, players, words with all schema updates)
+- **Schema Features:**
+  - ✅ Shared board per room (traditional Boggle rules)
+  - ✅ Host identification (host_id, is_host flags)
+  - ✅ Word validation paths (path coordinates)
+  - ✅ Scoring analytics (word_length field)
 - **Tests:** ⏳ Pending
 - **Documentation:** ⏳ Pending
 - **API Endpoints:** ⏳ Pending
