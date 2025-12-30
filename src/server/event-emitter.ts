@@ -10,6 +10,8 @@ import type {
   GameStartedEvent,
   GameEndedEvent,
   WordFoundEvent,
+  RevealWordEvent,
+  ResultsCompleteEvent,
   Player,
 } from './types';
 
@@ -65,4 +67,31 @@ export async function emitWordFound(roomId: string, playerId: string, playerName
     score,
     isUnique,
   } satisfies WordFoundEvent);
+}
+
+/**
+ * Emit reveal-word event (results phase - sequential word reveal)
+ */
+export async function emitRevealWord(
+  roomId: string,
+  word: string,
+  player: { id: string; name: string; avatar: string },
+  score: number,
+  isUnique: boolean
+): Promise<void> {
+  await triggerEvent(`presence-game-${roomId}`, 'reveal-word', {
+    word,
+    player,
+    score,
+    isUnique,
+  } satisfies RevealWordEvent);
+}
+
+/**
+ * Emit results-complete event (end of reveal phase)
+ */
+export async function emitResultsComplete(roomId: string, finalRankings: Array<{ id: string; name: string; avatar: string; score: number }>): Promise<void> {
+  await triggerEvent(`presence-game-${roomId}`, 'results-complete', {
+    finalRankings,
+  } satisfies ResultsCompleteEvent);
 }
