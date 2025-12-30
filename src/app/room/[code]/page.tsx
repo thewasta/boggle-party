@@ -67,12 +67,17 @@ function WaitingRoomClient(props: {
   const [gridSize, setGridSize] = useState<GridSize>(props.initialGridSize);
   const [status, setStatus] = useState(props.initialStatus);
   const [isStarting, setIsStarting] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const isHost = props.currentPlayerId === props.initialHost.id;
 
   useEffect(() => {
     if (status === 'playing') {
-      router.push(`/game/${props.roomCode}?playerId=${props.currentPlayerId}`);
+      setError('El juego ya empezó');
+      const timer = setTimeout(() => {
+        router.push(`/game/${props.roomCode}?playerId=${props.currentPlayerId}`);
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, [status, props.roomCode, props.currentPlayerId, router]);
 
@@ -124,6 +129,14 @@ function WaitingRoomClient(props: {
 
       <div className="relative z-10 min-h-screen py-12 px-4">
         <div className="max-w-lg mx-auto">
+          {/* Error Display */}
+          {error && (
+            <div className="mb-4 bg-red-100 dark:bg-red-900/30 border-2 border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-3">
+              <span className="text-xl">⚠️</span>
+              <p className="font-medium">{error}</p>
+            </div>
+          )}
+
           {/* Main Card */}
           <div className="bg-white rounded-2xl shadow-xl border-2 border-indigo-100 p-8 space-y-8">
             {/* Header with Room Code */}
