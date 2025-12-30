@@ -33,6 +33,7 @@ export function GameBoard({
 }: GameBoardProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [hoveredCell, setHoveredCell] = useState<Cell | null>(null);
   const lastCellRef = useRef<Cell | null>(null);
 
   const gridSize = board.length;
@@ -46,8 +47,9 @@ export function GameBoard({
    * Check if a cell can be added to selection (adjacent to last cell)
    */
   const canAddCell = useCallback((cell: Cell): boolean => {
+    // Can't add already selected cells
     if (selectedCellsSet.has(`${cell.row},${cell.col}`)) {
-      return false; // Already selected
+      return false;
     }
 
     if (selection.cells.length === 0) {
@@ -94,7 +96,7 @@ export function GameBoard({
   }, [isLocked, gridSize, getSelectedCell, onSelectionStart]);
 
   /**
-   * Handle pointer move (extend selection)
+   * Handle pointer move (extend selection or backtrack)
    */
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging || isLocked) return;
@@ -106,6 +108,10 @@ export function GameBoard({
     const y = e.clientY - rect.top;
 
     const cell = getCellFromCoordinates(x, y, CELL_SIZE, CELL_GAP, gridSize);
+
+    // Update hovered cell for visual feedback (even if null)
+    setHoveredCell(cell);
+
     if (!cell) return;
 
     // Skip if same as last cell
@@ -113,6 +119,7 @@ export function GameBoard({
       return;
     }
 
+    // Add new cell if valid (not already selected and adjacent)
     if (canAddCell(cell)) {
       lastCellRef.current = cell;
       const selectedCell = getSelectedCell(cell);
@@ -127,6 +134,7 @@ export function GameBoard({
     if (!isDragging) return;
 
     setIsDragging(false);
+    setHoveredCell(null);
     lastCellRef.current = null;
 
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
@@ -202,6 +210,8 @@ export function GameBoard({
           row.map((letter, colIndex) => {
             const cell = { row: rowIndex, col: colIndex };
             const isSelected = selectedCellsSet.has(`${rowIndex},${colIndex}`);
+            const isHovered = isDragging && hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex;
+            const isValidNext = isDragging && !isSelected && canAddCell(cell);
 
             return (
               <div
@@ -213,16 +223,25 @@ export function GameBoard({
                   relative overflow-hidden
                   ${isSelected
                     ? 'bg-indigo-600 text-white shadow-lg scale-105 z-10'
-                    : 'bg-indigo-100 text-indigo-900 hover:bg-indigo-200'
+                    : isHovered && isValidNext
+                      ? 'bg-indigo-400 text-white shadow-lg scale-105'
+                      : isHovered
+                        ? 'bg-indigo-200 text-indigo-900 scale-102'
+                        : 'bg-indigo-100 text-indigo-900'
                   }
+                  ${!isSelected && !isLocked ? 'hover:bg-indigo-200' : ''}
                   ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                  ${!isLocked && !isSelected ? 'hover:scale-102 hover:shadow-md' : ''}
+                  ${!isLocked && !isSelected && !isHovered ? 'hover:scale-102 hover:shadow-md' : ''}
                 `}
                 style={{ transformOrigin: 'center' }}
               >
                 {/* Subtle shine effect for unselected cells */}
-                {!isSelected && (
+                {!isSelected && !isHovered && (
                   <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-xl pointer-events-none" />
+                )}
+                {/* Highlight ring for valid next cell during drag */}
+                {isHovered && isValidNext && !isSelected && (
+                  <div className="absolute inset-0 -m-1 border-2 border-indigo-500 rounded-xl pointer-events-none animate-pulse" />
                 )}
                 {letter}
               </div>
