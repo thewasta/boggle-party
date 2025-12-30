@@ -148,8 +148,14 @@ function GameClient(props: {
   const { gameState, setGameState, timerState } = useGameSync({
     roomId: props.roomId,
     playerId: props.playerId,
-    onGameEnd: () => {
+    onGameEnd: async () => {
       props.setIsLocked(true);
+      // Call the end game endpoint to change room status to 'finished'
+      try {
+        await fetch(`/api/rooms/${props.roomCode}/end`, { method: 'POST' });
+      } catch (error) {
+        console.error('Failed to end game:', error);
+      }
       // Navigate to results page after delay using roomCode
       setTimeout(() => router.push(`/results/${props.roomCode}?playerId=${props.playerId}`), 2000);
     },
