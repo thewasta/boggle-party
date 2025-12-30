@@ -7,7 +7,8 @@
 "use client";
 
 import { useRef, useCallback, useState, useMemo } from 'react';
-import type { Cell, SelectedCell, WordSelection } from '@/types/game';
+import type { Cell } from '@/server/types';
+import type { SelectedCell, WordSelection } from '@/types/game';
 import { getAdjacentCells, calculateCellPosition, getCellFromCoordinates } from '@/lib/board-utils';
 
 interface GameBoardProps {
