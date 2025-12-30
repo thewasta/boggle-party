@@ -206,3 +206,80 @@ body {
 .animate-sparkle-4 {
   animation: sparkle-4 1.2s ease-in-out infinite;
 }
+
+/* Final ranking celebration animations */
+@keyframes celebrate {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.05) rotate(-3deg); }
+  50% { transform: scale(1.1) rotate(0deg); }
+  75% { transform: scale(1.05) rotate(3deg); }
+}
+
+@keyframes trophy-bounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-15px) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(10deg);
+  }
+}
+
+@keyframes podium-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(50px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes medal-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes medal-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.8));
+  }
+}
+
+.animate-celebrate {
+  animation: celebrate 1s ease-in-out;
+}
+
+.animate-trophy-bounce {
+  animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+.animate-podium-appear {
+  animation: podium-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+
+.animate-medal-float {
+  animation: medal-float 2s ease-in-out infinite;
+}
+
+.animate-medal-glow {
+  animation: medal-glow 2s ease-in-out infinite;
+}

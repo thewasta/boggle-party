@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { usePusherChannel } from '@/hooks/usePusherChannel';
 import { ScoreStairs } from '@/components/results/ScoreStairs';
 import { WordReveal } from '@/components/results/WordReveal';
+import { FinalRanking } from '@/components/results/FinalRanking';
 
 export interface PlayerScore {
   id: string;
@@ -130,18 +131,6 @@ export default function ResultsPage() {
           ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-// Placeholder components - will be implemented in next tasks
-function FinalRanking({ playerScores }: { playerScores: PlayerScore[] }) {
-  return (
-    <div className="text-center">
-      <h2 className="text-3xl font-bold text-indigo-900 mb-6">¡Resultados finales!</h2>
-      {playerScores.map((p) => (
-        <div key={p.id} className="py-2">{p.name}: {p.score}</div>
-      ))}
     </div>
   );
 }
