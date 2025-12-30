@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { roomsManager } from '@/server/rooms-manager';
-import { generateBoard } from '@/server/board-generator';
+import { generateBoard, generateGoodBoard } from '@/server/board-generator';
 import { startGameSchema } from '@/server/validation';
 import { emitGameStarted } from '@/server/event-emitter';
 import type { RouteParams } from '@/server/types';
@@ -41,7 +41,7 @@ export async function POST(
     }
 
     // Generate board
-    const board = generateBoard(gridSize);
+    const {board, allWords} = await generateGoodBoard(gridSize);
 
     // Calculate duration
     const duration = roomsManager.getDefaultDuration(gridSize);
@@ -64,6 +64,7 @@ export async function POST(
       startTime: updatedRoom.startTime!,
       duration,
       board,
+      totalPossibleWords: allWords.length
     });
   } catch (error) {
     console.error('Start game error:', error);
