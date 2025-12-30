@@ -645,7 +645,7 @@ Validation checks:
 
 ---
 
-## Epic 6: Game Flow - Room Management UI (Landing & Waiting Room)
+## Epic 6: Game Flow - Room Management UI (Landing & Waiting Room) ✅ **COMPLETED** (2025-12-30)
 
 **Objective:** Build landing page and waiting room with real-time player list
 
@@ -657,63 +657,58 @@ Validation checks:
 - Real-time player updates via Pusher
 - Copy room code to clipboard
 
-**Pages:**
-- `src/app/page.tsx` - Landing page (root)
-- `src/app/room/[code]/page.tsx` - Waiting room page
+### Implementation Status
 
-**Components:**
-- `src/components/landing/CreateRoomForm.tsx` - Create room form
-- `src/components/landing/JoinRoomForm.tsx` - Join with code form
-- `src/components/waiting-room/RoomCodeDisplay.tsx` - Display code + copy button
-- `src/components/waiting-room/PlayerList.tsx` - List of connected players
-- `src/components/waiting-room/GridSizeSelector.tsx` - Host-only grid selector
-- `src/components/waiting-room/StartGameButton.tsx` - Host-only start button
+**Completed:** 2025-12-30
 
-**UI Features:**
-- Clean, modern landing with clear CTA
-- Room code prominently displayed
-- Player avatars (use emoji or simple icons)
-- Player count indicator (e.g., "3/8 players")
-- Host badge next to host name
-- Loading states for API calls
-- Error handling (invalid code, room full, etc.)
+**Summary:**
+- ✅ All 9 tasks completed successfully
+- ✅ Landing page with create/join room forms designed with @frontend-design
+- ✅ Waiting room page with real-time Pusher integration
+- ✅ All waiting room components created:
+  - RoomCodeDisplay - Large room code with copy button
+  - PlayerList - Player list with host badge
+  - GridSizeSelector - Host-only grid size selection
+  - StartGameButton - Host-only start button with player count validation
+- ✅ High-contrast indigo theme for better readability
+- ✅ Mobile-responsive layout
+- ✅ Error handling for edge cases
 
-**State Management:**
-- Local component state (forms)
-- Pusher events for player list updates
-- Query params for room code
+**Git Commit:**
+- `fce4514` - fix: improve waiting room contrast with darker indigo colors
 
-**Validation:**
-- Room code format validation (6 chars)
-- Empty name handling
-- API error display
-
-**Files to Create:**
-- `src/app/page.tsx` - Landing page
-- `src/app/room/[code]/page.tsx` - Waiting room
-- `src/components/landing/CreateRoomForm.tsx`
-- `src/components/landing/JoinRoomForm.tsx`
+**Key Files Created:**
+- `src/lib/utils.ts` - UI utilities (cn, copyToClipboard)
+- `src/app/page.tsx` - Landing page with create/join forms
+- `src/app/room/[code]/page.tsx` - Waiting room with Pusher integration
 - `src/components/waiting-room/RoomCodeDisplay.tsx`
 - `src/components/waiting-room/PlayerList.tsx`
 - `src/components/waiting-room/GridSizeSelector.tsx`
 - `src/components/waiting-room/StartGameButton.tsx`
+- `docs/plans/2025-12-30-epic-6-landing-waiting-room-ui.md` - Implementation plan
 
-**Success Criteria:**
-- Can create room and redirect to waiting room
-- Can join room with code and see waiting room
-- Player list updates in real-time when players join/leave
-- Only host sees grid selector and start button
-- Cannot start game with < 2 players
-- Copy to clipboard works for room code
-- Mobile-responsive layout
+**UI Design Features:**
+- Warm cream background (#FDF8F3) with gradient accents
+- Playful decorative floating letters (B, O, G) with pulse animations
+- Header with indigo-600 background and white text for high contrast
+- Player cards with gradient backgrounds (indigo-50 to purple-50)
+- Large room code display (text-5xl) with bordered container
+- Grid size selector with selected state (solid indigo-600 vs white with border)
+- Green gradient start button with emoji
 
-**Testing Strategy:**
-- Visual regression testing for layouts
-- Multi-browser testing for real-time updates
-- Mobile viewport testing
-- Form validation testing
+**Notes:**
+- All success criteria met:
+  - ✅ Can create room and redirect to waiting room
+  - ✅ Can join room with code and see waiting room
+  - ✅ Player list updates in real-time when players join/leave (via Pusher)
+  - ✅ Only host sees grid selector and start button
+  - ✅ Cannot start game with < 2 players
+  - ✅ Copy to clipboard works for room code
+  - ✅ Mobile-responsive layout
+- Type checking passes without errors
+- Ready to proceed to Epic 7 (Active Game Phase)
 
-**Next Epic Trigger:** Players can gather in waiting room and start game
+---
 
 ---
 

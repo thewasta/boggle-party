@@ -277,14 +277,17 @@ scripts/
 - ✅ **Epic 3: Room Management System** - In-memory room state, join/leave/start/end game
 - ✅ **Epic 4: Dictionary & Word Validation** - Spanish dictionary (636K→154K words), Trie structure, DFS solver
 - ✅ **Epic 5: Pusher Integration** - Real-time events, typed emitters, React hooks
+- ✅ **Epic 6: Landing & Waiting Room UI** - Landing page, waiting room with real-time player updates
 
 **Recent Improvements:**
 - **Board Generation:** Migrated from letter frequency formula to specialized Spanish dice
 - **Dictionary Cleaning:** Reduced from 636,598 to 153,894 words (~76%) while maintaining quality
 - **Quality Guaranteed Boards:** Boards validated for minimum word count (20-40 depending on grid size)
+- **Landing Page:** Playful design with warm cream background (#FDF8F3), gradient titles, decorative floating letters
+- **Waiting Room:** Real-time Pusher integration, host controls (grid selector, start game), high-contrast indigo theme
 
 **Next Epic:**
-- Epic 6: Landing & Waiting Room UI (Frontend)
+- Epic 7: Active Game Phase - Interactive game board with drag-to-select word input
 
 See `docs/plans/2025-12-29-boggle-party-epics.md` for full project roadmap.
 
