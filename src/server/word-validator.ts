@@ -100,13 +100,16 @@ export interface WordValidationInput {
 export function validateWord(input: WordValidationInput): ValidationResult {
   const { word, path, foundWords, gridSize } = input;
 
+  const trimmedWord = word.trim();
+  const normalizedWordLower = trimmedWord.toLowerCase();
+
   // Check minimum length
-  if (word.length < 3) {
+  if (trimmedWord.length < 3) {
     return { valid: false, score: 0, reason: 'Word too short' };
   }
 
   // Check path length matches word length
-  if (path.length !== word.length) {
+  if (path.length !== trimmedWord.length) {
     return { valid: false, score: 0, reason: 'Path length does not match word length' };
   }
 
@@ -116,22 +119,17 @@ export function validateWord(input: WordValidationInput): ValidationResult {
   }
 
   // Check duplicate submission (case-insensitive)
-  const normalizedWord = word.toLowerCase();
-  if (foundWords.some(w => w.toLowerCase() === normalizedWord)) {
+  if (foundWords.some((w) => w.toLowerCase() === normalizedWordLower)) {
     return { valid: false, score: 0, reason: 'Word already submitted' };
   }
 
-  // Check dictionary (will throw if dictionary not loaded)
-  try {
-    if (!esValida(word)) {
-      return { valid: false, score: 0, reason: 'Word not found in dictionary' };
-    }
-  } catch (error) {
-    return { valid: false, score: 0, reason: 'Dictionary not loaded' };
+  // Check dictionary
+  if (!esValida(normalizedWordLower)) {
+    return { valid: false, score: 0, reason: 'Word not found in dictionary' };
   }
 
   // Calculate score
-  const score = calculateScore(word);
+  const score = calculateScore(trimmedWord);
 
   return { valid: true, score, reason: '' };
 }

@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { getDictionary } from '../dictionary';
 import { calculateScore, areAdjacent, isValidPath, validateWord } from '../word-validator';
-import type { ValidationResult } from '../word-validator';
 
 describe('Word Validator - Scoring', () => {
   beforeAll(async () => {
@@ -9,7 +8,6 @@ describe('Word Validator - Scoring', () => {
   });
 
   it('should score 3-letter words as 1 point', () => {
-    expect(calculateScore('HOLA')).toBe(1); // 4 letters, but let's test
     expect(calculateScore('SOL')).toBe(1);
     expect(calculateScore('MAR')).toBe(1);
   });
@@ -20,14 +18,11 @@ describe('Word Validator - Scoring', () => {
   });
 
   it('should score 5-letter words as 2 points', () => {
-    expect(calculateScore('GATO')).toBe(1); // 4 letters
     expect(calculateScore('CINCO')).toBe(2);
     expect(calculateScore('LETRA')).toBe(2);
   });
 
   it('should score 6-letter words as 3 points', () => {
-    expect(calculateScore('SEIS')).toBe(1); // 4 letters
-    expect(calculateScore('MESA')).toBe(1); // 4 letters
     expect(calculateScore('LECHES')).toBe(3);
     expect(calculateScore('PLANTA')).toBe(3);
   });

@@ -31,8 +31,6 @@ describe('Dictionary', () => {
   });
 
   it('should reject words with accents if not in dictionary', () => {
-    // The dictionary may or may not have accented forms
-    // This test verifies the function works correctly
     const result = esValida('jalapeño');
     expect(typeof result).toBe('boolean');
   });

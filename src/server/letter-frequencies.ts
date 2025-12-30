@@ -35,11 +35,17 @@ export const SPANISH_LETTER_FREQUENCIES: Record<string, number> = {
   W: 0.1,
 };
 
+let weightedLetterArrayCache: string[] | null = null;
+
 /**
  * Weighted letter array for random selection
  * More frequent letters appear more times in the array
  */
 export function getWeightedLetterArray(): string[] {
+  if (weightedLetterArrayCache) {
+    return weightedLetterArrayCache;
+  }
+
   const weightedLetters: string[] = [];
 
   // Scale frequencies to get reasonable total count (~5000)
@@ -52,7 +58,8 @@ export function getWeightedLetterArray(): string[] {
     }
   }
 
-  return weightedLetters;
+  weightedLetterArrayCache = weightedLetters;
+  return weightedLetterArrayCache;
 }
 
 /**

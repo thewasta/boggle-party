@@ -68,7 +68,7 @@ export function isValidBoard(board: string[][]): boolean {
     }
 
     for (const cell of row) {
-      if (!cell || !/^[A-Z]$/.test(cell)) {
+      if (!cell || !/^[A-ZÑ]$/.test(cell)) {
         return false;
       }
     }

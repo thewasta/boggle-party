@@ -24,7 +24,7 @@ describe('Board Generator', () => {
     const board = generateBoard(4);
     for (const row of board) {
       for (const cell of row) {
-        expect(cell).toMatch(/^[A-Z]$/);
+        expect(cell).toMatch(/^[A-ZÑ]$/);
         expect(cell.length).toBe(1);
       }
     }

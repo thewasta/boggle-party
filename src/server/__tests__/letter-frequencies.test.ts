@@ -10,7 +10,7 @@ describe('Letter Frequencies', () => {
 
   it('should generate valid letters', () => {
     const letter = getRandomLetter();
-    expect(letter).toMatch(/^[A-Z]$/);
+    expect(letter).toMatch(/^[A-ZÑ]$/);
     expect(letter.length).toBe(1);
   });
 
