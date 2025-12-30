@@ -3,8 +3,7 @@ import { joinRoomSchema } from '@/server/validation';
 import { roomsManager } from '@/server/rooms-manager';
 import { handleValidationError, apiSuccess, apiError, getDefaultAvatar, handleRoomError } from '@/server/api-utils';
 import type { Player } from '@/server/types';
-import { triggerEvent } from '@/server/pusher-client';
-import type { PlayerJoinedEvent } from '@/server/types';
+import { emitPlayerJoined } from '@/server/event-emitter';
 
 export async function POST(
   request: NextRequest,
@@ -34,10 +33,7 @@ export async function POST(
       return apiError('Room not found', 404);
     }
 
-    await triggerEvent(`presence-game-${room.id}`, 'player-joined', {
-      player,
-      totalPlayers: room.players.size,
-    } satisfies PlayerJoinedEvent);
+    await emitPlayerJoined(room.id, player, room.players.size);
 
     return apiSuccess({
       room: roomsManager.roomToDTO(room),
