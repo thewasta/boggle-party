@@ -56,6 +56,7 @@ export function calculateCellPosition(
 
 /**
  * Get cell from row/col coordinates (touch/mouse event handling)
+ * Only returns a cell if the pointer is within the actual cell area, not the gap
  */
 export function getCellFromCoordinates(
   x: number,
@@ -68,9 +69,19 @@ export function getCellFromCoordinates(
   const col = Math.floor(x / totalSize);
   const row = Math.floor(y / totalSize);
 
-  if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
-    return { row, col };
+  if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) {
+    return null;
   }
 
-  return null;
+  // Calculate position within the cell slot (cell + gap)
+  const xInSlot = x % totalSize;
+  const yInSlot = y % totalSize;
+
+  // Only count if we're in the actual cell area, not the gap
+  // This makes diagonal selection more precise by avoiding the gaps
+  if (xInSlot >= cellSize || yInSlot >= cellSize) {
+    return null; // Pointer is in the gap between cells
+  }
+
+  return { row, col };
 }

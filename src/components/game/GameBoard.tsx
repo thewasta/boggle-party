@@ -187,7 +187,7 @@ export function GameBoard({
       {/* Board grid */}
       <div
         ref={boardRef}
-        className="grid bg-white border-4 border-indigo-300 rounded-2xl shadow-2xl p-2 select-none touch-none"
+        className="grid bg-white border-4 border-indigo-300 rounded-2xl shadow-2xl p-2 select-none touch-none overscroll-none"
         style={{
           gridTemplateColumns: `repeat(${gridSize}, ${CELL_SIZE}px)`,
           gridTemplateRows: `repeat(${gridSize}, ${CELL_SIZE}px)`,

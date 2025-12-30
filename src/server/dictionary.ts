@@ -63,17 +63,15 @@ export async function getDictionary(): Promise<Set<string>> {
 
 /**
  * Check if a word is valid Spanish (case-insensitive)
+ * Auto-initializes dictionary if not loaded
  */
-export function esValida(word: string): boolean {
-  if (!dictionary) {
-    throw new Error('Dictionary not loaded. Call getDictionary() first.');
-  }
-
+export async function esValida(word: string): Promise<boolean> {
   if (!word || word.length < 3) {
     return false;
   }
 
-  return dictionary.has(word.toLowerCase());
+  const dict = dictionary || await getDictionary();
+  return dict.has(word.toLowerCase());
 }
 
 /**

@@ -211,7 +211,7 @@ function WaitingRoomClient(props: {
         const response = await fetch(`/api/rooms/${props.roomCode}/start`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ gridSize }),
+          body: JSON.stringify({ gridSize: gridSize.toString() }),
         });
 
         if (!response.ok) {

@@ -97,7 +97,7 @@ export interface WordValidationInput {
  * Complete word validation
  * Checks: dictionary, adjacency, path validity, duplicates, length
  */
-export function validateWord(input: WordValidationInput): ValidationResult {
+export async function validateWord(input: WordValidationInput): Promise<ValidationResult> {
   const { word, path, foundWords, gridSize } = input;
 
   const trimmedWord = word.trim();
@@ -124,7 +124,8 @@ export function validateWord(input: WordValidationInput): ValidationResult {
   }
 
   // Check dictionary
-  if (!esValida(normalizedWordLower)) {
+  const isValid = await esValida(normalizedWordLower);
+  if (!isValid) {
     return { valid: false, score: 0, reason: 'Word not found in dictionary' };
   }
 

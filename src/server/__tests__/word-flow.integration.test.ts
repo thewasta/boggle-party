@@ -44,7 +44,7 @@ describe('Word Flow Integration Tests', () => {
     }
   });
 
-  it('should handle complete word submission flow', () => {
+  it('should handle complete word submission flow', async () => {
     // Create room
     const room = roomsManager.createRoom(host, 4);
     roomsManager.joinRoom(room.code, player2);
@@ -60,7 +60,7 @@ describe('Word Flow Integration Tests', () => {
     roomsManager.startGame(room.code, 120, board);
 
     // Player 1 submits word
-    const result1 = validateWord({
+    const result1 = await validateWord({
       word: 'HOLA',
       path: [
         { row: 0, col: 0 },
@@ -80,7 +80,7 @@ describe('Word Flow Integration Tests', () => {
     host.score += result1.score;
 
     // Player 2 submits same word (not duplicate for them)
-    const result2 = validateWord({
+    const result2 = await validateWord({
       word: 'HOLA',
       path: [
         { row: 0, col: 0 },
@@ -95,7 +95,7 @@ describe('Word Flow Integration Tests', () => {
     expect(result2.valid).toBe(true);
 
     // Player 1 tries duplicate
-    const result3 = validateWord({
+    const result3 = await validateWord({
       word: 'HOLA',
       path: [
         { row: 0, col: 0 },
@@ -111,7 +111,7 @@ describe('Word Flow Integration Tests', () => {
     expect(result3.reason).toBe('Word already submitted');
   });
 
-  it('should correctly score different word lengths', () => {
+  it('should correctly score different word lengths', async () => {
     const room = roomsManager.createRoom(host, 4);
     roomsManager.joinRoom(room.code, player2);
     const board = generateBoard(4);
@@ -125,7 +125,7 @@ describe('Word Flow Integration Tests', () => {
     ];
 
     for (const { word, expectedScore } of testWords) {
-      const result = validateWord({
+      const result = await validateWord({
         word,
         path: [
           { row: 0, col: 0 },

@@ -104,8 +104,8 @@ describe('Word Validator - Complete Validation', () => {
     await getDictionary();
   });
 
-  it('should validate a correct word submission', () => {
-    const result = validateWord({
+  it('should validate a correct word submission', async () => {
+    const result = await validateWord({
       word: 'HOLA',
       path: [
         { row: 0, col: 0 },
@@ -122,8 +122,8 @@ describe('Word Validator - Complete Validation', () => {
     expect(result.reason).toBe('');
   });
 
-  it('should reject word not in dictionary', () => {
-    const result = validateWord({
+  it('should reject word not in dictionary', async () => {
+    const result = await validateWord({
       word: 'XXXX',
       path: [
         { row: 0, col: 0 },
@@ -139,8 +139,8 @@ describe('Word Validator - Complete Validation', () => {
     expect(result.reason).toBe('Word not found in dictionary');
   });
 
-  it('should reject duplicate submission', () => {
-    const result = validateWord({
+  it('should reject duplicate submission', async () => {
+    const result = await validateWord({
       word: 'HOLA',
       path: [
         { row: 0, col: 0 },
@@ -156,8 +156,8 @@ describe('Word Validator - Complete Validation', () => {
     expect(result.reason).toBe('Word already submitted');
   });
 
-  it('should reject invalid path (non-adjacent)', () => {
-    const result = validateWord({
+  it('should reject invalid path (non-adjacent)', async () => {
+    const result = await validateWord({
       word: 'HOLA',
       path: [
         { row: 0, col: 0 },
@@ -173,8 +173,8 @@ describe('Word Validator - Complete Validation', () => {
     expect(result.reason).toBe('Invalid path');
   });
 
-  it('should reject path with repeated cells', () => {
-    const result = validateWord({
+  it('should reject path with repeated cells', async () => {
+    const result = await validateWord({
       word: 'HOLA',
       path: [
         { row: 0, col: 0 },
@@ -190,8 +190,8 @@ describe('Word Validator - Complete Validation', () => {
     expect(result.reason).toBe('Invalid path');
   });
 
-  it('should reject word shorter than 3 letters', () => {
-    const result = validateWord({
+  it('should reject word shorter than 3 letters', async () => {
+    const result = await validateWord({
       word: 'HO',
       path: [
         { row: 0, col: 0 },
@@ -205,8 +205,8 @@ describe('Word Validator - Complete Validation', () => {
     expect(result.reason).toBe('Word too short');
   });
 
-  it('should reject path length mismatch', () => {
-    const result = validateWord({
+  it('should reject path length mismatch', async () => {
+    const result = await validateWord({
       word: 'HOLA', // 4 letters
       path: [
         { row: 0, col: 0 },
@@ -222,8 +222,8 @@ describe('Word Validator - Complete Validation', () => {
     expect(result.reason).toBe('Path length does not match word length');
   });
 
-  it('should be case-insensitive', () => {
-    const result1 = validateWord({
+  it('should be case-insensitive', async () => {
+    const result1 = await validateWord({
       word: 'HOLA',
       path: [
         { row: 0, col: 0 },
@@ -235,7 +235,7 @@ describe('Word Validator - Complete Validation', () => {
       gridSize: 4,
     });
 
-    const result2 = validateWord({
+    const result2 = await validateWord({
       word: 'hola',
       path: [
         { row: 0, col: 0 },
@@ -247,7 +247,7 @@ describe('Word Validator - Complete Validation', () => {
       gridSize: 4,
     });
 
-    const result3 = validateWord({
+    const result3 = await validateWord({
       word: 'HoLa',
       path: [
         { row: 0, col: 0 },

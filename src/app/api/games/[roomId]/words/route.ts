@@ -29,7 +29,8 @@ export async function POST(
 
     const { playerId, word, path } = validation.data;
 
-    const room = roomsManager.getRoomById(roomId);
+    // roomId is actually the room code (6-char public identifier), not internal UUID
+    const room = roomsManager.getRoom(roomId);
 
     if (!room) {
       return NextResponse.json(
@@ -54,7 +55,7 @@ export async function POST(
       );
     }
 
-    const result = validateWord({
+    const result = await validateWord({
       word,
       path,
       foundWords: player.foundWords,

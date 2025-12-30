@@ -11,27 +11,27 @@ describe('Dictionary', () => {
     expect(stats.wordCount).toBeGreaterThan(100000);
   });
 
-  it('should validate common Spanish words', () => {
-    expect(esValida('hola')).toBe(true);
-    expect(esValida('casa')).toBe(true);
-    expect(esValida('perro')).toBe(true);
-    expect(esValida('gato')).toBe(true);
+  it('should validate common Spanish words', async () => {
+    expect(await esValida('hola')).toBe(true);
+    expect(await esValida('casa')).toBe(true);
+    expect(await esValida('perro')).toBe(true);
+    expect(await esValida('gato')).toBe(true);
   });
 
-  it('should reject invalid words', () => {
-    expect(esValida('xxxx')).toBe(false);
-    expect(esValida('abc')).toBe(false);
-    expect(esValida('')).toBe(false);
+  it('should reject invalid words', async () => {
+    expect(await esValida('xxxx')).toBe(false);
+    expect(await esValida('abc')).toBe(false);
+    expect(await esValida('')).toBe(false);
   });
 
-  it('should be case-insensitive', () => {
-    expect(esValida('HOLA')).toBe(true);
-    expect(esValida('HoLa')).toBe(true);
-    expect(esValida('hola')).toBe(true);
+  it('should be case-insensitive', async () => {
+    expect(await esValida('HOLA')).toBe(true);
+    expect(await esValida('HoLa')).toBe(true);
+    expect(await esValida('hola')).toBe(true);
   });
 
-  it('should reject words with accents if not in dictionary', () => {
-    const result = esValida('jalapeño');
+  it('should reject words with accents if not in dictionary', async () => {
+    const result = await esValida('jalapeño');
     expect(typeof result).toBe('boolean');
   });
 });

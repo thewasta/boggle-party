@@ -67,13 +67,21 @@ describe('board-utils', () => {
   });
 
   describe('getCellFromCoordinates', () => {
-    it('returns cell for valid coordinates', () => {
-      const result = getCellFromCoordinates(50, 50, 60, 10, 4);
+    it('returns cell for valid coordinates within cell area', () => {
+      // CELL_SIZE=70, GAP=8, totalSize=78
+      const result = getCellFromCoordinates(35, 35, 70, 8, 4);
       expect(result).toEqual({ row: 0, col: 0 });
     });
 
+    it('returns null for coordinates in the gap area', () => {
+      // CELL_SIZE=70, GAP=8, totalSize=78
+      // Position 75 is in the gap (cell is 0-69, gap is 70-77)
+      const result = getCellFromCoordinates(75, 35, 70, 8, 4);
+      expect(result).toBeNull();
+    });
+
     it('returns null for coordinates outside grid', () => {
-      const result = getCellFromCoordinates(500, 500, 60, 10, 4);
+      const result = getCellFromCoordinates(500, 500, 70, 8, 4);
       expect(result).toBeNull();
     });
   });

@@ -5,8 +5,8 @@ import { getDictionary } from '@/server/dictionary';
 import { roomsManager } from '@/server/rooms-manager';
 import type { Player } from '@/server/types';
 
-describe('POST /api/games/[roomId]/words', () => {
-  let roomId: string;
+describe('POST /api/games/[roomCode]/words', () => {
+  let roomCode: string;
   let playerId: string;
 
   beforeAll(async () => {
@@ -38,7 +38,7 @@ describe('POST /api/games/[roomId]/words', () => {
 
     const room = roomsManager.createRoom(host, 4);
     roomsManager.joinRoom(room.code, player2);
-    roomId = room.id;
+    roomCode = room.code;
     playerId = host.id;
 
     const board = [
@@ -51,7 +51,7 @@ describe('POST /api/games/[roomId]/words', () => {
   });
 
   it('should accept valid word submission', async () => {
-    const request = new NextRequest(`http://localhost:3000/api/games/${roomId}/words`, {
+    const request = new NextRequest(`http://localhost:3000/api/games/${roomCode}/words`, {
       method: 'POST',
       body: JSON.stringify({
         playerId,
@@ -65,7 +65,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: Promise.resolve({ roomId }) });
+    const response = await POST(request, { params: Promise.resolve({ roomId: roomCode }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -75,7 +75,7 @@ describe('POST /api/games/[roomId]/words', () => {
   });
 
   it('should reject invalid word', async () => {
-    const request = new NextRequest(`http://localhost:3000/api/games/${roomId}/words`, {
+    const request = new NextRequest(`http://localhost:3000/api/games/${roomCode}/words`, {
       method: 'POST',
       body: JSON.stringify({
         playerId,
@@ -89,7 +89,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: Promise.resolve({ roomId }) });
+    const response = await POST(request, { params: Promise.resolve({ roomId: roomCode }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -98,7 +98,7 @@ describe('POST /api/games/[roomId]/words', () => {
   });
 
   it('should reject duplicate submission', async () => {
-    const request1 = new NextRequest(`http://localhost:3000/api/games/${roomId}/words`, {
+    const request1 = new NextRequest(`http://localhost:3000/api/games/${roomCode}/words`, {
       method: 'POST',
       body: JSON.stringify({
         playerId,
@@ -112,9 +112,9 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    await POST(request1, { params: Promise.resolve({ roomId }) });
+    await POST(request1, { params: Promise.resolve({ roomId: roomCode }) });
 
-    const request2 = new NextRequest(`http://localhost:3000/api/games/${roomId}/words`, {
+    const request2 = new NextRequest(`http://localhost:3000/api/games/${roomCode}/words`, {
       method: 'POST',
       body: JSON.stringify({
         playerId,
@@ -128,7 +128,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request2, { params: Promise.resolve({ roomId }) });
+    const response = await POST(request2, { params: Promise.resolve({ roomId: roomCode }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -137,7 +137,7 @@ describe('POST /api/games/[roomId]/words', () => {
   });
 
   it('should reject invalid path', async () => {
-    const request = new NextRequest(`http://localhost:3000/api/games/${roomId}/words`, {
+    const request = new NextRequest(`http://localhost:3000/api/games/${roomCode}/words`, {
       method: 'POST',
       body: JSON.stringify({
         playerId,
@@ -151,7 +151,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: Promise.resolve({ roomId }) });
+    const response = await POST(request, { params: Promise.resolve({ roomId: roomCode }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -174,7 +174,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: Promise.resolve({ roomId: 'non-existent-room-id' }) });
+    const response = await POST(request, { params: Promise.resolve({ roomCode: 'non-existent-room-id' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -183,7 +183,7 @@ describe('POST /api/games/[roomId]/words', () => {
   });
 
   it('should return 400 for non-existent player', async () => {
-    const request = new NextRequest(`http://localhost:3000/api/games/${roomId}/words`, {
+    const request = new NextRequest(`http://localhost:3000/api/games/${roomCode}/words`, {
       method: 'POST',
       body: JSON.stringify({
         playerId: crypto.randomUUID(),
@@ -197,7 +197,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: Promise.resolve({ roomId }) });
+    const response = await POST(request, { params: Promise.resolve({ roomId: roomCode }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -217,7 +217,7 @@ describe('POST /api/games/[roomId]/words', () => {
     };
 
     const room = roomsManager.createRoom(host, 4);
-    const roomWithoutGame = room.id;
+    const roomWithoutGame = room.code;
 
     const request = new NextRequest(`http://localhost:3000/api/games/${roomWithoutGame}/words`, {
       method: 'POST',
@@ -242,7 +242,7 @@ describe('POST /api/games/[roomId]/words', () => {
   });
 
   it('should validate request schema', async () => {
-    const request = new NextRequest(`http://localhost:3000/api/games/${roomId}/words`, {
+    const request = new NextRequest(`http://localhost:3000/api/games/${roomCode}/words`, {
       method: 'POST',
       body: JSON.stringify({
         playerId: 'not-a-uuid',
@@ -251,7 +251,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: Promise.resolve({ roomId }) });
+    const response = await POST(request, { params: Promise.resolve({ roomId: roomCode }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);

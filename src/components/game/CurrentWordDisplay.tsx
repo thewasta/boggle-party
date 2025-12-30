@@ -74,26 +74,8 @@ export function CurrentWordDisplay({
   return (
     <div className="w-full max-w-md">
       <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-indigo-200 overflow-hidden">
-        {/* Header with word count badge */}
-        <div className="flex justify-end px-5 pt-4 pb-2">
-          <div className="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-md">
-            <span className="text-white/90 text-xs font-bold tracking-wider">ENCONTRADAS</span>
-            <span className="text-white text-lg font-black">{wordCount}</span>
-          </div>
-        </div>
-
         {/* Current word display area */}
         <div className="flex items-center justify-center gap-4 px-6 py-6 min-h-[100px]">
-          {/* Empty state placeholder */}
-          {currentWord.length === 0 && (
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-zinc-300 text-4xl">—</span>
-              <span className="text-zinc-400 text-sm font-medium">
-                Arrastra para formar palabras
-              </span>
-            </div>
-          )}
-
           {/* Active word display */}
           {currentWord.length > 0 && (
             <>
@@ -104,15 +86,6 @@ export function CurrentWordDisplay({
             </>
           )}
         </div>
-
-        {/* Status message footer */}
-        {getStatusMessage() && (
-          <div className="px-6 pb-4">
-            <div className="text-center py-2 px-4 rounded-xl bg-zinc-50">
-              {getStatusMessage()}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

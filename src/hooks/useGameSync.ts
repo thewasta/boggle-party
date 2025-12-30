@@ -46,7 +46,13 @@ export function useGameSync({
     serverTimeOffsetRef.current = serverStartTime - clientNow;
 
     setIsSynced(true);
-  }, [gameState?.startTime]);
+    // Start the timer
+    setTimerState({
+      remaining: gameState.duration,
+      isPaused: false,
+      isExpired: false,
+    });
+  }, [gameState?.startTime, gameState?.duration]);
 
   // Update timer every 100ms for smooth countdown
   useEffect(() => {
