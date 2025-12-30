@@ -6,15 +6,19 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { GameBoard } from '@/components/game/GameBoard';
-import { CurrentWordDisplay } from '@/components/game/CurrentWordDisplay';
-import { Timer } from '@/components/game/Timer';
-import { FoundWordsList } from '@/components/game/FoundWordsList';
-import { Countdown } from '@/components/game/Countdown';
-import { useGameSync } from '@/hooks/useGameSync';
-import type { WordSelection, SelectedCell, FoundWord, WordValidationStatus } from '@/types/game';
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { Countdown } from "@/components/game/Countdown";
+import { CurrentWordDisplay } from "@/components/game/CurrentWordDisplay";
+import { GameBoard } from "@/components/game/GameBoard";
+import { Timer } from "@/components/game/Timer";
+import { useGameSync } from "@/hooks/useGameSync";
+import type {
+  FoundWord,
+  SelectedCell,
+  WordSelection,
+  WordValidationStatus,
+} from "@/types/game";
 
 interface GamePageProps {
   params: Promise<{ roomId: string }>;
@@ -29,6 +33,7 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
     roomId: string;
     playerId: string;
     roomCode: string;
+    hostId: string;
   } | null>(null);
 
   // Game state
@@ -36,10 +41,11 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
   const [isLocked, setIsLocked] = useState(true);
   const [selection, setSelection] = useState<WordSelection>({
     cells: [],
-    currentWord: '',
+    currentWord: "",
     isValid: null,
   });
-  const [validationStatus, setValidationStatus] = useState<WordValidationStatus>('idle');
+  const [validationStatus, setValidationStatus] =
+    useState<WordValidationStatus>("idle");
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
 
   // Resolve params
@@ -49,28 +55,38 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
       const { playerId } = await searchParams;
 
       if (!playerId) {
-        router.push('/');
+        router.push("/");
         return;
       }
 
       // Fetch room data first to get roomCode
       try {
-        const response = await fetch(`/api/rooms/${roomId}`, { cache: 'no-store' });
+        const response = await fetch(`/api/rooms/${roomId}`, {
+          cache: "no-store",
+        });
         if (!response.ok) {
-          throw new Error('Room not found');
+          throw new Error("Room not found");
         }
 
         const data = await response.json();
-        setResolvedParams({ roomId, playerId, roomCode: data.room.code });
-        if (data.room.status !== 'playing') {
-          setError('El juego no ha empezado');
-          setTimeout(() => router.push(`/room/${data.room.code}?playerId=${playerId}`), 2000);
+        setResolvedParams({
+          roomId,
+          playerId,
+          roomCode: data.room.code,
+          hostId: data.room.host.id,
+        });
+        if (data.room.status !== "playing") {
+          setError("El juego no ha empezado");
+          setTimeout(
+            () => router.push(`/room/${data.room.code}?playerId=${playerId}`),
+            2000,
+          );
           return;
         }
 
         setLoading(false);
       } catch (err) {
-        setError('Error al cargar el juego');
+        setError("Error al cargar el juego");
         setLoading(false);
       }
     };
@@ -83,9 +99,24 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
       <div className="min-h-screen bg-[#FDF8F3] flex items-center justify-center">
         <div className="text-center">
           <div className="inline-flex items-center gap-3">
-            <svg className="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <svg
+              className="animate-spin h-8 w-8 text-indigo-600"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
             <span className="text-zinc-600">Cargando juego...</span>
           </div>
@@ -110,6 +141,7 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
       roomId={resolvedParams.roomId}
       roomCode={resolvedParams.roomCode}
       playerId={resolvedParams.playerId}
+      hostId={resolvedParams.hostId}
       showCountdown={showCountdown}
       onCountdownComplete={() => {
         setShowCountdown(false);
@@ -131,6 +163,7 @@ function GameClient(props: {
   roomId: string;
   roomCode: string;
   playerId: string;
+  hostId: string;
   showCountdown: boolean;
   onCountdownComplete: () => void;
   isLocked: boolean;
@@ -150,14 +183,20 @@ function GameClient(props: {
     playerId: props.playerId,
     onGameEnd: async () => {
       props.setIsLocked(true);
-      // Call the end game endpoint to change room status to 'finished'
-      try {
-        await fetch(`/api/rooms/${props.roomCode}/end`, { method: 'POST' });
-      } catch (error) {
-        console.error('Failed to end game:', error);
+      // Only host should call the end game endpoint to avoid duplicate events
+      if (props.playerId === props.hostId) {
+        try {
+          await fetch(`/api/rooms/${props.roomCode}/end`, { method: "POST" });
+        } catch (error) {
+          console.error("Failed to end game:", error);
+        }
       }
       // Navigate to results page after delay using roomCode
-      setTimeout(() => router.push(`/results/${props.roomCode}?playerId=${props.playerId}`), 2000);
+      setTimeout(
+        () =>
+          router.push(`/results/${props.roomCode}?playerId=${props.playerId}`),
+        2000,
+      );
     },
   });
 
@@ -178,7 +217,7 @@ function GameClient(props: {
           playerId: props.playerId,
         });
       } catch (err) {
-        console.error('Failed to fetch game state:', err);
+        console.error("Failed to fetch game state:", err);
       }
     };
 
@@ -195,12 +234,12 @@ function GameClient(props: {
     const path = props.selection.cells.map(({ row, col }) => ({ row, col }));
 
     setIsSubmitting(true);
-    props.setValidationStatus('validating');
+    props.setValidationStatus("validating");
 
     try {
       const response = await fetch(`/api/games/${props.roomId}/words`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           playerId: props.playerId,
           word,
@@ -211,7 +250,7 @@ function GameClient(props: {
       const data = await response.json();
 
       if (data.success) {
-        props.setValidationStatus('valid');
+        props.setValidationStatus("valid");
         props.setFoundWords([
           { word: data.word, score: data.score, timestamp: Date.now() },
           ...props.foundWords,
@@ -219,59 +258,77 @@ function GameClient(props: {
 
         // Clear selection after brief delay
         setTimeout(() => {
-          props.setSelection({ cells: [], currentWord: '', isValid: null });
-          props.setValidationStatus('idle');
+          props.setSelection({ cells: [], currentWord: "", isValid: null });
+          props.setValidationStatus("idle");
         }, 500);
       } else {
-        props.setValidationStatus('invalid');
+        props.setValidationStatus("invalid");
         setTimeout(() => {
-          props.setSelection({ cells: [], currentWord: '', isValid: null });
-          props.setValidationStatus('idle');
+          props.setSelection({ cells: [], currentWord: "", isValid: null });
+          props.setValidationStatus("idle");
         }, 1000);
       }
     } catch (err) {
-      props.setValidationStatus('invalid');
+      props.setValidationStatus("invalid");
       setTimeout(() => {
-        props.setSelection({ cells: [], currentWord: '', isValid: null });
-        props.setValidationStatus('idle');
+        props.setSelection({ cells: [], currentWord: "", isValid: null });
+        props.setValidationStatus("idle");
       }, 1000);
     } finally {
       setIsSubmitting(false);
     }
-  }, [props.selection, props.foundWords, props.roomId, props.playerId, isSubmitting, props]);
+  }, [
+    props.selection,
+    props.foundWords,
+    props.roomId,
+    props.playerId,
+    isSubmitting,
+    props,
+  ]);
 
   /**
    * Handle selection start
    */
-  const handleSelectionStart = useCallback((cell: SelectedCell) => {
-    if (props.isLocked) return;
+  const handleSelectionStart = useCallback(
+    (cell: SelectedCell) => {
+      if (props.isLocked) return;
 
-    // Get letter from board
-    const letter = gameState?.board[cell.row][cell.col] || '';
+      // Get letter from board
+      const letter = gameState?.board[cell.row][cell.col] || "";
 
-    props.setSelection({
-      cells: [cell],
-      currentWord: letter,
-      isValid: null,
-    });
-    props.setValidationStatus('idle');
-  }, [props.isLocked, gameState?.board, props.setSelection, props.setValidationStatus]);
+      props.setSelection({
+        cells: [cell],
+        currentWord: letter,
+        isValid: null,
+      });
+      props.setValidationStatus("idle");
+    },
+    [
+      props.isLocked,
+      gameState?.board,
+      props.setSelection,
+      props.setValidationStatus,
+    ],
+  );
 
   /**
    * Handle selection move (drag)
    */
-  const handleSelectionMove = useCallback((cell: SelectedCell) => {
-    if (props.isLocked) return;
+  const handleSelectionMove = useCallback(
+    (cell: SelectedCell) => {
+      if (props.isLocked) return;
 
-    const letter = gameState?.board[cell.row][cell.col] || '';
-    const newWord = props.selection.currentWord + letter;
+      const letter = gameState?.board[cell.row][cell.col] || "";
+      const newWord = props.selection.currentWord + letter;
 
-    props.setSelection({
-      cells: [...props.selection.cells, cell],
-      currentWord: newWord,
-      isValid: null,
-    });
-  }, [props.isLocked, gameState?.board, props.selection, props.setSelection]);
+      props.setSelection({
+        cells: [...props.selection.cells, cell],
+        currentWord: newWord,
+        isValid: null,
+      });
+    },
+    [props.isLocked, gameState?.board, props.selection, props.setSelection],
+  );
 
   /**
    * Handle selection end (submit word)
@@ -279,7 +336,7 @@ function GameClient(props: {
   const handleSelectionEnd = useCallback(() => {
     if (props.isLocked || props.selection.cells.length < 3) {
       // Clear selection if too short
-      props.setSelection({ cells: [], currentWord: '', isValid: null });
+      props.setSelection({ cells: [], currentWord: "", isValid: null });
       return;
     }
 
@@ -297,7 +354,9 @@ function GameClient(props: {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden touch-none">
       {/* Countdown Overlay */}
-      {props.showCountdown && <Countdown onComplete={props.onCountdownComplete} />}
+      {props.showCountdown && (
+        <Countdown onComplete={props.onCountdownComplete} />
+      )}
 
       {/* Main Game Layout */}
       <div className="min-h-screen py-6 px-4">
@@ -322,11 +381,6 @@ function GameClient(props: {
               onSelectionEnd={handleSelectionEnd}
               isLocked={props.isLocked}
             />
-          </div>
-
-          {/* Found Words List */}
-          <div className="flex justify-center">
-            <FoundWordsList words={props.foundWords} />
           </div>
         </div>
       </div>
