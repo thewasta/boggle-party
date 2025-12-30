@@ -90,7 +90,7 @@ export function ScoreStairs({ playerScores }: ScoreStairsProps) {
   );
 }
 
-interface PlayerAvatarProps {
+export interface PlayerAvatarProps {
   avatar: string;
   name: string;
   score: number;
@@ -99,7 +99,7 @@ interface PlayerAvatarProps {
   delay: number;
 }
 
-function PlayerAvatar({ avatar, name, score, position, isLeader, delay }: PlayerAvatarProps) {
+export function PlayerAvatar({ avatar, name, score, position, isLeader, delay }: PlayerAvatarProps) {
   return (
     <div
       className="flex flex-col items-center animate-climb-in"
