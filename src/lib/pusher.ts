@@ -50,6 +50,7 @@ export const PUSHER_EVENTS = {
   PLAYER_LEFT: "player-left",
   GAME_STARTED: "game-started",
   GAME_ENDED: "game-ended",
+  ROOM_CLOSED: "room-closed",
   WORD_FOUND: "word-found",
   REVEAL_WORD: "reveal-word",
   RESULTS_COMPLETE: "results-complete",

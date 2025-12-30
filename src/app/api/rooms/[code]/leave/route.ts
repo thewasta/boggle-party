@@ -3,6 +3,7 @@ import { leaveRoomSchema } from '@/server/validation';
 import { roomsManager } from '@/server/rooms-manager';
 import { handleValidationError, apiSuccess, apiError, handleRoomError } from '@/server/api-utils';
 import { emitPlayerLeft } from '@/server/event-emitter';
+import { triggerEvent } from '@/server/pusher-client';
 import type { RouteParams } from '@/server/types';
 
 export async function POST(
@@ -28,10 +29,23 @@ export async function POST(
     }
 
     const playerName = player.name;
+    const isHost = room.host.id === validatedData.playerId;
     const result = roomsManager.leaveRoom(validatedData.roomCode, validatedData.playerId);
 
     if (!result) {
-      return apiSuccess({ message: 'Player left successfully' });
+      // Room was deleted (no players left)
+      return apiSuccess({ message: 'Room closed' });
+    }
+
+    // If host left, close the room for everyone
+    if (isHost) {
+      await triggerEvent(`game-${room.id}`, 'room-closed', {
+        reason: 'host-left',
+        message: 'El anfitrión abandonó la sala',
+      });
+      // Delete the room
+      roomsManager.deleteRoom(validatedData.roomCode);
+      return apiSuccess({ message: 'Host left, room closed' });
     }
 
     await emitPlayerLeft(result.id, validatedData.playerId, playerName, result.players.size);

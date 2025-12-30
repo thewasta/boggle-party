@@ -194,6 +194,13 @@ function WaitingRoomClient(props: {
     onGameStarted: () => {
       setStatus("playing");
     },
+    onRoomClosed: (data) => {
+      setError(data.message);
+      const timer = setTimeout(() => {
+        router.push("/");
+      }, 2000);
+      return () => clearTimeout(timer);
+    },
   });
 
   const handleStartGame = async () => {
@@ -215,6 +222,20 @@ function WaitingRoomClient(props: {
         console.error("Error starting game:", error);
       }
     });
+  };
+
+  const handleLeave = async () => {
+    try {
+      await fetch(`/api/rooms/${props.roomCode}/leave`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId: props.currentPlayerId }),
+      });
+    } catch (error) {
+      console.error("Error leaving room:", error);
+    } finally {
+      router.push("/");
+    }
   };
 
   return (
@@ -327,7 +348,7 @@ function WaitingRoomClient(props: {
           <div className="mt-6 text-center">
             <button
               type="button"
-              onClick={() => router.push("/")}
+              onClick={handleLeave}
               className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold transition-colors"
             >
               ← Volver al inicio

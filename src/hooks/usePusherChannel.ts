@@ -15,6 +15,7 @@ export interface PusherEventHandlers {
   onPlayerLeft?: (data: { playerId: string; playerName: string; totalPlayers: number }) => void;
   onGameStarted?: (data: { startTime: number; duration: number; board: string[][] }) => void;
   onGameEnded?: (data: { endTime: number }) => void;
+  onRoomClosed?: (data: { reason: string; message: string }) => void;
   onWordFound?: (data: { playerId: string; playerName: string; word: string; score: number; isUnique: boolean }) => void;
   onRevealWord?: (data: { word: string; player: { id: string; name: string; avatar: string }; score: number; isUnique: boolean }) => void;
   onResultsComplete?: (data: { finalRankings: Array<{ id: string; name: string; avatar: string; score: number }> }) => void;
@@ -89,6 +90,12 @@ export function usePusherChannel(
       if (handlers.onGameEnded) {
         channel.bind(PUSHER_EVENTS.GAME_ENDED, (data: unknown) => {
           handlersRef.current.onGameEnded?.(data as Parameters<NonNullable<typeof handlers.onGameEnded>>[0]);
+        });
+      }
+
+      if (handlers.onRoomClosed) {
+        channel.bind(PUSHER_EVENTS.ROOM_CLOSED, (data: unknown) => {
+          handlersRef.current.onRoomClosed?.(data as Parameters<NonNullable<typeof handlers.onRoomClosed>>[0]);
         });
       }
 
