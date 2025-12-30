@@ -184,3 +184,45 @@ export class RoomError extends Error {
     this.name = 'RoomError';
   }
 }
+
+// ============================================================================
+// Word Submission Types
+// ============================================================================
+
+/**
+ * Represents a cell position on the board
+ */
+export interface Cell {
+  row: number;
+  col: number;
+}
+
+/**
+ * Word submission from a player
+ */
+export interface WordSubmission {
+  playerId: string;
+  word: string;
+  path: Cell[];
+}
+
+/**
+ * Word validation result
+ */
+export interface WordValidationResult {
+  valid: boolean;
+  score: number;
+  reason: string;
+  word: string;
+}
+
+/**
+ * Word found event (for Pusher)
+ */
+export interface WordFoundEvent {
+  playerId: string;
+  playerName: string;
+  word: string;
+  score: number;
+  isUnique: boolean;
+}
