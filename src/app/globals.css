@@ -87,3 +87,19 @@ body {
 .animate-check-bounce {
   animation: check-bounce 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
+
+/* Word list slide-in animation */
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
