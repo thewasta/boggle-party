@@ -234,6 +234,13 @@ export class RoomsManager {
   }
 
   /**
+   * Delete a room (for testing)
+   */
+  deleteRoom(code: string): boolean {
+    return this.rooms.delete(code);
+  }
+
+  /**
    * Get room count
    */
   getRoomCount(): number {
