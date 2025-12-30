@@ -168,6 +168,32 @@ export interface GameEndedEvent {
   endTime: number;
 }
 
+/**
+ * Word reveal event payload (results phase)
+ */
+export interface RevealWordEvent {
+  word: string;
+  player: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
+  score: number;
+  isUnique: boolean;
+}
+
+/**
+ * Results complete event payload
+ */
+export interface ResultsCompleteEvent {
+  finalRankings: Array<{
+    id: string;
+    name: string;
+    avatar: string;
+    score: number;
+  }>;
+}
+
 // ============================================================================
 // Error Types
 // ============================================================================
