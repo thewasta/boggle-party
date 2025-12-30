@@ -65,7 +65,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: { roomId } });
+    const response = await POST(request, { params: Promise.resolve({ roomId }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -89,7 +89,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: { roomId } });
+    const response = await POST(request, { params: Promise.resolve({ roomId }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -112,7 +112,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    await POST(request1, { params: { roomId } });
+    await POST(request1, { params: Promise.resolve({ roomId }) });
 
     const request2 = new NextRequest(`http://localhost:3000/api/games/${roomId}/words`, {
       method: 'POST',
@@ -128,7 +128,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request2, { params: { roomId } });
+    const response = await POST(request2, { params: Promise.resolve({ roomId }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -151,7 +151,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: { roomId } });
+    const response = await POST(request, { params: Promise.resolve({ roomId }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -174,7 +174,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: { roomId: 'non-existent-room-id' } });
+    const response = await POST(request, { params: Promise.resolve({ roomId: 'non-existent-room-id' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -197,7 +197,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: { roomId } });
+    const response = await POST(request, { params: Promise.resolve({ roomId }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -233,7 +233,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: { roomId: roomWithoutGame } });
+    const response = await POST(request, { params: Promise.resolve({ roomId: roomWithoutGame }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -251,7 +251,7 @@ describe('POST /api/games/[roomId]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: { roomId } });
+    const response = await POST(request, { params: Promise.resolve({ roomId }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);

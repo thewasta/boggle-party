@@ -20,7 +20,7 @@ describe('POST /api/rooms/[code]/join', () => {
       }),
     });
 
-    const response = await POST(request, { params: { code: 'ABC123' } });
+    const response = await POST(request, { params: Promise.resolve({ code: 'ABC123' }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -36,7 +36,7 @@ describe('POST /api/rooms/[code]/join', () => {
       }),
     });
 
-    const response = await POST(request, { params: { code: 'AB' } });
+    const response = await POST(request, { params: Promise.resolve({ code: 'AB' }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);

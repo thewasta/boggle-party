@@ -3,13 +3,14 @@ import { roomsManager } from '@/server/rooms-manager';
 import { validateWord } from '@/server/word-validator';
 import { wordSubmissionSchema } from '@/server/validation';
 import { RoomError } from '@/server/types';
+import type { RouteParams } from '@/server/types';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { roomId: string } }
+  { params }: RouteParams<{ roomId: string }>
 ) {
   try {
-    const roomId = params.roomId;
+    const { roomId } = await params;
 
     const body = await request.json();
     const validation = wordSubmissionSchema.safeParse(body);

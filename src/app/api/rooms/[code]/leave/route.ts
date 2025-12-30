@@ -3,13 +3,14 @@ import { leaveRoomSchema } from '@/server/validation';
 import { roomsManager } from '@/server/rooms-manager';
 import { handleValidationError, apiSuccess, apiError, handleRoomError } from '@/server/api-utils';
 import { emitPlayerLeft } from '@/server/event-emitter';
+import type { RouteParams } from '@/server/types';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: RouteParams<{ code: string }>
 ) {
   try {
-    const { code } = params;
+    const { code } = await params;
     const body = await request.json();
     const validatedData = leaveRoomSchema.parse({
       ...body,

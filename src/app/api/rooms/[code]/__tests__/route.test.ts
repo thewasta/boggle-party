@@ -26,7 +26,7 @@ describe('GET /api/rooms/[code]', () => {
     const code = createData.room.code;
 
     const getRequest = new NextRequest(`http://localhost:3000/api/rooms/${code}`);
-    const response = await GET(getRequest, { params: { code } });
+    const response = await GET(getRequest, { params: Promise.resolve({ code }) });
 
     const data = await response.json();
 
@@ -37,7 +37,7 @@ describe('GET /api/rooms/[code]', () => {
 
   it('should return 404 for non-existent room', async () => {
     const request = new NextRequest('http://localhost:3000/api/rooms/INVALID');
-    const response = await GET(request, { params: { code: 'INVALID' } });
+    const response = await GET(request, { params: Promise.resolve({ code: 'INVALID' }) });
 
     const data = await response.json();
 

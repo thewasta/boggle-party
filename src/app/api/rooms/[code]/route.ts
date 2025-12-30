@@ -1,13 +1,14 @@
 import { NextRequest } from 'next/server';
 import { roomsManager } from '@/server/rooms-manager';
 import { apiSuccess, apiError } from '@/server/api-utils';
+import type { RouteParams } from '@/server/types';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: RouteParams<{ code: string }>
 ) {
   try {
-    const { code } = params;
+    const { code } = await params;
 
     const room = roomsManager.getRoom(code.toUpperCase());
 

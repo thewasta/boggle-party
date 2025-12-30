@@ -17,7 +17,7 @@ describe('POST /api/rooms/[code]/start', () => {
       body: JSON.stringify({}),
     });
 
-    const response = await POST(request, { params: { code: 'ABC123' } });
+    const response = await POST(request, { params: Promise.resolve({ code: 'ABC123' }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -32,7 +32,7 @@ describe('POST /api/rooms/[code]/start', () => {
       }),
     });
 
-    const response = await POST(request, { params: { code: 'INVALID' } });
+    const response = await POST(request, { params: Promise.resolve({ code: 'INVALID' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);

@@ -3,13 +3,14 @@ import { roomsManager } from '@/server/rooms-manager';
 import { generateBoard } from '@/server/board-generator';
 import { startGameSchema } from '@/server/validation';
 import { emitGameStarted } from '@/server/event-emitter';
+import type { RouteParams } from '@/server/types';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: RouteParams<{ code: string }>
 ) {
   try {
-    const roomCode = params.code;
+    const { code: roomCode } = await params;
 
     // Parse request body
     const body = await request.json();
