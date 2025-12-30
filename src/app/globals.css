@@ -103,3 +103,38 @@ body {
 .animate-slide-in {
   animation: slide-in 0.3s ease-out forwards;
 }
+
+/* Results phase animations */
+@keyframes climb-in {
+  0% {
+    transform: translateY(30px) scale(0.85);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes crown-bounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(10deg);
+  }
+}
+
+.animate-climb-in {
+  animation: climb-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-crown-bounce {
+  animation: crown-bounce 2s ease-in-out infinite;
+}

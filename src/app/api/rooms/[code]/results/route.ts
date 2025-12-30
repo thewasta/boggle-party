@@ -5,9 +5,10 @@ import { gamesRepository, playersRepository, wordsRepository } from '@/server/db
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
-  const room = roomsManager.getRoom(params.code);
+  const { code } = await params;
+  const room = roomsManager.getRoom(code);
 
   if (!room) {
     return NextResponse.json({ error: 'Room not found' }, { status: 404 });

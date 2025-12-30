@@ -7,9 +7,10 @@ const REVEAL_DELAY_MS = 1500;
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
-  const room = roomsManager.getRoom(params.code);
+  const { code } = await params;
+  const room = roomsManager.getRoom(code);
 
   if (!room) {
     return NextResponse.json({ error: 'Room not found' }, { status: 404 });
@@ -36,16 +37,17 @@ async function startRevealSequence(roomCode: string, words: RevealWordData[]) {
     const player = room.players.get(wordData.playerId);
     if (!player) continue;
 
-    await emitRevealWord(roomCode, {
-      word: wordData.word,
-      player: {
+    await emitRevealWord(
+      roomCode,
+      wordData.word,
+      {
         id: player.id,
         name: player.name,
         avatar: player.avatar,
       },
-      score: wordData.isUnique ? wordData.score * 2 : wordData.score,
-      isUnique: wordData.isUnique,
-    });
+      wordData.isUnique ? wordData.score * 2 : wordData.score,
+      wordData.isUnique
+    );
 
     await new Promise(resolve => setTimeout(resolve, REVEAL_DELAY_MS));
   }
@@ -55,5 +57,5 @@ async function startRevealSequence(roomCode: string, words: RevealWordData[]) {
     .map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
     .sort((a, b) => b.score - a.score);
 
-  await emitResultsComplete(roomCode, { finalRankings });
+  await emitResultsComplete(roomCode, finalRankings);
 }
