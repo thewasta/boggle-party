@@ -13,9 +13,9 @@ const GRID_OPTIONS: Array<{
   label: string;
   description: string;
 }> = [
-  { value: 4, label: "4 × 4", description: "2 minutos" },
-  { value: 5, label: "5 × 5", description: "3 minutos" },
-  { value: 6, label: "6 × 6", description: "6 minutos" },
+  { value: 4, label: "4 × 4", description: "90 segundos" },
+  { value: 5, label: "5 × 5", description: "2 minutos" },
+  { value: 6, label: "6 × 6", description: "3 minutos" },
 ];
 
 export function GridSizeSelector({

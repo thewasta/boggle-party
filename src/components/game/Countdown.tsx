@@ -48,7 +48,7 @@ export function Countdown({ onComplete }: CountdownProps) {
               <span className="text-[12rem] font-black text-green-400 drop-shadow-[0_0_60px_rgba(74,222,128,0.6)] animate-explode">
                 ¡YA!
               </span>
-              <span className="text-2xl font-bold text-green-300 tracking-widest mt-[-20px] animate-pulse">
+              <span className="text-2xl font-bold text-green-300 tracking-widest -mt-5 animate-pulse">
                 ¡JUEGA!
               </span>
             </div>
