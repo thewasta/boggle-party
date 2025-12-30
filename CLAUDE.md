@@ -129,18 +129,38 @@ All database access goes through repository classes in `src/server/db/repositori
 - Run with: `pnpm migrate` or `docker compose exec web pnpm migrate`
 - Custom migration runner in `src/server/db/migrate.ts`
 
-### Word Validation
+### Word Validation & Board Generation
 
-**Server-side:** Spanish dictionary loaded into Set for O(1) lookup, validates adjacency rules (DFS/BFS), prevents duplicate submissions
+**Board Generation System:**
+- Uses **specialized Spanish dice** instead of letter frequency formulas
+- Dice designed with Spanish letter frequencies in mind
+- Each grid size has its own set of dice (16 for 4×4, 25 for 5×5, 36 for 6×6)
+- Boards are validated to ensure minimum word count before starting game
 
-**Client-side:** Immediate visual feedback (✓ green valid, ✗ red invalid) while dragging
+**Dice Configuration:**
+- Vowel-heavy dice (A, E, I, O, U appear frequently)
+- Common consonants (R, L, S, T, D, N)
+- Special treatment for **QU** as single unit
+- One die per grid size includes **Ñ**
 
-**Scoring:**
-- 3-4 letters: 1pt
-- 5 letters: 2pt
-- 6 letters: 3pt
-- 7+ letters: 5pt
-- Unique word bonus: ×2 (only one player found it)
+**Server-side:** Spanish dictionary loaded into Trie structure for O(1) prefix lookup, validates adjacency rules (DFS), prevents duplicate submissions
+
+**Dictionary:**
+- **Original:** `data/dictionary.json` (636,598 words, 7.9MB)
+- **Cleaned:** `data/dictionary_clean.json` (153,894 words, ~2MB) - 76% reduction
+- Source: `an-array-of-spanish-words` npm package
+- Cleaning script: `scripts/clean-dictionary.js`
+
+**Board Generation Functions:**
+- `generateBoard(gridSize)` - Simple random board from dice
+- `generateGoodBoard(gridSize)` - Quality-guaranteed board (min 20-40 words, max 100 attempts)
+- Returns `{ board, allWords }` with total possible word count
+
+**Word Validation:**
+- Trie-based dictionary for efficient prefix checking
+- DFS solver with 8-directional movement
+- Minimum word length: 3 characters
+- Handles QU as two letters in one cell
 
 ### Key Data Structures
 
@@ -198,31 +218,46 @@ src/
 ├── app/                    # Next.js App Router pages
 │   ├── api/               # API routes
 │   │   ├── health/        # Health check endpoint
-│   │   └── db/            # Database endpoints
+│   │   └── rooms/         # Room management endpoints
 │   └── ...
 ├── components/             # React components
+├── hooks/                  # Custom React hooks
+│   └── usePusherChannel.ts # Pusher subscription hook
 ├── lib/                    # Shared utilities
+│   └── pusher.ts          # Pusher client utilities
 ├── server/                 # Server-side code
-│   └── db/                # Database layer
-│       ├── connection.ts   # PostgreSQL connection pool
-│       ├── schema.ts       # TypeScript schema types
-│       ├── migrate.ts      # Migration runner
-│       ├── migrations/     # SQL migration files
-│       └── repositories/   # Repository pattern
-│           ├── games.repository.ts
-│           ├── players.repository.ts
-│           └── words.repository.ts
+│   ├── db/                # Database layer
+│   │   ├── connection.ts   # PostgreSQL connection pool
+│   │   ├── schema.ts       # TypeScript schema types
+│   │   ├── migrate.ts      # Migration runner
+│   │   ├── migrations/     # SQL migration files
+│   │   └── repositories/   # Repository pattern
+│   ├── board-generator.ts # Spanish Boggle dice & board generation
+│   ├── dictionary.ts      # Spanish dictionary + Trie structure
+│   ├── solver.ts          # Board solving algorithm (DFS)
+│   ├── event-emitter.ts   # Typed Pusher event emitters
+│   ├── pusher-client.ts   # Pusher server client singleton
+│   ├── rooms-manager.ts   # In-memory room state management
+│   └── types.ts           # Shared TypeScript types
 ├── types/                  # TypeScript type definitions
 └── styles/                 # Global styles (if needed)
 
 data/
-└── dictionary.json         # Spanish words dictionary (7.9MB)
+├── dictionary.json         # Spanish words dictionary (636K words, 7.9MB)
+└── dictionary_clean.json   # Cleaned dictionary (154K words, ~2MB)
 
 docs/
-└── plans/                  # Epic implementation plans
-    ├── 2025-12-29-boggle-party-epics.md
-    ├── 2025-12-29-epic-1-docker-infrastructure.md
-    └── 2025-12-29-epic-2-database-schema.md
+├── plans/                  # Epic implementation plans
+│   ├── 2025-12-29-boggle-party-epics.md
+│   ├── 2025-12-29-epic-1-docker-infrastructure.md
+│   ├── 2025-12-29-epic-2-database-schema.md
+│   └── 2025-12-30-epic-5-pusher-integration.md
+└── technical/              # Technical documentation
+    ├── board-generator-architecture.md
+    └── dictionary-cleaning-script.md
+
+scripts/
+└── clean-dictionary.js     # Dictionary cleaning utility
 ```
 
 ## Important Implementation Notes
@@ -238,10 +273,18 @@ docs/
 
 **Completed Epics:**
 - ✅ **Epic 1: Docker & Infrastructure** - Docker Compose setup with web and db services, health check endpoint
-- 🔄 **Epic 2: Database Schema** (50% complete) - PostgreSQL schema, migrations, and repositories (in progress)
+- ✅ **Epic 2: Database Schema** - PostgreSQL schema, migrations, and repositories
+- ✅ **Epic 3: Room Management System** - In-memory room state, join/leave/start/end game
+- ✅ **Epic 4: Dictionary & Word Validation** - Spanish dictionary (636K→154K words), Trie structure, DFS solver
+- ✅ **Epic 5: Pusher Integration** - Real-time events, typed emitters, React hooks
+
+**Recent Improvements:**
+- **Board Generation:** Migrated from letter frequency formula to specialized Spanish dice
+- **Dictionary Cleaning:** Reduced from 636,598 to 153,894 words (~76%) while maintaining quality
+- **Quality Guaranteed Boards:** Boards validated for minimum word count (20-40 depending on grid size)
 
 **Next Epic:**
-- Epic 3: Server-Side Core - Room Management System
+- Epic 6: Landing & Waiting Room UI (Frontend)
 
 See `docs/plans/2025-12-29-boggle-party-epics.md` for full project roadmap.
 
@@ -312,3 +355,71 @@ await wordsRepository.create({
 ```
 
 **Note:** Active game room state is managed in-memory (server-side Map). The database is only for historical records and analytics after games complete.
+
+## Board Generation & Dictionary Workflow
+
+### Dictionary Cleaning
+
+To regenerate the cleaned dictionary from the original:
+
+```bash
+# Run cleaning script (outside Docker)
+node scripts/clean-dictionary.js
+
+# Output: data/dictionary_clean.json
+# Expected: ~153K words (76% reduction from 636K)
+```
+
+**The cleaning script applies:**
+- Length filter (3-8 characters)
+- Spanish-specific rules (Q always with U)
+- Rare verb endings removal
+- Technical prefix/suffix filtering
+- Consonant pattern validation
+- Frequency scoring (threshold: 10)
+
+### Board Generation Usage
+
+```typescript
+import { generateBoard, generateGoodBoard } from '@/server/board-generator';
+
+// Simple random board (fast)
+const board = generateBoard(4); // 4x4 grid
+// Returns: string[][] (e.g., [['A', 'R', 'T', 'S'], ...])
+
+// Quality-guaranteed board (recommended)
+const { board, allWords } = await generateGoodBoard(5);
+// Returns: { board: string[][], allWords: string[] }
+// Ensures: min 40 words, max 100 generation attempts
+```
+
+### Board Solving
+
+```typescript
+import { solveBoard } from '@/server/solver';
+import { buildTrie, getDictionary } from '@/server/dictionary';
+
+// Load dictionary and build Trie
+const dictSet = await getDictionary();
+const trieRoot = buildTrie(dictSet);
+
+// Solve a board
+const result = solveBoard(board, trieRoot);
+// Returns: { words: string[], maxLen: number }
+```
+
+### Dice Configuration
+
+Spanish dice are defined in `src/server/board-generator.ts`:
+
+```typescript
+// 4x4 = 16 dice, 5x5 = 25 dice, 6x6 = 36 dice
+export const SPANISH_BOGGLE_DICE_4x4 = [
+  ['A', 'E', 'O', 'I', 'U', 'N'],
+  ['R', 'L', 'S', 'T', 'D', 'N'],
+  ['QU', 'E', 'I', 'A', 'O', 'U'],
+  // ... 13 more dice
+];
+```
+
+Each die has 6 faces with Spanish letter combinations. Dice are shuffled (Fisher-Yates) and rolled (random face) during board generation.
