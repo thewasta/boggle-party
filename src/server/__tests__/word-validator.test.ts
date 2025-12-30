@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { getDictionary } from '../dictionary';
-import { calculateScore } from '../word-validator';
+import { calculateScore, areAdjacent, isValidPath } from '../word-validator';
 
 describe('Word Validator - Scoring', () => {
   beforeAll(async () => {
@@ -44,5 +44,61 @@ describe('Word Validator - Scoring', () => {
 
   it('should handle empty string', () => {
     expect(calculateScore('')).toBe(0);
+  });
+});
+
+describe('Word Validator - Adjacency', () => {
+  it('should check horizontal adjacency', () => {
+    expect(areAdjacent({ row: 0, col: 0 }, { row: 0, col: 1 })).toBe(true);
+    expect(areAdjacent({ row: 0, col: 1 }, { row: 0, col: 0 })).toBe(true);
+    expect(areAdjacent({ row: 0, col: 0 }, { row: 0, col: 2 })).toBe(false);
+  });
+
+  it('should check vertical adjacency', () => {
+    expect(areAdjacent({ row: 0, col: 0 }, { row: 1, col: 0 })).toBe(true);
+    expect(areAdjacent({ row: 1, col: 0 }, { row: 0, col: 0 })).toBe(true);
+    expect(areAdjacent({ row: 0, col: 0 }, { row: 2, col: 0 })).toBe(false);
+  });
+
+  it('should check diagonal adjacency', () => {
+    expect(areAdjacent({ row: 0, col: 0 }, { row: 1, col: 1 })).toBe(true);
+    expect(areAdjacent({ row: 1, col: 1 }, { row: 0, col: 0 })).toBe(true);
+    expect(areAdjacent({ row: 0, col: 0 }, { row: 1, col: -1 })).toBe(true);
+    expect(areAdjacent({ row: 0, col: 0 }, { row: 2, col: 2 })).toBe(false);
+  });
+
+  it('should validate a correct path', () => {
+    const path = [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+    ];
+    expect(isValidPath(path, 4)).toBe(true);
+  });
+
+  it('should reject path with non-adjacent cells', () => {
+    const path = [
+      { row: 0, col: 0 },
+      { row: 0, col: 2 }, // Not adjacent!
+    ];
+    expect(isValidPath(path, 4)).toBe(false);
+  });
+
+  it('should reject path with repeated cells', () => {
+    const path = [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 0 }, // Repeated!
+    ];
+    expect(isValidPath(path, 4)).toBe(false);
+  });
+
+  it('should reject empty path', () => {
+    expect(isValidPath([], 4)).toBe(false);
+  });
+
+  it('should reject single-cell path', () => {
+    expect(isValidPath([{ row: 0, col: 0 }], 4)).toBe(false);
   });
 });
