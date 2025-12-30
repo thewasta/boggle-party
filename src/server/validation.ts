@@ -30,8 +30,7 @@ export const leaveRoomSchema = z.object({
 });
 
 export const startGameSchema = z.object({
-  roomId: z.string().uuid('Invalid room ID'),
-  gridSize: z.enum(['4', '5', '6']).transform((val): GridSize => parseInt(val, 10) as GridSize),
+  gridSize: z.enum(['4', '5', '6']).transform((val) => parseInt(val, 10) as 4 | 5 | 6),
 });
 
 export const getRoomSchema = z.object({
@@ -43,7 +42,6 @@ export const getRoomSchema = z.object({
 export type CreateRoomInput = z.infer<typeof createRoomSchema>;
 export type JoinRoomInput = z.infer<typeof joinRoomSchema>;
 export type LeaveRoomInput = z.infer<typeof leaveRoomSchema>;
-export type StartGameInput = z.infer<typeof startGameSchema>;
 export type GetRoomInput = z.infer<typeof getRoomSchema>;
 
 /**

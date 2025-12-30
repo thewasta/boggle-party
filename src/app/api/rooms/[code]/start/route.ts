@@ -1,75 +1,71 @@
-/**
- * POST /api/rooms/[code]/start
- * Start game in room (host only)
- */
-
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { roomsManager } from '@/server/rooms-manager';
-import { apiSuccess, apiError, handleRoomError } from '@/server/api-utils';
-import { triggerEvent } from '@/server/pusher-client';
-import type { GameStartedEvent } from '@/server/types';
+import { generateBoard } from '@/server/board-generator';
+import { startGameSchema } from '@/server/validation';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { code: string } }
 ) {
   try {
-    const { code } = params;
-    const body = await request.json();
-    const { playerId } = body;
+    const roomCode = params.code;
 
-    if (!playerId) {
-      return apiError('playerId is required', 400);
+    // Parse request body
+    const body = await request.json();
+    const validation = startGameSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid request',
+          details: validation.error.errors,
+        },
+        { status: 400 }
+      );
     }
 
-    const room = roomsManager.getRoom(code.toUpperCase());
+    const { gridSize } = validation.data;
+
+    // Get room
+    const room = roomsManager.getRoom(roomCode);
 
     if (!room) {
-      return apiError('Room not found', 404);
+      return NextResponse.json(
+        { success: false, error: 'Room not found' },
+        { status: 404 }
+      );
     }
 
-    if (room.host.id !== playerId) {
-      return apiError('Only the host can start the game', 403);
-    }
+    // Generate board
+    const board = generateBoard(gridSize);
 
-    const board = body.board || generateDefaultBoard(room.gridSize);
+    // Calculate duration
+    const duration = roomsManager.getDefaultDuration(gridSize);
 
-    const updatedRoom = roomsManager.startGame(code.toUpperCase(), room.duration, board);
+    // Start game
+    const updatedRoom = roomsManager.startGame(roomCode, duration, board);
 
     if (!updatedRoom) {
-      return apiError('Failed to start game', 500);
+      return NextResponse.json(
+        { success: false, error: 'Failed to start game' },
+        { status: 500 }
+      );
     }
 
-    await triggerEvent(`presence-game-${room.id}`, 'game-started', {
-      startTime: updatedRoom.startTime!,
-      duration: updatedRoom.duration,
-      board: updatedRoom.board!,
-    } satisfies GameStartedEvent);
-
-    return apiSuccess({
+    return NextResponse.json({
+      success: true,
       message: 'Game started',
-      startTime: updatedRoom.startTime,
-      duration: updatedRoom.duration,
-      board: updatedRoom.board,
+      startTime: updatedRoom.startTime!,
+      duration,
+      board,
     });
-
   } catch (error) {
-    return handleRoomError(error);
+    console.error('Start game error:', error);
+
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
   }
-}
-
-function generateDefaultBoard(gridSize: number): string[][] {
-  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                   'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-
-  const board: string[][] = [];
-  for (let i = 0; i < gridSize; i++) {
-    const row: string[] = [];
-    for (let j = 0; j < gridSize; j++) {
-      row.push(letters[Math.floor(Math.random() * letters.length)]);
-    }
-    board.push(row);
-  }
-
-  return board;
 }

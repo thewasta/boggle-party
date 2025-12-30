@@ -11,7 +11,7 @@ describe('POST /api/rooms/[code]/start', () => {
     vi.clearAllMocks();
   });
 
-  it('should validate playerId is required', async () => {
+  it('should validate gridSize is required', async () => {
     const request = new NextRequest('http://localhost:3000/api/rooms/ABC123/start', {
       method: 'POST',
       body: JSON.stringify({}),
@@ -28,7 +28,7 @@ describe('POST /api/rooms/[code]/start', () => {
     const request = new NextRequest('http://localhost:3000/api/rooms/INVALID/start', {
       method: 'POST',
       body: JSON.stringify({
-        playerId: '123e4567-e89b-12d3-a456-426614174000',
+        gridSize: '4',
       }),
     });
 

@@ -213,7 +213,7 @@ export class RoomsManager {
   /**
    * Get default duration based on grid size
    */
-  private getDefaultDuration(gridSize: GridSize): number {
+  getDefaultDuration(gridSize: GridSize): number {
     switch (gridSize) {
       case 4:
         return 120; // 2 minutes
