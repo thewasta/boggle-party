@@ -278,6 +278,7 @@ scripts/
 - ✅ **Epic 4: Dictionary & Word Validation** - Spanish dictionary (636K→154K words), Trie structure, DFS solver
 - ✅ **Epic 5: Pusher Integration** - Real-time events, typed emitters, React hooks
 - ✅ **Epic 6: Landing & Waiting Room UI** - Landing page, waiting room with real-time player updates
+- ✅ **Epic 7: Active Game Phase** - Interactive game board with drag-to-select, countdown, timer, word validation, and found words list
 
 **Recent Improvements:**
 - **Board Generation:** Migrated from letter frequency formula to specialized Spanish dice
@@ -285,9 +286,10 @@ scripts/
 - **Quality Guaranteed Boards:** Boards validated for minimum word count (20-40 depending on grid size)
 - **Landing Page:** Playful design with warm cream background (#FDF8F3), gradient titles, decorative floating letters
 - **Waiting Room:** Real-time Pusher integration, host controls (grid selector, start game), high-contrast indigo theme
+- **Active Game:** Drag-to-select word input, 3-2-1 countdown overlay, synchronized timer, visual path rendering, validation feedback
 
 **Next Epic:**
-- Epic 7: Active Game Phase - Interactive game board with drag-to-select word input
+- Epic 8: Results Phase - Sequential word reveal with animated scoring and final rankings
 
 See `docs/plans/2025-12-29-boggle-party-epics.md` for full project roadmap.
 
