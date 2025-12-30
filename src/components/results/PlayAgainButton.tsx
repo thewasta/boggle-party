@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export function PlayAgainButton() {
   const router = useRouter();
@@ -9,12 +9,13 @@ export function PlayAgainButton() {
 
   async function handlePlayAgain() {
     setIsLoading(true);
-    router.push('/');
+    router.push("/");
   }
 
   return (
     <div className="text-center pt-4">
       <button
+        type="button"
         onClick={handlePlayAgain}
         disabled={isLoading}
         className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xl font-black rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden"
