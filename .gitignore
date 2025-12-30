@@ -46,3 +46,4 @@ next-env.d.ts
 # Keep data directory but exclude temporary data files
 data/*.tmp
 data/temp/
+.pnpm-store
