@@ -2,8 +2,7 @@ import { NextRequest } from 'next/server';
 import { leaveRoomSchema } from '@/server/validation';
 import { roomsManager } from '@/server/rooms-manager';
 import { handleValidationError, apiSuccess, apiError, handleRoomError } from '@/server/api-utils';
-import { triggerEvent } from '@/server/pusher-client';
-import type { PlayerLeftEvent } from '@/server/types';
+import { emitPlayerLeft } from '@/server/event-emitter';
 
 export async function POST(
   request: NextRequest,
@@ -34,11 +33,7 @@ export async function POST(
       return apiSuccess({ message: 'Player left successfully' });
     }
 
-    await triggerEvent(`presence-game-${result.id}`, 'player-left', {
-      playerId: validatedData.playerId,
-      playerName,
-      totalPlayers: result.players.size,
-    } satisfies PlayerLeftEvent);
+    await emitPlayerLeft(result.id, validatedData.playerId, playerName, result.players.size);
 
     return apiSuccess({
       room: roomsManager.roomToDTO(result),
