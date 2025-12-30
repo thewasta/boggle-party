@@ -266,5 +266,15 @@ export class RoomsManager {
   }
 }
 
-// Export singleton instance
-export const roomsManager = new RoomsManager();
+// Declare global type for the singleton
+declare global {
+  var _roomsManager: RoomsManager | undefined;
+}
+
+// Export singleton instance that persists across module reloads in development
+export const roomsManager = globalThis._roomsManager ?? new RoomsManager();
+
+// Store in globalThis to persist across hot module reload
+if (process.env.NODE_ENV !== 'production') {
+  globalThis._roomsManager = roomsManager;
+}
