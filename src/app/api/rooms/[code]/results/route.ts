@@ -81,9 +81,19 @@ export async function POST(
     console.error('Failed to save game to database:', error);
   }
 
+  // Prepare initial player scores (all start at 0)
+  const initialScores = Array.from(room.players.values()).map(p => ({
+    id: p.id,
+    name: p.name,
+    avatar: p.avatar,
+    score: 0,
+    position: 0,
+  }));
+
   return NextResponse.json({
     revealSequence,
     totalWords: allFoundWords.length,
+    initialScores,
   });
 }
 

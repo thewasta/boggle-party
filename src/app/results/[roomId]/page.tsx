@@ -59,17 +59,8 @@ export default function ResultsPage() {
 
       const data = await response.json();
 
-      // Initialize player scores at 0
-      const response2 = await fetch(`/api/rooms/${roomId}`);
-      const roomData = await response2.json();
-      const initialScores = roomData.players.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        avatar: p.avatar,
-        score: 0,
-        position: 0,
-      }));
-      setPlayerScores(initialScores);
+      // Initialize player scores at 0 (from response)
+      setPlayerScores(data.initialScores);
 
       // Start reveal
       await fetch(`/api/rooms/${roomId}/reveal`, {
