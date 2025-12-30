@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { roomsManager } from '@/server/rooms-manager';
 import { generateBoard } from '@/server/board-generator';
 import { startGameSchema } from '@/server/validation';
-import { triggerEvent } from '@/server/pusher-client';
-import type { GameStartedEvent } from '@/server/types';
+import { emitGameStarted } from '@/server/event-emitter';
 
 export async function POST(
   request: NextRequest,
@@ -56,11 +55,7 @@ export async function POST(
       );
     }
 
-    await triggerEvent(`presence-game-${room.id}`, 'game-started', {
-      startTime: updatedRoom.startTime!,
-      duration,
-      board,
-    } satisfies GameStartedEvent);
+    await emitGameStarted(room.id, updatedRoom.startTime!, duration, board);
 
     return NextResponse.json({
       success: true,
