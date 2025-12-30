@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { copyToClipboard } from '@/lib/utils';
+import { useState } from "react";
+import { copyToClipboard } from "@/lib/utils";
 
 interface RoomCodeDisplayProps {
   roomCode: string;
@@ -19,32 +19,59 @@ export function RoomCodeDisplay({ roomCode }: RoomCodeDisplayProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+    <div className="flex flex-col items-center gap-3">
+      <p className="text-sm font-medium text-indigo-700">
         Comparte este código con tus amigos
       </p>
       <div className="flex items-center gap-3">
-        <code className="text-4xl font-mono font-bold tracking-widest text-indigo-600 dark:text-indigo-400">
+        <code className="text-5xl font-mono font-black tracking-widest text-indigo-700 px-6 py-3 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-xl border-2 border-indigo-300">
           {roomCode}
         </code>
         <button
+          type="button"
           onClick={handleCopy}
-          className="p-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+          className="p-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
           aria-label="Copiar código"
         >
           {copied ? (
-            <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              role="img"
+              aria-label="Copiado"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={3}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           ) : (
-            <svg className="w-5 h-5 text-zinc-600 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              role="img"
+              aria-label="Copiar"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
             </svg>
           )}
         </button>
       </div>
       {copied && (
-        <p className="text-sm text-green-600 dark:text-green-400">¡Copiado!</p>
+        <p className="text-sm font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full">
+          ¡Copiado!
+        </p>
       )}
     </div>
   );

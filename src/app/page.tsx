@@ -1,18 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#FDF8F3] relative overflow-hidden">
       {/* Decorative background pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-10 left-10 text-8xl font-bold text-indigo-900 rotate-12">B</div>
-        <div className="absolute top-40 right-20 text-6xl font-bold text-purple-900 -rotate-6">O</div>
-        <div className="absolute bottom-32 left-1/4 text-7xl font-bold text-indigo-800 rotate-3">G</div>
-        <div className="absolute bottom-20 right-1/3 text-5xl font-bold text-purple-800 -rotate-12">L</div>
-        <div className="absolute top-1/3 right-10 text-6xl font-bold text-indigo-900 rotate-6">E</div>
+        <div className="absolute top-10 left-10 text-8xl font-bold text-indigo-900 rotate-12">
+          B
+        </div>
+        <div className="absolute top-40 right-20 text-6xl font-bold text-purple-900 -rotate-6">
+          O
+        </div>
+        <div className="absolute bottom-32 left-1/4 text-7xl font-bold text-indigo-800 rotate-3">
+          G
+        </div>
+        <div className="absolute bottom-20 right-1/3 text-5xl font-bold text-purple-800 -rotate-12">
+          L
+        </div>
+        <div className="absolute top-1/3 right-10 text-6xl font-bold text-indigo-900 rotate-6">
+          E
+        </div>
       </div>
 
       {/* Main content */}
@@ -21,12 +31,16 @@ export default function Home() {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="text-5xl">🎮</span>
-            <h1 className="text-6xl md:text-7xl font-black tracking-tight" style={{
-              background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A855F7 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
+            <h1
+              className="text-6xl md:text-7xl font-black tracking-tight"
+              style={{
+                background:
+                  "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A855F7 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
               Boggle Party
             </h1>
             <span className="text-5xl">🎲</span>
@@ -67,37 +81,37 @@ export default function Home() {
 
 function CreateRoomCard() {
   const router = useRouter();
-  const [playerName, setPlayerName] = useState('');
-  const [error, setError] = useState('');
+  const [playerName, setPlayerName] = useState("");
+  const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!playerName.trim()) {
-      setError('Ingresa tu nombre');
+      setError("Ingresa tu nombre");
       return;
     }
 
     startTransition(async () => {
       try {
-        const response = await fetch('/api/rooms', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/rooms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ playerName }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.error || 'Error al crear sala');
+          setError(data.error || "Error al crear sala");
           return;
         }
 
         router.push(`/room/${data.room.code}?playerId=${data.playerId}`);
       } catch {
-        setError('Error de conexión');
+        setError("Error de conexión");
       }
     });
   };
@@ -132,13 +146,32 @@ function CreateRoomCard() {
         >
           {isPending ? (
             <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <svg
+                className="animate-spin h-5 w-5"
+                viewBox="0 0 24 24"
+                role="img"
+                aria-label="Cargando"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
               </svg>
               Creando...
             </span>
-          ) : '¡Crear Sala!'}
+          ) : (
+            "¡Crear Sala!"
+          )}
         </button>
       </form>
     </div>
@@ -147,43 +180,48 @@ function CreateRoomCard() {
 
 function JoinRoomCard() {
   const router = useRouter();
-  const [roomCode, setRoomCode] = useState('');
-  const [playerName, setPlayerName] = useState('');
-  const [error, setError] = useState('');
+  const [roomCode, setRoomCode] = useState("");
+  const [playerName, setPlayerName] = useState("");
+  const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!roomCode.trim() || roomCode.length !== 6) {
-      setError('Código de sala inválido');
+      setError("Código de sala inválido");
       return;
     }
 
     if (!playerName.trim()) {
-      setError('Ingresa tu nombre');
+      setError("Ingresa tu nombre");
       return;
     }
 
     startTransition(async () => {
       try {
-        const response = await fetch(`/api/rooms/${roomCode.toUpperCase()}/join`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ playerName }),
-        });
+        const response = await fetch(
+          `/api/rooms/${roomCode.toUpperCase()}/join`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ playerName }),
+          },
+        );
 
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.error || 'Error al unirse');
+          setError(data.error || "Error al unirse");
           return;
         }
 
-        router.push(`/room/${roomCode.toUpperCase()}?playerId=${data.playerId}`);
+        router.push(
+          `/room/${roomCode.toUpperCase()}?playerId=${data.playerId}`,
+        );
       } catch {
-        setError('Error de conexión');
+        setError("Error de conexión");
       }
     });
   };
@@ -202,7 +240,9 @@ function JoinRoomCard() {
             type="text"
             value={roomCode}
             onChange={(e) => {
-              const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+              const val = e.target.value
+                .toUpperCase()
+                .replace(/[^A-Z0-9]/g, "");
               setRoomCode(val);
             }}
             placeholder="CÓDIGO"
@@ -232,13 +272,32 @@ function JoinRoomCard() {
         >
           {isPending ? (
             <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <svg
+                className="animate-spin h-5 w-5"
+                viewBox="0 0 24 24"
+                role="img"
+                aria-label="Cargando"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
               </svg>
               Uniéndose...
             </span>
-          ) : '¡Unirse!'}
+          ) : (
+            "¡Unirse!"
+          )}
         </button>
       </form>
     </div>
