@@ -19,7 +19,8 @@ export async function POST(
         {
           success: false,
           error: 'Invalid request',
-          details: validation.error.errors,
+          // Zod v4 expone los detalles de validación en `issues`, no en `errors`
+          details: validation.error.issues,
         },
         { status: 400 }
       );

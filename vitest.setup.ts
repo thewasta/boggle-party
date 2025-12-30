@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 
-// Set test environment
-process.env.NODE_ENV = 'test';
+// Set test environment (evitamos asignar directamente a una propiedad readonly)
+process.env = { ...process.env, NODE_ENV: 'test' };
 
 // Load test environment variables
 config({ path: '.env.test' });
