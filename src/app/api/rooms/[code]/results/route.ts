@@ -1,25 +1,37 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { roomsManager } from '@/server/rooms-manager';
-import { calculateUniqueWords, prepareRevealSequence } from '@/server/word-unique-calculator';
-import { gamesRepository, playersRepository, wordsRepository } from '@/server/db/repositories';
+import { type NextRequest, NextResponse } from "next/server";
+import {
+  gamesRepository,
+  playersRepository,
+  wordsRepository,
+} from "@/server/db/repositories";
+import { roomsManager } from "@/server/rooms-manager";
+import {
+  calculateUniqueWords,
+  prepareRevealSequence,
+} from "@/server/word-unique-calculator";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ code: string }> }
+  { params }: { params: Promise<{ code: string }> },
 ) {
   const { code } = await params;
   const room = roomsManager.getRoom(code);
 
   if (!room) {
-    return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+    return NextResponse.json({ error: "Room not found" }, { status: 404 });
   }
 
-  if (room.status !== 'finished') {
-    return NextResponse.json({ error: 'Game not finished' }, { status: 400 });
+  if (room.status !== "finished") {
+    return NextResponse.json({ error: "Game not finished" }, { status: 400 });
   }
 
   // Collect all found words from all players
-  const allFoundWords: Array<{ playerId: string; playerName: string; word: string; score: number }> = [];
+  const allFoundWords: Array<{
+    playerId: string;
+    playerName: string;
+    word: string;
+    score: number;
+  }> = [];
 
   for (const [playerId, player] of room.players) {
     for (const word of player.foundWords) {
@@ -43,7 +55,7 @@ export async function POST(
       room_code: room.code,
       grid_size: room.gridSize,
       duration: room.duration,
-      status: 'finished',
+      status: "finished",
       board: room.board,
     });
 
@@ -78,11 +90,11 @@ export async function POST(
       }
     }
   } catch (error) {
-    console.error('Failed to save game to database:', error);
+    console.error("Failed to save game to database:", error);
   }
 
   // Prepare initial player scores (all start at 0)
-  const initialScores = Array.from(room.players.values()).map(p => ({
+  const initialScores = Array.from(room.players.values()).map((p) => ({
     id: p.id,
     name: p.name,
     avatar: p.avatar,
@@ -94,6 +106,7 @@ export async function POST(
     revealSequence,
     totalWords: allFoundWords.length,
     initialScores,
+    hostId: room.host.id,
   });
 }
 

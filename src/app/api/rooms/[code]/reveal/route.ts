@@ -3,7 +3,7 @@ import { roomsManager } from '@/server/rooms-manager';
 import { emitRevealWord, emitResultsComplete } from '@/server/event-emitter';
 import type { RevealWordData } from '@/server/word-unique-calculator';
 
-const REVEAL_DELAY_MS = 1500;
+const REVEAL_DELAY_MS = 2500;
 
 export async function POST(
   request: NextRequest,
