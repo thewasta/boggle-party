@@ -70,44 +70,58 @@ export function usePusherChannel(
       // Bind event handlers
       if (handlers.onPlayerJoined) {
         channel.bind(PUSHER_EVENTS.PLAYER_JOINED, (data: unknown) => {
+          console.log('[Pusher] Received player-joined event:', data);
           handlersRef.current.onPlayerJoined?.(data as Parameters<NonNullable<typeof handlers.onPlayerJoined>>[0]);
         });
+        console.log('[Pusher] Bound handler for player-joined');
       }
 
       if (handlers.onPlayerLeft) {
         channel.bind(PUSHER_EVENTS.PLAYER_LEFT, (data: unknown) => {
+          console.log('[Pusher] Received player-left event:', data);
           handlersRef.current.onPlayerLeft?.(data as Parameters<NonNullable<typeof handlers.onPlayerLeft>>[0]);
         });
+        console.log('[Pusher] Bound handler for player-left');
       }
 
       if (handlers.onGameStarted) {
         channel.bind(PUSHER_EVENTS.GAME_STARTED, (data: unknown) => {
+          console.log('[Pusher] Received game-started event:', data);
           handlersRef.current.onGameStarted?.(data as Parameters<NonNullable<typeof handlers.onGameStarted>>[0]);
         });
+        console.log('[Pusher] Bound handler for game-started');
       }
 
       if (handlers.onGameEnded) {
         channel.bind(PUSHER_EVENTS.GAME_ENDED, (data: unknown) => {
+          console.log('[Pusher] Received game-ended event:', data);
           handlersRef.current.onGameEnded?.(data as Parameters<NonNullable<typeof handlers.onGameEnded>>[0]);
         });
+        console.log('[Pusher] Bound handler for game-ended');
       }
 
       if (handlers.onWordFound) {
         channel.bind(PUSHER_EVENTS.WORD_FOUND, (data: unknown) => {
+          console.log('[Pusher] Received word-found event:', data);
           handlersRef.current.onWordFound?.(data as Parameters<NonNullable<typeof handlers.onWordFound>>[0]);
         });
+        console.log('[Pusher] Bound handler for word-found');
       }
 
       if (handlers.onRevealWord) {
         channel.bind(PUSHER_EVENTS.REVEAL_WORD, (data: unknown) => {
+          console.log('[Pusher] Received reveal-word event:', data);
           handlersRef.current.onRevealWord?.(data as Parameters<NonNullable<typeof handlers.onRevealWord>>[0]);
         });
+        console.log('[Pusher] Bound handler for reveal-word');
       }
 
       if (handlers.onResultsComplete) {
         channel.bind(PUSHER_EVENTS.RESULTS_COMPLETE, (data: unknown) => {
+          console.log('[Pusher] Received results-complete event:', data);
           handlersRef.current.onResultsComplete?.(data as Parameters<NonNullable<typeof handlers.onResultsComplete>>[0]);
         });
+        console.log('[Pusher] Bound handler for results-complete');
       }
 
       // Log successful subscription

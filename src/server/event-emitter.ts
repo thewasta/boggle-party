@@ -19,7 +19,7 @@ import type {
  * Emit player-joined event
  */
 export async function emitPlayerJoined(roomId: string, player: Player, totalPlayers: number): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'player-joined', {
+  await triggerEvent(`game-${roomId}`, 'player-joined', {
     player,
     totalPlayers,
   } satisfies PlayerJoinedEvent);
@@ -29,7 +29,7 @@ export async function emitPlayerJoined(roomId: string, player: Player, totalPlay
  * Emit player-left event
  */
 export async function emitPlayerLeft(roomId: string, playerId: string, playerName: string, totalPlayers: number): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'player-left', {
+  await triggerEvent(`game-${roomId}`, 'player-left', {
     playerId,
     playerName,
     totalPlayers,
@@ -40,7 +40,7 @@ export async function emitPlayerLeft(roomId: string, playerId: string, playerNam
  * Emit game-started event
  */
 export async function emitGameStarted(roomId: string, startTime: number, duration: number, board: string[][]): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'game-started', {
+  await triggerEvent(`game-${roomId}`, 'game-started', {
     startTime,
     duration,
     board,
@@ -51,7 +51,7 @@ export async function emitGameStarted(roomId: string, startTime: number, duratio
  * Emit game-ended event
  */
 export async function emitGameEnded(roomId: string, endTime: number): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'game-ended', {
+  await triggerEvent(`game-${roomId}`, 'game-ended', {
     endTime,
   } satisfies GameEndedEvent);
 }
@@ -60,7 +60,7 @@ export async function emitGameEnded(roomId: string, endTime: number): Promise<vo
  * Emit word-found event (real-time word submission notification)
  */
 export async function emitWordFound(roomId: string, playerId: string, playerName: string, word: string, score: number, isUnique: boolean): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'word-found', {
+  await triggerEvent(`game-${roomId}`, 'word-found', {
     playerId,
     playerName,
     word,
@@ -79,7 +79,7 @@ export async function emitRevealWord(
   score: number,
   isUnique: boolean
 ): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'reveal-word', {
+  await triggerEvent(`game-${roomId}`, 'reveal-word', {
     word,
     player,
     score,
@@ -91,7 +91,7 @@ export async function emitRevealWord(
  * Emit results-complete event (end of reveal phase)
  */
 export async function emitResultsComplete(roomId: string, finalRankings: Array<{ id: string; name: string; avatar: string; score: number }>): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'results-complete', {
+  await triggerEvent(`game-${roomId}`, 'results-complete', {
     finalRankings,
   } satisfies ResultsCompleteEvent);
 }
