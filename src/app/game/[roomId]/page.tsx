@@ -28,6 +28,7 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
   const [resolvedParams, setResolvedParams] = useState<{
     roomId: string;
     playerId: string;
+    roomCode: string;
   } | null>(null);
 
   // Game state
@@ -52,9 +53,7 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
         return;
       }
 
-      setResolvedParams({ roomId, playerId });
-
-      // Fetch room data
+      // Fetch room data first to get roomCode
       try {
         const response = await fetch(`/api/rooms/${roomId}`, { cache: 'no-store' });
         if (!response.ok) {
@@ -62,6 +61,7 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
         }
 
         const data = await response.json();
+        setResolvedParams({ roomId, playerId, roomCode: data.room.code });
         if (data.room.status !== 'playing') {
           setError('El juego no ha empezado');
           setTimeout(() => router.push(`/room/${data.room.code}?playerId=${playerId}`), 2000);
@@ -108,6 +108,7 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
   return (
     <GameClient
       roomId={resolvedParams.roomId}
+      roomCode={resolvedParams.roomCode}
       playerId={resolvedParams.playerId}
       showCountdown={showCountdown}
       onCountdownComplete={() => {
@@ -128,6 +129,7 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
 
 function GameClient(props: {
   roomId: string;
+  roomCode: string;
   playerId: string;
   showCountdown: boolean;
   onCountdownComplete: () => void;
@@ -148,8 +150,8 @@ function GameClient(props: {
     playerId: props.playerId,
     onGameEnd: () => {
       props.setIsLocked(true);
-      // Navigate to results page after delay
-      setTimeout(() => router.push(`/results/${props.roomId}?playerId=${props.playerId}`), 2000);
+      // Navigate to results page after delay using roomCode
+      setTimeout(() => router.push(`/results/${props.roomCode}?playerId=${props.playerId}`), 2000);
     },
   });
 
