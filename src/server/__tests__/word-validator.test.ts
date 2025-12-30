@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { getDictionary } from '../dictionary';
-import { calculateScore, areAdjacent, isValidPath } from '../word-validator';
+import { calculateScore, areAdjacent, isValidPath, validateWord } from '../word-validator';
+import type { ValidationResult } from '../word-validator';
 
 describe('Word Validator - Scoring', () => {
   beforeAll(async () => {
@@ -100,5 +101,171 @@ describe('Word Validator - Adjacency', () => {
 
   it('should reject single-cell path', () => {
     expect(isValidPath([{ row: 0, col: 0 }], 4)).toBe(false);
+  });
+});
+
+describe('Word Validator - Complete Validation', () => {
+  beforeAll(async () => {
+    await getDictionary();
+  });
+
+  it('should validate a correct word submission', () => {
+    const result = validateWord({
+      word: 'HOLA',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 1, col: 1 },
+        { row: 1, col: 2 },
+      ],
+      foundWords: ['CASA'],
+      gridSize: 4,
+    });
+
+    expect(result.valid).toBe(true);
+    expect(result.score).toBe(1);
+    expect(result.reason).toBe('');
+  });
+
+  it('should reject word not in dictionary', () => {
+    const result = validateWord({
+      word: 'XXXX',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+        { row: 0, col: 3 },
+      ],
+      foundWords: [],
+      gridSize: 4,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.reason).toBe('Word not found in dictionary');
+  });
+
+  it('should reject duplicate submission', () => {
+    const result = validateWord({
+      word: 'HOLA',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 1, col: 1 },
+        { row: 1, col: 2 },
+      ],
+      foundWords: ['HOLA'],
+      gridSize: 4,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.reason).toBe('Word already submitted');
+  });
+
+  it('should reject invalid path (non-adjacent)', () => {
+    const result = validateWord({
+      word: 'HOLA',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+        { row: 0, col: 2 }, // Not adjacent from previous!
+      ],
+      foundWords: [],
+      gridSize: 4,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.reason).toBe('Invalid path');
+  });
+
+  it('should reject path with repeated cells', () => {
+    const result = validateWord({
+      word: 'HOLA',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 1, col: 1 },
+        { row: 0, col: 0 }, // Repeated!
+      ],
+      foundWords: [],
+      gridSize: 4,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.reason).toBe('Invalid path');
+  });
+
+  it('should reject word shorter than 3 letters', () => {
+    const result = validateWord({
+      word: 'HO',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+      ],
+      foundWords: [],
+      gridSize: 4,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.reason).toBe('Word too short');
+  });
+
+  it('should reject path length mismatch', () => {
+    const result = validateWord({
+      word: 'HOLA', // 4 letters
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+        // Only 3 cells!
+      ],
+      foundWords: [],
+      gridSize: 4,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.reason).toBe('Path length does not match word length');
+  });
+
+  it('should be case-insensitive', () => {
+    const result1 = validateWord({
+      word: 'HOLA',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+        { row: 0, col: 3 },
+      ],
+      foundWords: [],
+      gridSize: 4,
+    });
+
+    const result2 = validateWord({
+      word: 'hola',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+        { row: 0, col: 3 },
+      ],
+      foundWords: [],
+      gridSize: 4,
+    });
+
+    const result3 = validateWord({
+      word: 'HoLa',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+        { row: 0, col: 3 },
+      ],
+      foundWords: [],
+      gridSize: 4,
+    });
+
+    // All should have same validation result (word not found check aside)
+    expect(result1.score).toBe(result2.score);
+    expect(result2.score).toBe(result3.score);
   });
 });

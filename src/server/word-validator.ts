@@ -1,3 +1,5 @@
+import { esValida } from './dictionary';
+
 export interface Cell {
   row: number;
   col: number;
@@ -76,4 +78,60 @@ export function isValidPath(path: Cell[], gridSize: number): boolean {
   }
 
   return true;
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  score: number;
+  reason: string;
+}
+
+export interface WordValidationInput {
+  word: string;
+  path: Cell[];
+  foundWords: string[];
+  gridSize: number;
+}
+
+/**
+ * Complete word validation
+ * Checks: dictionary, adjacency, path validity, duplicates, length
+ */
+export function validateWord(input: WordValidationInput): ValidationResult {
+  const { word, path, foundWords, gridSize } = input;
+
+  // Check minimum length
+  if (word.length < 3) {
+    return { valid: false, score: 0, reason: 'Word too short' };
+  }
+
+  // Check path length matches word length
+  if (path.length !== word.length) {
+    return { valid: false, score: 0, reason: 'Path length does not match word length' };
+  }
+
+  // Check path validity (adjacency + no repeats)
+  if (!isValidPath(path, gridSize)) {
+    return { valid: false, score: 0, reason: 'Invalid path' };
+  }
+
+  // Check duplicate submission (case-insensitive)
+  const normalizedWord = word.toLowerCase();
+  if (foundWords.some(w => w.toLowerCase() === normalizedWord)) {
+    return { valid: false, score: 0, reason: 'Word already submitted' };
+  }
+
+  // Check dictionary (will throw if dictionary not loaded)
+  try {
+    if (!esValida(word)) {
+      return { valid: false, score: 0, reason: 'Word not found in dictionary' };
+    }
+  } catch (error) {
+    return { valid: false, score: 0, reason: 'Dictionary not loaded' };
+  }
+
+  // Calculate score
+  const score = calculateScore(word);
+
+  return { valid: true, score, reason: '' };
 }
