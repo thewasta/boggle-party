@@ -138,3 +138,71 @@ body {
 .animate-crown-bounce {
   animation: crown-bounce 2s ease-in-out infinite;
 }
+
+/* Word reveal animation */
+@keyframes word-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes unique-glow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes sparkle-1 {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sparkle-2 {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+@keyframes sparkle-3 {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  33% { opacity: 1; transform: scale(1) rotate(90deg); }
+}
+
+@keyframes sparkle-4 {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  25% { opacity: 1; transform: scale(1.2); }
+  75% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.animate-word-reveal {
+  animation: word-reveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-unique-glow {
+  animation: unique-glow 2s ease-in-out infinite;
+}
+
+.animate-sparkle-1 {
+  animation: sparkle-1 1.5s ease-in-out infinite;
+}
+
+.animate-sparkle-2 {
+  animation: sparkle-2 2s ease-in-out infinite;
+}
+
+.animate-sparkle-3 {
+  animation: sparkle-3 1.8s ease-in-out infinite;
+}
+
+.animate-sparkle-4 {
+  animation: sparkle-4 1.2s ease-in-out infinite;
+}

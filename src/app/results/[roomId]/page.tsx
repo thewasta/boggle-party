@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { usePusherChannel } from '@/hooks/usePusherChannel';
 import { ScoreStairs } from '@/components/results/ScoreStairs';
+import { WordReveal } from '@/components/results/WordReveal';
 
 export interface PlayerScore {
   id: string;
@@ -13,7 +14,7 @@ export interface PlayerScore {
   position: number;
 }
 
-interface RevealWord {
+export interface RevealWord {
   word: string;
   player: { id: string; name: string; avatar: string };
   score: number;
@@ -134,10 +135,6 @@ export default function ResultsPage() {
 }
 
 // Placeholder components - will be implemented in next tasks
-function WordReveal({ word, delay }: { word: RevealWord; delay: number }) {
-  return <div className="text-center text-gray-400">{word.word}</div>;
-}
-
 function FinalRanking({ playerScores }: { playerScores: PlayerScore[] }) {
   return (
     <div className="text-center">
