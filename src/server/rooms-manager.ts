@@ -248,6 +248,13 @@ export class RoomsManager {
   }
 
   /**
+   * Get number of active rooms
+   */
+  getActiveRoomCount(): number {
+    return this.rooms.size;
+  }
+
+  /**
    * Clear all rooms (TEST ONLY)
    */
   clearAllRoomsForTesting(): void {
