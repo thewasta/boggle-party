@@ -6,8 +6,7 @@
 import { NextRequest } from 'next/server';
 import { roomsManager } from '@/server/rooms-manager';
 import { apiSuccess, apiError } from '@/server/api-utils';
-import { triggerEvent } from '@/server/pusher-client';
-import type { GameEndedEvent } from '@/server/types';
+import { emitGameEnded } from '@/server/event-emitter';
 
 export async function POST(
   request: NextRequest,
@@ -28,9 +27,7 @@ export async function POST(
       return apiError('Failed to end game', 500);
     }
 
-    await triggerEvent(`presence-game-${room.id}`, 'game-ended', {
-      endTime: updatedRoom.endTime!,
-    } satisfies GameEndedEvent);
+    await emitGameEnded(room.id, updatedRoom.endTime!);
 
     return apiSuccess({
       message: 'Game ended',
