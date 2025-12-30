@@ -45,3 +45,22 @@ export type JoinRoomInput = z.infer<typeof joinRoomSchema>;
 export type LeaveRoomInput = z.infer<typeof leaveRoomSchema>;
 export type StartGameInput = z.infer<typeof startGameSchema>;
 export type GetRoomInput = z.infer<typeof getRoomSchema>;
+
+/**
+ * Cell position schema
+ */
+export const cellSchema = z.object({
+  row: z.number().int().min(0),
+  col: z.number().int().min(0),
+});
+
+/**
+ * Word submission request schema
+ */
+export const wordSubmissionSchema = z.object({
+  playerId: z.string().uuid('Invalid player ID'),
+  word: z.string().min(3, 'Word must be at least 3 characters'),
+  path: z.array(cellSchema).min(2, 'Path must have at least 2 cells'),
+});
+
+export type WordSubmissionInput = z.infer<typeof wordSubmissionSchema>;

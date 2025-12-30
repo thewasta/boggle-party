@@ -61,6 +61,18 @@ export class RoomsManager {
   }
 
   /**
+   * Get room by internal ID
+   */
+  getRoomById(id: string): Room | null {
+    for (const room of this.rooms.values()) {
+      if (room.id === id) {
+        return room;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Check if room exists
    */
   roomExists(code: string): boolean {
