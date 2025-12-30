@@ -4,6 +4,34 @@ import { join } from 'path';
 let dictionary: Set<string> | null = null;
 let stats = { wordCount: 0, loadedAt: new Date() };
 
+export class TrieNode {
+  children: Record<string, TrieNode> = {};
+  isWord: boolean = false;
+}
+
+export function buildTrie(words: Iterable<string>): TrieNode {
+  const root = new TrieNode();
+  for (const word of words) {
+    let node = root;
+    for (const char of word.toUpperCase()) {
+      if (!node.children[char]) node.children[char] = new TrieNode();
+      node = node.children[char];
+    }
+    node.isWord = true;
+  }
+  return root;
+}
+
+let trieCache: TrieNode | null = null;
+
+export async function getTrie(): Promise<TrieNode> {
+  if (trieCache) return trieCache;
+  
+  const words = await getDictionary();
+  trieCache = buildTrie(words);
+  return trieCache;
+}
+
 /**
  * Load Spanish dictionary into memory (singleton pattern)
  */
@@ -13,7 +41,7 @@ export async function getDictionary(): Promise<Set<string>> {
   }
 
   try {
-    const dictionaryPath = join(process.cwd(), 'data', 'dictionary.json');
+    const dictionaryPath = join(process.cwd(), 'data', 'dictionary_clean.json');
     const fileContent = readFileSync(dictionaryPath, 'utf-8');
     const words: string[] = JSON.parse(fileContent);
 
