@@ -1,7 +1,11 @@
-FROM node:20-alpine
+# Development Dockerfile for local development
+# Usage: docker compose up
 
-# Enable pnpm
-RUN corepack enable pnpm && corepack prepare pnpm@latest --activate
+FROM node:22-alpine
+
+# Install wget for healthchecks and pnpm globally
+RUN apk add --no-cache wget libc6-compat && \
+    npm install -g pnpm
 
 WORKDIR /app
 
@@ -9,7 +13,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
-RUN pnpm install
+RUN pnpm install --shamefully-hoist
 
 # Copy source code
 COPY . .
