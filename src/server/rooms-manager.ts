@@ -33,15 +33,31 @@ export class RoomsManager {
       attempts++;
 
       const existsInMemory = this.rooms.has(code);
-      const existsInDb = await gamesRepository.roomCodeExists(code);
+
+      // Check database with error handling
+      let existsInDb = false;
+      try {
+        existsInDb = await gamesRepository.roomCodeExists(code);
+      } catch (error) {
+        // Log but continue - if DB is down, we still check in-memory
+        // This allows the game to function during DB outages
+        console.warn('Database unavailable for room code check, using in-memory only:', error);
+      }
 
       if (!existsInMemory && !existsInDb) {
         break;
       }
     } while (attempts < maxAttempts);
 
+    // Final verification with graceful DB handling
     const existsInMemory = this.rooms.has(code);
-    const existsInDb = await gamesRepository.roomCodeExists(code);
+    let existsInDb = false;
+
+    try {
+      existsInDb = await gamesRepository.roomCodeExists(code);
+    } catch (error) {
+      console.warn('Database unavailable for final verification:', error);
+    }
 
     if (existsInMemory || existsInDb) {
       throw new RoomError('Failed to generate unique room code', 'INVALID_CODE');
