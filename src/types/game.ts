@@ -37,6 +37,7 @@ export interface GameState {
   duration: number;
   gridSize: 4 | 5 | 6;
   playerId: string;
+  initialRemaining?: number; // Calculated by server for page reload scenarios
 }
 
 /**

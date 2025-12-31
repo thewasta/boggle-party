@@ -35,24 +35,66 @@ export function useGameSync({
 
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const serverTimeOffsetRef = useRef<number>(0);
+  const hasTriggeredGameEndRef = useRef(false);
+  const lastStartTimeRef = useRef<number | null>(null);
+  const lastInitialRemainingRef = useRef<number | null>(null);
 
   // Synchronize timer with server time
   useEffect(() => {
     if (!gameState?.startTime) return;
 
-    // Calculate offset between client and server time
+    // Check if this is a new game (startTime changed)
+    const isNewGame = lastStartTimeRef.current !== gameState.startTime;
+    if (isNewGame) {
+      lastStartTimeRef.current = gameState.startTime;
+      hasTriggeredGameEndRef.current = false;
+      lastInitialRemainingRef.current = null;
+    }
+
+    // If server provided initialRemaining (page reload scenario), use it directly
+    if (gameState.initialRemaining !== undefined && lastInitialRemainingRef.current !== gameState.initialRemaining) {
+      lastInitialRemainingRef.current = gameState.initialRemaining;
+      setIsSynced(true);
+      const isExpired = gameState.initialRemaining <= 0;
+      setTimerState({
+        remaining: Math.max(0, gameState.initialRemaining),
+        isPaused: false,
+        isExpired,
+      });
+
+      // If game already expired, trigger end callback (only once per game)
+      if (isExpired && !hasTriggeredGameEndRef.current) {
+        hasTriggeredGameEndRef.current = true;
+        onGameEnd?.();
+      }
+      return;
+    }
+
+    // Calculate offset between client and server time (only for normal game start)
     const serverStartTime = gameState.startTime;
     const clientNow = Date.now();
     serverTimeOffsetRef.current = serverStartTime - clientNow;
 
+    // Calculate initial remaining time based on elapsed time
+    const serverNow = clientNow + serverTimeOffsetRef.current;
+    const elapsed = (serverNow - gameState.startTime) / 1000;
+    const initialRemaining = Math.max(0, gameState.duration - elapsed);
+
     setIsSynced(true);
-    // Start the timer
+    // Start the timer with actual remaining time, not full duration
+    const isExpired = initialRemaining <= 0;
     setTimerState({
-      remaining: gameState.duration,
+      remaining: Math.ceil(initialRemaining),
       isPaused: false,
-      isExpired: false,
+      isExpired,
     });
-  }, [gameState?.startTime, gameState?.duration]);
+
+    // If game already expired, trigger end callback (only once per game)
+    if (isExpired && !hasTriggeredGameEndRef.current) {
+      hasTriggeredGameEndRef.current = true;
+      onGameEnd?.();
+    }
+  }, [gameState?.startTime, gameState?.duration, gameState?.initialRemaining]);
 
   // Update timer every 100ms for smooth countdown
   useEffect(() => {

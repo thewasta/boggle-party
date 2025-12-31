@@ -195,25 +195,32 @@ function GameClient(props: {
   useEffect(() => {
     const fetchGameState = async () => {
       try {
-        const response = await fetch(`/api/rooms/${props.roomId}`);
+        const response = await fetch(
+          `/api/rooms/${props.roomCode}/player-state?playerId=${props.playerId}`,
+          { cache: "no-store" }
+        );
         const data = await response.json();
 
         setGameState({
-          roomId: data.room.id,
-          roomCode: data.room.code,
-          board: data.room.board,
-          startTime: data.room.startTime,
-          duration: data.room.duration,
-          gridSize: data.room.gridSize,
+          roomId: props.roomId,
+          roomCode: props.roomCode,
+          board: data.playerState.board,
+          startTime: data.playerState.startTime,
+          duration: data.playerState.duration,
+          gridSize: data.playerState.gridSize,
           playerId: props.playerId,
+          initialRemaining: data.playerState.remaining,
         });
+
+        // Restore found words from server (now includes score and timestamp)
+        props.setFoundWords(data.playerState.foundWords);
       } catch (err) {
         console.error("Failed to fetch game state:", err);
       }
     };
 
     fetchGameState();
-  }, [props.roomId, props.playerId, setGameState]);
+  }, [props.roomId, props.playerId, props.roomCode, setGameState, props.setFoundWords]);
 
   /**
    * Handle word submission
