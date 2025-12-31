@@ -8,7 +8,6 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Countdown } from "@/components/game/Countdown";
 import { CurrentWordDisplay } from "@/components/game/CurrentWordDisplay";
 import { GameBoard } from "@/components/game/GameBoard";
 import { Timer } from "@/components/game/Timer";
@@ -37,8 +36,7 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
   } | null>(null);
 
   // Game state
-  const [showCountdown, setShowCountdown] = useState(true);
-  const [isLocked, setIsLocked] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
   const [selection, setSelection] = useState<WordSelection>({
     cells: [],
     currentWord: "",
@@ -142,11 +140,6 @@ export default function GamePage({ params, searchParams }: GamePageProps) {
       roomCode={resolvedParams.roomCode}
       playerId={resolvedParams.playerId}
       hostId={resolvedParams.hostId}
-      showCountdown={showCountdown}
-      onCountdownComplete={() => {
-        setShowCountdown(false);
-        setIsLocked(false);
-      }}
       isLocked={isLocked}
       selection={selection}
       setSelection={setSelection}
@@ -164,8 +157,6 @@ function GameClient(props: {
   roomCode: string;
   playerId: string;
   hostId: string;
-  showCountdown: boolean;
-  onCountdownComplete: () => void;
   isLocked: boolean;
   selection: WordSelection;
   setSelection: (s: WordSelection) => void;
@@ -353,11 +344,6 @@ function GameClient(props: {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden touch-none">
-      {/* Countdown Overlay */}
-      {props.showCountdown && (
-        <Countdown onComplete={props.onCountdownComplete} />
-      )}
-
       {/* Main Game Layout */}
       <div className="min-h-screen py-6 px-4">
         <div className="max-w-4xl mx-auto space-y-6">
