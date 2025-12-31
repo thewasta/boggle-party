@@ -19,6 +19,9 @@ services:
       - PUSHER_USE_TLS=${PUSHER_USE_TLS:-true}
       - NEXT_PUBLIC_PUSHER_KEY=${NEXT_PUBLIC_PUSHER_KEY}
       - NEXT_PUBLIC_PUSHER_CLUSTER=${NEXT_PUBLIC_PUSHER_CLUSTER}
+    labels:
+      - "coolify.port=3000"
+      - "coolify.service=web"
     depends_on:
       db:
         condition: service_healthy
