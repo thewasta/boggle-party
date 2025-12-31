@@ -15,6 +15,15 @@ export type RouteParams<T> = { params: Promise<T> };
 // ============================================================================
 
 /**
+ * A word found by a player with its metadata
+ */
+export interface FoundWord {
+  word: string;
+  score: number;
+  timestamp: number;
+}
+
+/**
  * Represents a player in a room
  */
 export interface Player {
@@ -23,7 +32,7 @@ export interface Player {
   avatar: string;
   isHost: boolean;
   score: number;
-  foundWords: string[]; // Words submitted by this player
+  foundWords: FoundWord[]; // Words submitted by this player with metadata
   createdAt: Date;
 }
 

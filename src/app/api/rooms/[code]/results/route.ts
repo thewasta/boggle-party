@@ -34,8 +34,7 @@ export async function POST(
   }> = [];
 
   for (const [playerId, player] of room.players) {
-    for (const word of player.foundWords) {
-      const score = calculateWordScore(word);
+    for (const { word, score } of player.foundWords) {
       allFoundWords.push({
         playerId,
         playerName: player.name,

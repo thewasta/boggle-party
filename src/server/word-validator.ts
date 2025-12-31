@@ -89,7 +89,7 @@ export interface ValidationResult {
 export interface WordValidationInput {
   word: string;
   path: Cell[];
-  foundWords: string[];
+  foundWords: { word: string }[];
   gridSize: number;
 }
 
@@ -119,7 +119,7 @@ export async function validateWord(input: WordValidationInput): Promise<Validati
   }
 
   // Check duplicate submission (case-insensitive)
-  if (foundWords.some((w) => w.toLowerCase() === normalizedWordLower)) {
+  if (foundWords.some((w) => w.word.toLowerCase() === normalizedWordLower)) {
     return { valid: false, score: 0, reason: 'Word already submitted' };
   }
 

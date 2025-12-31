@@ -72,7 +72,11 @@ export async function POST(
       );
     }
 
-    player.foundWords.push(word.toUpperCase());
+    player.foundWords.push({
+      word: word.toUpperCase(),
+      score: result.score,
+      timestamp: Date.now(),
+    });
     player.score += result.score;
 
     return NextResponse.json({
