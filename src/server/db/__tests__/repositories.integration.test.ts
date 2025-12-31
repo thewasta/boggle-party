@@ -66,6 +66,24 @@ describe('Database Repositories Integration Tests', () => {
       expect(updated.status).toBe('playing');
       expect(updated.started_at).toBeDefined();
     });
+
+    it('should detect existing room codes', async () => {
+      // Create a game with a specific room code
+      await gamesRepository.create({
+        room_code: 'UNIQUE1',
+        grid_size: 4,
+        duration: 120,
+        status: 'finished',
+      });
+
+      // Check that the code exists
+      const exists = await gamesRepository.roomCodeExists('UNIQUE1');
+      expect(exists).toBe(true);
+
+      // Check that a different code does not exist
+      const notExists = await gamesRepository.roomCodeExists('NOTREAL');
+      expect(notExists).toBe(false);
+    });
   });
 
   describe('PlayersRepository', () => {
