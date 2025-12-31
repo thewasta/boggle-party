@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { POST } from '../route';
+import { NextRequest } from 'next/server';
 import { roomsManager } from '@/server/rooms-manager';
 import { gamesRepository, playersRepository, wordsRepository } from '@/server/db/repositories';
 import type { Room } from '@/server/types';
@@ -45,11 +46,11 @@ describe('POST /api/rooms/[code]/results', () => {
   it('returns 404 for non-existent room', async () => {
     vi.mocked(roomsManager.getRoom).mockReturnValue(null as any);
 
-    const request = new Request('http://localhost:3000/api/rooms/INVALID/results', {
+    const request = new NextRequest('http://localhost:3000/api/rooms/INVALID/results', {
       method: 'POST',
     });
 
-    const response = await POST(request, { params: { code: 'INVALID' } });
+    const response = await POST(request, { params: Promise.resolve({ code: 'INVALID' }) });
 
     expect(response.status).toBe(404);
   });

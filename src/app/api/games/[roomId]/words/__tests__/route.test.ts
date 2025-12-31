@@ -174,7 +174,7 @@ describe('POST /api/games/[roomCode]/words', () => {
       }),
     });
 
-    const response = await POST(request, { params: Promise.resolve({ roomCode: 'non-existent-room-id' }) });
+    const response = await POST(request, { params: Promise.resolve({ roomId: 'non-existent-room-id' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
