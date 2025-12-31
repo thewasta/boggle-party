@@ -13,7 +13,7 @@ describe('POST /api/games/[roomCode]/words', () => {
     await getDictionary();
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     roomsManager.clearAllRoomsForTesting();
 
     const host: Player = {
@@ -36,7 +36,7 @@ describe('POST /api/games/[roomCode]/words', () => {
       createdAt: new Date(),
     };
 
-    const room = roomsManager.createRoom(host, 4);
+    const room = await roomsManager.createRoom(host, 4);
     roomsManager.joinRoom(room.code, player2);
     roomCode = room.code;
     playerId = host.id;
@@ -216,7 +216,7 @@ describe('POST /api/games/[roomCode]/words', () => {
       createdAt: new Date(),
     };
 
-    const room = roomsManager.createRoom(host, 4);
+    const room = await roomsManager.createRoom(host, 4);
     const roomWithoutGame = room.code;
 
     const request = new NextRequest(`http://localhost:3000/api/games/${roomWithoutGame}/words`, {

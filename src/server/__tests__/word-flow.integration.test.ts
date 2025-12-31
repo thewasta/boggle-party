@@ -46,7 +46,7 @@ describe('Word Flow Integration Tests', () => {
 
   it('should handle complete word submission flow', async () => {
     // Create room
-    const room = roomsManager.createRoom(host, 4);
+    const room = await roomsManager.createRoom(host, 4);
     roomsManager.joinRoom(room.code, player2);
 
     // Generate board with known words
@@ -112,7 +112,7 @@ describe('Word Flow Integration Tests', () => {
   });
 
   it('should correctly score different word lengths', async () => {
-    const room = roomsManager.createRoom(host, 4);
+    const room = await roomsManager.createRoom(host, 4);
     roomsManager.joinRoom(room.code, player2);
     const board = generateBoard(4);
     roomsManager.startGame(room.code, 120, board);

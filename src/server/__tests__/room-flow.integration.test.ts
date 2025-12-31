@@ -9,7 +9,7 @@ describe('Room Flow Integration Tests', () => {
   });
 
   describe('Complete game lifecycle', () => {
-    it('should create, join, leave, and delete room', () => {
+    it('should create, join, leave, and delete room', async () => {
       // 1. Create room with host
       const host: Player = {
         id: 'host-1',
@@ -21,7 +21,7 @@ describe('Room Flow Integration Tests', () => {
         createdAt: new Date(),
       };
 
-      const room = roomsManager.createRoom(host, 4);
+      const room = await roomsManager.createRoom(host, 4);
       expect(room.code).toHaveLength(6);
       expect(room.players.size).toBe(1);
 
@@ -49,7 +49,7 @@ describe('Room Flow Integration Tests', () => {
       expect(roomsManager.getRoom(room.code)).toBeNull();
     });
 
-    it('should transfer host when original host leaves', () => {
+    it('should transfer host when original host leaves', async () => {
       // Create room with host
       const host: Player = {
         id: 'host-1',
@@ -61,7 +61,7 @@ describe('Room Flow Integration Tests', () => {
         createdAt: new Date(),
       };
 
-      const room = roomsManager.createRoom(host, 4);
+      const room = await roomsManager.createRoom(host, 4);
 
       // Add more players
       const player2: Player = {
@@ -98,7 +98,7 @@ describe('Room Flow Integration Tests', () => {
   });
 
   describe('Game state transitions', () => {
-    it('should transition through game states', () => {
+    it('should transition through game states', async () => {
       const host: Player = {
         id: 'host-1',
         name: 'Alice',
@@ -109,7 +109,7 @@ describe('Room Flow Integration Tests', () => {
         createdAt: new Date(),
       };
 
-      const room = roomsManager.createRoom(host, 4);
+      const room = await roomsManager.createRoom(host, 4);
 
       // Add player 2
       const player2: Player = {
@@ -141,7 +141,7 @@ describe('Room Flow Integration Tests', () => {
   });
 
   describe('Edge cases', () => {
-    it('should not allow starting game with < 2 players', () => {
+    it('should not allow starting game with < 2 players', async () => {
       const host: Player = {
         id: 'host-1',
         name: 'Alice',
@@ -152,7 +152,7 @@ describe('Room Flow Integration Tests', () => {
         createdAt: new Date(),
       };
 
-      const room = roomsManager.createRoom(host, 4);
+      const room = await roomsManager.createRoom(host, 4);
 
       const mockBoard = [['H', 'O', 'L', 'A']];
 
@@ -161,7 +161,7 @@ describe('Room Flow Integration Tests', () => {
       }).toThrow();
     });
 
-    it('should not allow joining full room (8 players)', () => {
+    it('should not allow joining full room (8 players)', async () => {
       const host: Player = {
         id: 'host-1',
         name: 'Alice',
@@ -172,7 +172,7 @@ describe('Room Flow Integration Tests', () => {
         createdAt: new Date(),
       };
 
-      const room = roomsManager.createRoom(host, 4);
+      const room = await roomsManager.createRoom(host, 4);
 
       // Add 7 more players (total 8)
       for (let i = 2; i <= 8; i++) {

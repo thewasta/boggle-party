@@ -47,6 +47,16 @@ export class GamesRepository {
   }
 
   /**
+   * Check if a room code already exists in the database
+   */
+  async roomCodeExists(roomCode: string): Promise<boolean> {
+    const pool = getPool();
+    const query = 'SELECT 1 FROM games WHERE room_code = $1 LIMIT 1';
+    const result = await pool.query(query, [roomCode]);
+    return result.rows.length > 0;
+  }
+
+  /**
    * Update game status with optional timestamps
    */
   async updateStatus(

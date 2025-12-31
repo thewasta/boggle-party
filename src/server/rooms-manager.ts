@@ -11,6 +11,7 @@ import type {
 } from './types';
 import type { GridSize } from '@/server/db/schema';
 import { RoomError } from './types';
+import { gamesRepository } from './db/repositories';
 
 const ROOM_CODE_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const generateRoomCode = customAlphabet(ROOM_CODE_ALPHABET, 6);
@@ -21,7 +22,7 @@ export class RoomsManager {
   /**
    * Create a new room with a unique code
    */
-  createRoom(host: Player, gridSize: GridSize): Room {
+  async createRoom(host: Player, gridSize: GridSize): Promise<Room> {
     // Generate unique room code
     let code: string;
     let attempts = 0;
@@ -30,9 +31,19 @@ export class RoomsManager {
     do {
       code = generateRoomCode();
       attempts++;
-    } while (this.rooms.has(code) && attempts < maxAttempts);
 
-    if (this.rooms.has(code)) {
+      const existsInMemory = this.rooms.has(code);
+      const existsInDb = await gamesRepository.roomCodeExists(code);
+
+      if (!existsInMemory && !existsInDb) {
+        break;
+      }
+    } while (attempts < maxAttempts);
+
+    const existsInMemory = this.rooms.has(code);
+    const existsInDb = await gamesRepository.roomCodeExists(code);
+
+    if (existsInMemory || existsInDb) {
       throw new RoomError('Failed to generate unique room code', 'INVALID_CODE');
     }
 

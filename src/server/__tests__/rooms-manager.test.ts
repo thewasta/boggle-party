@@ -22,7 +22,7 @@ describe('RoomsManager', () => {
   });
 
   describe('createRoom', () => {
-    it('should create a room with unique 6-character code', () => {
+    it('should create a room with unique 6-character code', async () => {
       const player: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -33,7 +33,7 @@ describe('RoomsManager', () => {
         createdAt: new Date(),
       };
 
-      const room = manager.createRoom(player, 4);
+      const room = await manager.createRoom(player, 4);
 
       expect(room).toBeDefined();
       expect(room.code).toHaveLength(6);
@@ -43,7 +43,7 @@ describe('RoomsManager', () => {
       expect(room.status).toBe('waiting');
     });
 
-    it('should generate unique room codes', () => {
+    it('should generate unique room codes', async () => {
       const player1: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -67,7 +67,7 @@ describe('RoomsManager', () => {
 
       // Create 100 rooms, all codes should be unique
       for (let i = 0; i < 100; i++) {
-        const room = manager.createRoom(player1, 4);
+        const room = await manager.createRoom(player1, 4);
         codes.add(room.code);
       }
 
@@ -76,7 +76,7 @@ describe('RoomsManager', () => {
   });
 
   describe('getRoom', () => {
-    it('should return room by code', () => {
+    it('should return room by code', async () => {
       const player: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -87,7 +87,7 @@ describe('RoomsManager', () => {
         createdAt: new Date(),
       };
 
-      const room = manager.createRoom(player, 4);
+      const room = await manager.createRoom(player, 4);
 
       const found = manager.getRoom(room.code);
 
@@ -103,7 +103,7 @@ describe('RoomsManager', () => {
   });
 
   describe('joinRoom', () => {
-    it('should add player to existing room', () => {
+    it('should add player to existing room', async () => {
       const host: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -114,7 +114,7 @@ describe('RoomsManager', () => {
         createdAt: new Date(),
       };
 
-      const room = manager.createRoom(host, 4);
+      const room = await manager.createRoom(host, 4);
 
       const player: Player = {
         id: 'player-2',
@@ -151,7 +151,7 @@ describe('RoomsManager', () => {
   });
 
   describe('leaveRoom', () => {
-    it('should remove player from room', () => {
+    it('should remove player from room', async () => {
       const host: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -162,7 +162,7 @@ describe('RoomsManager', () => {
         createdAt: new Date(),
       };
 
-      const room = manager.createRoom(host, 4);
+      const room = await manager.createRoom(host, 4);
 
       const player: Player = {
         id: 'player-2',
@@ -183,7 +183,7 @@ describe('RoomsManager', () => {
       expect(updatedRoom?.players.has('player-2')).toBe(false);
     });
 
-    it('should delete room if host leaves and no players remain', () => {
+    it('should delete room if host leaves and no players remain', async () => {
       const host: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -194,7 +194,7 @@ describe('RoomsManager', () => {
         createdAt: new Date(),
       };
 
-      const room = manager.createRoom(host, 4);
+      const room = await manager.createRoom(host, 4);
 
       const updatedRoom = manager.leaveRoom(room.code, 'player-1');
 
@@ -204,7 +204,7 @@ describe('RoomsManager', () => {
   });
 
   describe('startGame', () => {
-    it('should update room status to playing and set timestamps', () => {
+    it('should update room status to playing and set timestamps', async () => {
       const host: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -215,7 +215,7 @@ describe('RoomsManager', () => {
         createdAt: new Date(),
       };
 
-      const room = manager.createRoom(host, 4);
+      const room = await manager.createRoom(host, 4);
 
       // Add another player
       const player2: Player = {
@@ -256,7 +256,7 @@ describe('RoomsManager', () => {
   });
 
   describe('endGame', () => {
-    it('should update room status to finished and set endTime', () => {
+    it('should update room status to finished and set endTime', async () => {
       const host: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -267,7 +267,7 @@ describe('RoomsManager', () => {
         createdAt: new Date(),
       };
 
-      const room = manager.createRoom(host, 4);
+      const room = await manager.createRoom(host, 4);
 
       // Add second player to meet minimum requirement
       const player2: Player = {
@@ -293,7 +293,7 @@ describe('RoomsManager', () => {
   });
 
   describe('playerCount', () => {
-    it('should return correct player count', () => {
+    it('should return correct player count', async () => {
       const host: Player = {
         id: 'player-1',
         name: 'Alice',
@@ -304,7 +304,7 @@ describe('RoomsManager', () => {
         createdAt: new Date(),
       };
 
-      const room = manager.createRoom(host, 4);
+      const room = await manager.createRoom(host, 4);
 
       expect(manager.playerCount(room.code)).toBe(1);
 
@@ -330,14 +330,14 @@ describe('RoomsManager', () => {
 });
 
 describe('RoomsManager - Stress Tests', () => {
-  it('should generate unique codes even with many rooms', () => {
+  it('should generate unique codes even with many rooms', async () => {
     const manager = new RoomsManager();
     const player = createMockPlayer('player-1', 'Alice');
     const codes = new Set<string>();
 
     // Create 1000 rooms
     for (let i = 0; i < 1000; i++) {
-      const room = manager.createRoom(player, 4);
+      const room = await manager.createRoom(player, 4);
       codes.add(room.code);
     }
 
@@ -352,12 +352,12 @@ describe('RoomsManager - Stress Tests', () => {
     // Create rooms concurrently
     const promises = Array.from({ length: 100 }, async (_, i) => {
       const player = createMockPlayer(`player-${i}`, `Player${i}`);
-      const room = manager.createRoom(player, 4);
+      const room = await manager.createRoom(player, 4);
       return room.code;
     });
 
     const results = await Promise.all(promises);
-    results.forEach(code => codes.add(code));
+    results.forEach((code: string) => codes.add(code));
 
     // All codes should be unique
     expect(codes.size).toBe(100);

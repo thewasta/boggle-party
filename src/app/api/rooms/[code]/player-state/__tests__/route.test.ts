@@ -34,7 +34,7 @@ function createMockNextRequest(url: string): NextRequest {
 }
 
 describe('GET /api/rooms/[code]/player-state', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     roomsManager.clearAllRoomsForTesting();
   });
 
@@ -63,7 +63,7 @@ describe('GET /api/rooms/[code]/player-state', () => {
       createdAt: new Date(),
     };
 
-    const room = roomsManager.createRoom(host, 4);
+    const room = await roomsManager.createRoom(host, 4);
     roomsManager.joinRoom(room.code, player2);
     roomsManager.startGame(room.code, 90, [
       ['A', 'B', 'C', 'D'],
@@ -130,7 +130,7 @@ describe('GET /api/rooms/[code]/player-state', () => {
       createdAt: new Date(),
     };
 
-    const room = roomsManager.createRoom(host, 4);
+    const room = await roomsManager.createRoom(host, 4);
 
     const request = createMockNextRequest(
       `http://localhost:3000/api/rooms/${room.code}/player-state?playerId=host-1`
