@@ -73,11 +73,12 @@ describe('board-utils', () => {
       expect(result).toEqual({ row: 0, col: 0 });
     });
 
-    it('returns null for coordinates in the gap area', () => {
+    it('returns cell for coordinates near gap using generous hit radius', () => {
       // CELL_SIZE=70, GAP=8, totalSize=78
-      // Position 75 is in the gap (cell is 0-69, gap is 70-77)
+      // Position 75 is in the gap but hit radius (49) reaches cell (0,1) center at 113
       const result = getCellFromCoordinates(75, 35, 70, 8, 4);
-      expect(result).toBeNull();
+      // Should return (0,1) as it's the closest cell within hit radius
+      expect(result).toEqual({ row: 0, col: 1 });
     });
 
     it('returns null for coordinates outside grid', () => {

@@ -20,12 +20,13 @@ describe('Board Generator', () => {
     expect(board[0]).toHaveLength(6);
   });
 
-  it('should contain only single uppercase letters', () => {
+  it('should contain only valid letters (including QU as special case)', () => {
     const board = generateBoard(4);
     for (const row of board) {
       for (const cell of row) {
-        expect(cell).toMatch(/^[A-ZÑ]$/);
-        expect(cell.length).toBe(1);
+        // QU is a special case in Spanish (Q always with U)
+        const isValid = cell === 'QU' || (/^[A-ZÑ]$/.test(cell));
+        expect(isValid).toBe(true);
       }
     }
   });

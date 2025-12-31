@@ -76,7 +76,7 @@ describe('Word Flow Integration Tests', () => {
     expect(result1.score).toBe(1);
 
     // Update player
-    host.foundWords.push('HOLA');
+    host.foundWords.push({ word: 'HOLA', score: result1.score, timestamp: Date.now() });
     host.score += result1.score;
 
     // Player 2 submits same word (not duplicate for them)

@@ -113,7 +113,7 @@ describe('Word Validator - Complete Validation', () => {
         { row: 1, col: 1 },
         { row: 1, col: 2 },
       ],
-      foundWords: ['CASA'],
+      foundWords: [{ word: 'CASA', score: 4, timestamp: 1000 }],
       gridSize: 4,
     });
 
@@ -148,7 +148,7 @@ describe('Word Validator - Complete Validation', () => {
         { row: 1, col: 1 },
         { row: 1, col: 2 },
       ],
-      foundWords: ['HOLA'],
+      foundWords: [{ word: 'HOLA', score: 4, timestamp: 1000 }],
       gridSize: 4,
     });
 
