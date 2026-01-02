@@ -10,6 +10,7 @@ Boggle Party is a real-time multiplayer Boggle game in Spanish. Players find wor
 - Next.js 16 with App Router and React 19
 - TypeScript 5
 - Tailwind CSS v4
+- Framer Motion for animations
 - Pusher Channels for real-time synchronization
 - In-memory Spanish dictionary (7.9MB) for server-side validation
 - Biome for linting and formatting
@@ -279,6 +280,8 @@ scripts/
 - ✅ **Epic 5: Pusher Integration** - Real-time events, typed emitters, React hooks
 - ✅ **Epic 6: Landing & Waiting Room UI** - Landing page, waiting room with real-time player updates
 - ✅ **Epic 7: Active Game Phase** - Interactive game board with drag-to-select, countdown, timer, word validation, and found words list
+- ✅ **Epic 8: Results Phase** - Sequential word reveal with animated scoring and final rankings
+- ✅ **Epic 9: Polish & Animations** - Visual polish, micro-interactions, accessibility improvements, performance optimizations, error boundaries
 
 **Recent Improvements:**
 - **Board Generation:** Migrated from letter frequency formula to specialized Spanish dice
@@ -287,9 +290,13 @@ scripts/
 - **Landing Page:** Playful design with warm cream background (#FDF8F3), gradient titles, decorative floating letters
 - **Waiting Room:** Real-time Pusher integration, host controls (grid selector, start game), high-contrast indigo theme
 - **Active Game:** Drag-to-select word input, 3-2-1 countdown overlay, synchronized timer, visual path rendering, validation feedback
+- **Results Phase:** Animated word reveal with staggered delays, score animations, podium with bouncing trophy
+- **Animations:** Framer Motion integration for smooth transitions, hover states, and micro-interactions
+- **Accessibility:** ARIA labels, skip links, focus traps, keyboard navigation support
+- **Performance:** React Compiler enabled, lazy loading, optimized Docker build
 
 **Next Epic:**
-- Epic 8: Results Phase - Sequential word reveal with animated scoring and final rankings
+- Ready for production deployment
 
 See `docs/plans/2025-12-29-boggle-party-epics.md` for full project roadmap.
 
@@ -300,6 +307,58 @@ See `docs/plans/2025-12-29-boggle-party-epics.md` for full project roadmap.
 ## React Compiler
 
 The project uses React Compiler (`reactCompiler: true` in next.config.ts) - optimize for automatic memoization.
+
+## Epic 9 Features: Polish & Animations
+
+### Animation Components (Framer Motion)
+
+**Core Animation Components:**
+- `AnimatedButton` - Base button with hover/tap animations (src/components/ui/AnimatedButton.tsx)
+- `PageTransition` - Page transition wrapper with fade/slide effects
+- `ValidationFeedback` - Success/error feedback animations with shake effects
+- `ScoreAnimation` - Score change animations with unique bonus indicator
+- `CopyFeedback` - Copy success feedback with checkmark animation
+
+**Game-Specific Animations:**
+- `WordPath` - Animated SVG line showing word selection path
+- `FloatingLetters` - Background decoration letters on landing page
+- `PlayerAvatar` - Animated player avatars with spin entrance effects
+- `WordReveal` - Staggered word reveal with scale/fade animations
+- `FinalRanking` - Podium animations with bouncing trophy
+
+### Accessibility Features
+
+**Keyboard Navigation:**
+- Skip link allows jumping to main content
+- Focus traps for modal dialogs
+- Logical tab order through interactive elements
+- ARIA labels and roles throughout
+
+**Screen Reader Support:**
+- Game state announcements
+- Word validation feedback
+- Player join/leave announcements
+- Results reading order
+
+### Performance Optimizations
+
+**Build Configuration:**
+- React Compiler enabled for automatic memoization
+- Package import optimization for framer-motion
+- Console removal in production builds
+- SWC minification
+- Multi-stage Docker build with standalone output
+
+**Lazy Loading:**
+- `LazyImage` component with loading skeleton
+- Image format optimization (WebP/AVIF)
+
+### Error Handling
+
+**Error Boundaries:**
+- `ErrorBoundary` class component wrapping the app
+- `ErrorMessage` with animated error display
+- Graceful fallbacks and retry mechanisms
 
 ## Database Development Workflow
 
