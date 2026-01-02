@@ -26,7 +26,7 @@ describe('Pusher Events', () => {
     await POST(request);
 
     expect(triggerEvent).toHaveBeenCalledWith(
-      expect.stringContaining('presence-game-'),
+      expect.stringContaining('game-'),
       'player-joined',
       expect.objectContaining({
         player: expect.objectContaining({ name: 'Alice' }),

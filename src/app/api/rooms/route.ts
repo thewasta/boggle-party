@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     const room = await roomsManager.createRoom(player, validatedData.gridSize || 4);
 
-    await triggerEvent(`presence-game-${room.id}`, 'player-joined', {
+    await triggerEvent(`game-${room.code}`, 'player-joined', {
       player: room.host,
       totalPlayers: room.players.size,
     } satisfies PlayerJoinedEvent);
