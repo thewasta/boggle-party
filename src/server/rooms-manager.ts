@@ -211,6 +211,42 @@ export class RoomsManager {
   }
 
   /**
+   * Reset room for a rematch
+   * Clears game data but keeps all players
+   */
+  rematchRoom(code: string, requesterPlayerId: string): Room | null {
+    const room = this.rooms.get(code);
+
+    if (!room) {
+      throw new RoomError('Room not found', 'ROOM_NOT_FOUND');
+    }
+
+    // Only host can request rematch
+    if (room.host.id !== requesterPlayerId) {
+      throw new RoomError('Only host can request rematch', 'NOT_HOST');
+    }
+
+    // Room must be in finished state
+    if (room.status !== 'finished') {
+      throw new RoomError('Can only rematch from finished state', 'REMATCH_NOT_ALLOWED');
+    }
+
+    // Reset room state for new game
+    room.status = 'waiting';
+    room.board = undefined;
+    room.startTime = undefined;
+    room.endTime = undefined;
+
+    // Clear player scores and found words for new game
+    for (const player of room.players.values()) {
+      player.score = 0;
+      player.foundWords = [];
+    }
+
+    return room;
+  }
+
+  /**
    * Get player count in room
    */
   playerCount(code: string): number {
