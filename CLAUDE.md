@@ -284,6 +284,9 @@ scripts/
 - ✅ **Epic 9: Polish & Animations** - Visual polish, micro-interactions, accessibility improvements, performance optimizations, error boundaries
 - ✅ **Epic 10: Rematch Feature** - Players can stay together after game ends and play again without recreating room
 
+**In Progress:**
+- 🔄 **Epic 11: Testing & Deployment** (~60-70% complete) - Vitest unit tests, Playwright E2E tests, deployment config pending
+
 **Recent Improvements:**
 - **Board Generation:** Migrated from letter frequency formula to specialized Spanish dice
 - **Dictionary Cleaning:** Reduced from 636,598 to 153,894 words (~76%) while maintaining quality
@@ -296,6 +299,7 @@ scripts/
 - **Accessibility:** ARIA labels, skip links, focus traps, keyboard navigation support
 - **Performance:** React Compiler enabled, lazy loading, optimized Docker build
 - **Rematch Feature:** Host can trigger "Jugar otra vez" to reset room and return to waiting room together with all players
+- **Testing Infrastructure:** Vitest unit tests (26+ files), Playwright E2E tests (14 tests), coverage for core game flows
 
 **Next Epic:**
 - Ready for production deployment
@@ -488,4 +492,65 @@ export const SPANISH_BOGGLE_DICE_4x4 = [
 ];
 ```
 
-Each die has 6 faces with Spanish letter combinations. Dice are shuffled (Fisher-Yates) and rolled (random face) during board generation.
+## Testing Workflow
+
+The project uses Vitest for unit/integration tests and Playwright for E2E tests.
+
+### Unit/Integration Tests (Vitest)
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test --watch
+
+# Run tests with coverage
+pnpm test --coverage
+
+# Run specific test file
+pnpm test src/server/__tests__/rooms-manager.test.ts
+```
+
+**Test Structure:**
+- `src/server/__tests__/` - Server-side unit/integration tests
+- `src/app/api/**/__tests__/` - API route tests
+- `src/components/**/__tests__/` - Component tests
+
+### E2E Tests (Playwright)
+
+```bash
+# Run all E2E tests (headless)
+pnpm test:e2e
+
+# Run E2E tests with UI
+pnpm test:e2e:ui
+
+# Run E2E tests in headed mode (visible browser)
+pnpm test:e2e:headed
+
+# Run specific test file
+pnpm exec playwright test e2e/game-flow.spec.ts
+```
+
+**E2E Test Suites:**
+- `e2e/game-flow.spec.ts` - Full game loop, room validation, host controls
+- `e2e/multiplayer.spec.ts` - Multi-player scenarios, real-time sync
+- `e2e/mobile.spec.ts` - Mobile viewport, touch interactions
+
+**E2E Test Requirements:**
+- Tests run on `http://localhost:3322` (configured in `playwright.config.ts`)
+- Uses `pnpm dev:test` script to start dev server on port 3322
+- Requires `.env.test` file with test environment variables
+
+### Test Coverage
+
+Current coverage (Epic 11, ~60-70% complete):
+- ✅ RoomsManager: creation, joining, leaving, game state
+- ✅ Word validation: dictionary lookup, adjacency checking
+- ✅ Board generation: Spanish dice, quality validation
+- ✅ API routes: rooms, games, words, results
+- ✅ Database: repository integration tests
+- ✅ Pusher: event emission (mocked)
+- ⏳ Load testing: pending
+- ⏳ Code coverage reporting: pending
