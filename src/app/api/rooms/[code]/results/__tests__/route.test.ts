@@ -20,8 +20,8 @@ describe('POST /api/rooms/[code]/results', () => {
       status: 'finished' as const,
       host: { id: 'p1', name: 'Alice', avatar: '🎮', score: 10, foundWords: [], isHost: true, createdAt: new Date() },
       players: new Map([
-        ['p1', { id: 'p1', name: 'Alice', avatar: '🎮', score: 10, foundWords: [{ word: 'HOLA', score: 4, timestamp: 1000 }, { word: 'CASA', score: 4, timestamp: 2000 }] }],
-        ['p2', { id: 'p2', name: 'Bob', avatar: '🎯', score: 4, foundWords: [{ word: 'HOLA', score: 4, timestamp: 1500 }] }],
+        ['p1', { id: 'p1', name: 'Alice', avatar: '🎮', score: 10, foundWords: [{ word: 'HOLA', score: 4, timestamp: 1000 }, { word: 'CASA', score: 4, timestamp: 2000 }], isHost: true, createdAt: new Date() }],
+        ['p2', { id: 'p2', name: 'Bob', avatar: '🎯', score: 4, foundWords: [{ word: 'HOLA', score: 4, timestamp: 1500 }], isHost: false, createdAt: new Date() }],
       ]),
       gridSize: 4 as const,
       board: [['A', 'B'], ['C', 'D']],
@@ -30,9 +30,9 @@ describe('POST /api/rooms/[code]/results', () => {
     };
 
     vi.mocked(roomsManager.getRoom).mockReturnValue(mockRoom as unknown as Room);
-    vi.mocked(gamesRepository.create).mockResolvedValue({ id: 'game-123' });
-    vi.mocked(playersRepository.create).mockResolvedValue({ id: 'player-db-1' });
-    vi.mocked(wordsRepository.create).mockResolvedValue({});
+    vi.mocked(gamesRepository.create).mockResolvedValue({ id: 'game-123', room_code: 'ABC123', grid_size: 4, duration: 90, status: 'finished' as const, created_at: new Date(), started_at: null, ended_at: null, total_words_found: 0, host_id: null, board: null });
+    vi.mocked(playersRepository.create).mockResolvedValue({ id: 'player-db-1', game_id: 'game-123', player_name: 'Alice', avatar: '🎮', is_host: true, final_score: 10, words_found: 2, unique_words_found: 1, joined_at: new Date() });
+    vi.mocked(wordsRepository.create).mockResolvedValue({ id: 'word-1', game_id: 'game-123', player_id: 'player-db-1', word: 'HOLA', word_length: 4, path: null, score: 4, is_unique: true, found_at: new Date() });
 
     const request = new Request('http://localhost:3000/api/rooms/ABC123/results', {
       method: 'POST',

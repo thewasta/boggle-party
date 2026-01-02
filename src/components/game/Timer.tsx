@@ -32,7 +32,7 @@ export function Timer({ timerState }: TimerProps) {
   const ringOffset = remaining > 0 ? (1 - remaining / 120) * 283 : 283;
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-3" data-testid="timer">
       {/* Timer display with urgency styling */}
       <div className="relative">
         {/* Urgency glow effect */}

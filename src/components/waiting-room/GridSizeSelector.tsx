@@ -24,7 +24,7 @@ export function GridSizeSelector({
   disabled,
 }: GridSizeSelectorProps) {
   return (
-    <div className="w-full">
+    <div className="w-full" data-testid="grid-size-selector">
       <h2 className="text-lg font-semibold text-indigo-900 mb-4">
         Tamaño del tablero
       </h2>
@@ -33,6 +33,7 @@ export function GridSizeSelector({
           <button
             type="button"
             key={option.value}
+            data-testid={`grid-size-${option.value}`}
             onClick={() => onChange(option.value)}
             disabled={disabled}
             className={`

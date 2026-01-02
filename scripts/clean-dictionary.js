@@ -11,7 +11,7 @@ const cleanSpanish = (text) => {
 };
 
 function shouldKeep(word) {
-    if (word.length < 3 || word.length > 8) return false;
+    if (word.length > 8) return false;
     if (word.includes('q') && !word.includes('qu')) return false;
     
 

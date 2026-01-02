@@ -162,7 +162,7 @@ const GameBoardMemo = function GameBoard({
   const boardHeight = gridSize * (CELL_SIZE + CELL_GAP) - CELL_GAP;
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block" data-testid="game-board">
       {/* SVG overlay for selection path */}
       <svg
         className="absolute inset-0 pointer-events-none z-10"
@@ -216,6 +216,7 @@ const GameBoardMemo = function GameBoard({
             return (
               <div
                 key={`${rowIndex}-${colIndex}`}
+                data-testid={`board-cell-${rowIndex}-${colIndex}`}
                 className={`
                   flex items-center justify-center
                   text-3xl font-black rounded-xl

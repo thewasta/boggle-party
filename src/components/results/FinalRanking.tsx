@@ -16,7 +16,7 @@ export function FinalRanking({ playerScores, roomCode, playerId, isHost }: Final
   const topThree = playerScores.slice(0, 3);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="final-ranking">
       {winner && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}

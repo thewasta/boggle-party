@@ -3,8 +3,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { PlayerList } from '../PlayerList';
 
 const mockPlayers = [
-  { id: '1', name: 'Alice', avatar: '🎮' },
-  { id: '2', name: 'Bob', avatar: '🎯' },
+  { id: '1', name: 'Alice', avatar: '🎮', isHost: false, score: 0, foundWords: [], createdAt: new Date() },
+  { id: '2', name: 'Bob', avatar: '🎯', isHost: false, score: 0, foundWords: [], createdAt: new Date() },
 ];
 
 describe('PlayerList', () => {
