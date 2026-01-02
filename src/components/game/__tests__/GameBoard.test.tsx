@@ -9,7 +9,8 @@ const mockBoard = [
 
 const mockSelection = {
   cells: [],
-  word: ''
+  currentWord: '',
+  isValid: null as boolean | null
 };
 
 describe('GameBoard', () => {

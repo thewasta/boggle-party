@@ -16,7 +16,7 @@ export function PlayerList({
   maxPlayers = 8,
 }: PlayerListProps) {
   return (
-    <div className="w-full">
+    <div className="w-full" data-testid="player-list">
       <div className="flex items-center justify-between mb-4">
         <motion.h2
           initial={{ opacity: 0, x: -20 }}
@@ -47,6 +47,7 @@ export function PlayerList({
                 ease: 'easeOut'
               }}
               className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200"
+              data-testid="player-card"
             >
               <PlayerAvatar avatar={player.avatar} name={player.name} />
               <span className="font-semibold text-indigo-900 flex-1">
