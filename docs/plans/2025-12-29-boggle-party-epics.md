@@ -1162,7 +1162,94 @@ Validation checks:
 
 ---
 
-## Epic 10: Testing & Deployment
+## Epic 10: Rematch Feature ✅ **COMPLETED** (2026-01-02)
+
+**Objective:** Allow players to stay together after a game ends and play again without recreating the room
+
+**Deliverables:**
+- ✅ `rematchRoom()` method in RoomsManager that resets room state
+- ✅ RematchRequestedEvent type for Pusher
+- ✅ `emitRematchRequested()` function for event broadcasting
+- ✅ `/api/rooms/[code]/rematch` endpoint (host-only)
+- ✅ PlayAgainButton component that calls rematch API
+- ✅ Results page handles `rematch-requested` event
+- ✅ Smooth transition animation when navigating to waiting room
+
+**Core Features:**
+- ✅ Room state resets to 'waiting' while keeping all players
+- ✅ Only host can trigger rematch
+- ✅ Non-host players see disabled "Esperando al anfitrión" button
+- ✅ All players navigate back to waiting room together via Pusher event
+- ✅ Loading animation with emerald spinner during transition
+- ✅ Scores, found words, and board data cleared for new game
+
+**Pusher Events:**
+- `rematch-requested` - `{requestedBy: {id, name}}`
+
+**Implementation Status**
+
+**Completed:** 2026-01-02
+
+**Summary:**
+- ✅ All 14 tasks completed successfully
+- ✅ RematchRequestedEvent type added to server types
+- ✅ rematchRoom() method in RoomsManager resets room to 'waiting' state
+- ✅ emitRematchRequested() function for Pusher event broadcasting
+- ✅ POST /api/rooms/[code]/rematch endpoint with host validation
+- ✅ onRematchRequested callback added to usePusherChannel hook
+- ✅ PlayAgainButton rewritten to call rematch API
+- ✅ FinalRanking updated to pass roomCode, playerId, isHost props
+- ✅ Results page handles rematch-requested event with navigation
+- ✅ Results API returns roomCode for navigation
+- ✅ Transition animation with emerald loading spinner
+
+**Git Commits:**
+- `e0b3ef4` - feat: add rematchRoom method to RoomsManager
+- `5c143e7` - feat: add rematch-requested event emitter
+- `624a522` - feat: add rematch API endpoint
+- `63a6795` - feat: add onRematchRequested callback to usePusherChannel
+- `9c2df42` - feat: add rematch API call to PlayAgainButton
+- `3ab0a43` - feat: wire rematch through results flow
+- `522ea54` - feat: add transition animation for rematch
+
+**Key Files Modified:**
+- `src/server/types.ts` - Added RematchRequestedEvent and REMATCH_NOT_ALLOWED error code
+- `src/server/rooms-manager.ts` - Added rematchRoom() method
+- `src/server/event-emitter.ts` - Added emitRematchRequested() function
+- `src/app/api/rooms/[code]/rematch/route.ts` - New rematch endpoint
+- `src/hooks/usePusherChannel.ts` - Added onRematchRequested callback
+- `src/lib/pusher.ts` - Added REMATCH_REQUESTED to PUSHER_EVENTS
+- `src/components/results/PlayAgainButton.tsx` - Rewritten to call rematch API
+- `src/components/results/FinalRanking.tsx` - Updated to pass rematch props
+- `src/app/results/[roomId]/page.tsx` - Handles rematch event with transition animation
+- `src/app/api/rooms/[code]/results/route.ts` - Returns roomCode in response
+
+**Flow:**
+1. Game ends → Results page shows final rankings
+2. Host clicks "Jugar otra vez" → API call resets room to 'waiting'
+3. Pusher broadcasts `rematch-requested` event to all players
+4. All players see "Volviendo a la sala..." loading state (500ms)
+5. All players navigate back to waiting room together
+6. Host can start new game with same players
+
+**Notes:**
+- All success criteria met:
+  - ✅ Host can trigger rematch after results
+  - ✅ All players return to waiting room together
+  - ✅ Waiting room shows all players
+  - ✅ Host can start new game
+  - ✅ New game generates fresh board
+  - ✅ Scores are reset for new game
+  - ✅ Non-host button is disabled
+  - ✅ Smooth transition animation
+- Type checking passes without errors
+- Ready for production use
+
+**Implementation Plan:** `docs/plans/2026-01-02-epic-10-rematch-feature.md`
+
+---
+
+## Epic 11: Testing & Deployment
 
 **Objective:** Comprehensive testing suite and production deployment setup
 
@@ -1255,7 +1342,7 @@ Validation checks:
 
 ---
 
-## Epic 11: DevOps & Monitoring (Production-Ready)
+## Epic 12: DevOps & Monitoring (Production-Ready)
 
 **Objective:** Set up production infrastructure, monitoring, logging, and automated backups
 
@@ -1323,7 +1410,7 @@ Validation checks:
 
 ---
 
-## Epic 12: Post-Launch Features (Future)
+## Epic 13: Post-Launch Features (Future)
 
 **Objective:** Nice-to-have features for future iterations after MVP launch
 
@@ -1331,7 +1418,6 @@ Validation checks:
 - Custom room durations
 - Game mode variations (themes, special tiles)
 - Player statistics and history (from database)
-- Rematch functionality
 - Spectator mode
 - Replay best words
 - Sound effects and music
@@ -1367,11 +1453,12 @@ Validation checks:
 
 ### Phase 5: Polish & Launch (Week 5-6)
 8. **Epic 9** (Polish) - Can be done incrementally alongside 6-8
-9. **Epic 10** (Testing/Deployment) - After all features complete
-10. **Epic 11** (DevOps/Monitoring) - After Epic 10, before full launch
+9. **Epic 10** (Rematch Feature) - Quality of life improvement
+10. **Epic 11** (Testing/Deployment) - After all features complete
+11. **Epic 12** (DevOps/Monitoring) - After Epic 11, before full launch
 
 ### Phase 6: Post-Launch (Future)
-11. **Epic 12** (Post-Launch Features) - Future iterations
+12. **Epic 13** (Post-Launch Features) - Future iterations
 
 ---
 
