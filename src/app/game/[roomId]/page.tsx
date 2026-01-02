@@ -170,7 +170,7 @@ function GameClient(props: {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { gameState, setGameState, timerState } = useGameSync({
-    roomId: props.roomId,
+    roomCode: props.roomCode,
     playerId: props.playerId,
     onGameEnd: async () => {
       props.setIsLocked(true);
