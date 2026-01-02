@@ -8,7 +8,7 @@ import { usePusherChannel } from './usePusherChannel';
 import type { GameState, TimerState } from '@/types/game';
 
 interface UseGameSyncOptions {
-  roomId: string;
+  roomCode: string;
   playerId: string;
   onGameEnd?: () => void;
 }
@@ -21,7 +21,7 @@ interface UseGameSyncReturn {
 }
 
 export function useGameSync({
-  roomId,
+  roomCode,
   playerId,
   onGameEnd,
 }: UseGameSyncOptions): UseGameSyncReturn {
@@ -133,7 +133,7 @@ export function useGameSync({
   }, [onGameEnd]);
 
   // Subscribe to Pusher events (read-only, no word submission)
-  usePusherChannel(roomId, {
+  usePusherChannel(roomCode, {
     onGameEnded: handleGameEnded,
   });
 
