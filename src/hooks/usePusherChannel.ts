@@ -32,12 +32,12 @@ export interface UsePusherChannelOptions {
 /**
  * Subscribe to a Pusher channel and bind event handlers
  *
- * @param roomId - Internal room UUID
+ * @param roomCode - Room code (6-character string like 'JX4XU3')
  * @param handlers - Event callback functions
  * @param options - Configuration options
  */
 export function usePusherChannel(
-  roomId: string | null,
+  roomCode: string | null,
   handlers: PusherEventHandlers,
   options: UsePusherChannelOptions = {}
 ): void {
@@ -52,7 +52,7 @@ export function usePusherChannel(
   }, [handlers]);
 
   useEffect(() => {
-    if (!enabled || !roomId) {
+    if (!enabled || !roomCode) {
       return;
     }
 
@@ -65,7 +65,7 @@ export function usePusherChannel(
       pusherRef.current = pusher;
 
       // Subscribe to channel
-      const channelName = getRoomChannelName(roomId);
+      const channelName = getRoomChannelName(roomCode);
       channel = pusher.subscribe(channelName);
       channelRef.current = channel;
 
@@ -136,5 +136,5 @@ export function usePusherChannel(
         pusher?.unsubscribe(channel.name);
       }
     };
-  }, [roomId, enabled]);
+  }, [roomCode, enabled]);
 }
