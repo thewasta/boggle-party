@@ -1,26 +1,53 @@
+"use client";
+
+import { motion } from "framer-motion";
 import type { PlayerScore } from "@/app/results/[roomId]/page";
 import { PlayAgainButton } from "./PlayAgainButton";
 
 interface FinalRankingProps {
   playerScores: PlayerScore[];
+  roomCode: string | null;
+  playerId: string;
+  isHost: boolean;
 }
 
-export function FinalRanking({ playerScores }: FinalRankingProps) {
+export function FinalRanking({ playerScores, roomCode, playerId, isHost }: FinalRankingProps) {
   const winner = playerScores[0];
   const topThree = playerScores.slice(0, 3);
 
   return (
     <div className="space-y-6">
       {winner && (
-        <div className="text-center">
-          <div className="text-6xl mb-3 animate-trophy-bounce">🏆</div>
-          <h2 className="text-3xl font-black text-gray-900 mb-1">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="text-6xl mb-3"
+          >
+            🏆
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-3xl font-black text-gray-900 mb-1"
+          >
             ¡{winner.name} gana!
-          </h2>
-          <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500">
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+            className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500"
+          >
             {winner.score} puntos
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       )}
 
       <div className="flex items-end justify-center gap-3 sm:gap-6 py-4">
@@ -43,12 +70,30 @@ export function FinalRanking({ playerScores }: FinalRankingProps) {
           ];
 
           return (
-            <div key={player.id} className="flex flex-col items-center">
-              <div className="text-4xl sm:text-5xl mb-2 animate-medal-float">
+            <motion.div
+              key={player.id}
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.2, type: "spring" }}
+              className="flex flex-col items-center"
+            >
+              <motion.div
+                animate={{ y: [0, -5, 0] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: index * 0.3,
+                  ease: "easeInOut",
+                }}
+                className="text-4xl sm:text-5xl mb-2"
+              >
                 {medals[index]}
-              </div>
+              </motion.div>
 
-              <div
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: index * 0.2 + 0.4, type: "spring" }}
                 className={`rounded-xl flex items-center justify-center shadow-lg border-3 bg-gradient-to-br ${medalColors[index]} ${avatarSizes[index]} ${
                   index === 0
                     ? "border-yellow-300"
@@ -58,9 +103,14 @@ export function FinalRanking({ playerScores }: FinalRankingProps) {
                 }`}
               >
                 {player.avatar}
-              </div>
+              </motion.div>
 
-              <div className="mt-2 text-center">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.2 + 0.6 }}
+                className="mt-2 text-center"
+              >
                 <p
                   className={`text-xs sm:text-sm font-bold ${
                     index === 0
@@ -72,7 +122,10 @@ export function FinalRanking({ playerScores }: FinalRankingProps) {
                 >
                   {player.name}
                 </p>
-                <p
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2 + 0.8 }}
                   className={`text-lg sm:text-xl font-black ${
                     index === 0
                       ? "text-amber-600"
@@ -82,18 +135,34 @@ export function FinalRanking({ playerScores }: FinalRankingProps) {
                   }`}
                 >
                   {player.score}
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
 
-              <div
+              <motion.div
+                initial={{ scaleY: 0 }}
+                animate={{ scaleY: 1 }}
+                transition={{ delay: index * 0.2 + 1, ease: "easeOut" }}
+                style={{ transformOrigin: "bottom" }}
                 className={`w-14 sm:w-20 mt-2 rounded-t-lg bg-gradient-to-b ${medalColors[index]} ${podiumHeights[index]} opacity-80`}
               />
-            </div>
+            </motion.div>
           );
         })}
       </div>
 
-      <PlayAgainButton />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5 }}
+      >
+        {roomCode && (
+          <PlayAgainButton
+            roomCode={roomCode}
+            playerId={playerId}
+            isHost={isHost}
+          />
+        )}
+      </motion.div>
     </div>
   );
 }

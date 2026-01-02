@@ -106,6 +106,7 @@ export async function POST(
     totalWords: allFoundWords.length,
     initialScores,
     hostId: room.host.id,
+    roomCode: room.code,
   });
 }
 

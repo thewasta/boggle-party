@@ -35,6 +35,8 @@ export default function ResultsPage() {
   const [playerScores, setPlayerScores] = useState<PlayerScore[]>([]);
   const [isRevealComplete, setIsRevealComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [roomCode, setRoomCode] = useState<string | null>(null);
+  const [isHost, setIsHost] = useState(false);
 
   const updatePlayerScore = useCallback((wordData: RevealWord) => {
     setPlayerScores((prev) =>
@@ -57,6 +59,9 @@ export default function ResultsPage() {
         data.finalRankings.map((p, i) => ({ ...p, position: i + 1 })),
       );
     },
+    onRematchRequested: (data) => {
+      router.push(`/room/${roomCode}?playerId=${playerId}`);
+    },
   });
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: Only run on mount
@@ -76,6 +81,8 @@ export default function ResultsPage() {
 
       const data = await response.json();
       setPlayerScores(data.initialScores);
+      setRoomCode(data.roomCode);
+      setIsHost(playerId === data.hostId);
 
       // Only host should call the reveal endpoint to avoid duplicate events
       if (playerId === data.hostId) {
@@ -110,7 +117,12 @@ export default function ResultsPage() {
     return (
       <div className="h-screen bg-[#FDF8F3] flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
-          <FinalRanking playerScores={playerScores} />
+          <FinalRanking
+            playerScores={playerScores}
+            roomCode={roomCode}
+            playerId={playerId}
+            isHost={isHost}
+          />
         </div>
       </div>
     );
