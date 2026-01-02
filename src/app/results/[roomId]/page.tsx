@@ -37,6 +37,7 @@ export default function ResultsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const updatePlayerScore = useCallback((wordData: RevealWord) => {
     setPlayerScores((prev) =>
@@ -60,7 +61,12 @@ export default function ResultsPage() {
       );
     },
     onRematchRequested: (data) => {
-      router.push(`/room/${roomCode}?playerId=${playerId}`);
+      if (!isNavigating && roomCode) {
+        setIsNavigating(true);
+        setTimeout(() => {
+          router.push(`/room/${roomCode}?playerId=${playerId}`);
+        }, 500);
+      }
     },
   });
 
@@ -107,6 +113,19 @@ export default function ResultsPage() {
           <div className="animate-spin rounded-full h-14 w-14 border-b-4 border-rose-500 mx-auto mb-4" />
           <p className="text-gray-700 text-lg font-semibold">
             Preparando resultados...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isNavigating) {
+    return (
+      <div className="h-screen bg-[#FDF8F3] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-14 w-14 border-b-4 border-emerald-500 mx-auto mb-4" />
+          <p className="text-gray-700 text-lg font-semibold">
+            Volviendo a la sala...
           </p>
         </div>
       </div>
