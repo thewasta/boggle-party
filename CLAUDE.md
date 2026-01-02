@@ -282,6 +282,7 @@ scripts/
 - ✅ **Epic 7: Active Game Phase** - Interactive game board with drag-to-select, countdown, timer, word validation, and found words list
 - ✅ **Epic 8: Results Phase** - Sequential word reveal with animated scoring and final rankings
 - ✅ **Epic 9: Polish & Animations** - Visual polish, micro-interactions, accessibility improvements, performance optimizations, error boundaries
+- ✅ **Epic 10: Rematch Feature** - Players can stay together after game ends and play again without recreating room
 
 **Recent Improvements:**
 - **Board Generation:** Migrated from letter frequency formula to specialized Spanish dice
@@ -294,6 +295,7 @@ scripts/
 - **Animations:** Framer Motion integration for smooth transitions, hover states, and micro-interactions
 - **Accessibility:** ARIA labels, skip links, focus traps, keyboard navigation support
 - **Performance:** React Compiler enabled, lazy loading, optimized Docker build
+- **Rematch Feature:** Host can trigger "Jugar otra vez" to reset room and return to waiting room together with all players
 
 **Next Epic:**
 - Ready for production deployment
