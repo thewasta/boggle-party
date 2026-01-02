@@ -2,80 +2,98 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { motion } from "framer-motion";
+import { PageTransition } from "@/components/ui/PageTransition";
+import { FloatingLetters } from "@/components/landing/FloatingLetters";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#FDF8F3] relative overflow-hidden">
-      {/* Decorative background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-10 left-10 text-8xl font-bold text-indigo-900 rotate-12">
-          B
-        </div>
-        <div className="absolute top-40 right-20 text-6xl font-bold text-purple-900 -rotate-6">
-          O
-        </div>
-        <div className="absolute bottom-32 left-1/4 text-7xl font-bold text-indigo-800 rotate-3">
-          G
-        </div>
-        <div className="absolute bottom-20 right-1/3 text-5xl font-bold text-purple-800 -rotate-12">
-          L
-        </div>
-        <div className="absolute top-1/3 right-10 text-6xl font-bold text-indigo-900 rotate-6">
-          E
-        </div>
-      </div>
+    <PageTransition>
+      <div className="min-h-screen bg-[#FDF8F3] relative overflow-hidden">
+        {/* Animated floating letters */}
+        <FloatingLetters />
 
-      {/* Main content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-12">
-        {/* Logo/Title */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="text-5xl">🎮</span>
-            <h1
-              className="text-6xl md:text-7xl font-black tracking-tight"
-              style={{
-                background:
-                  "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A855F7 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
+        {/* Main content */}
+        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-12">
+          {/* Logo/Title */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-center mb-12"
+          >
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <motion.span
+                initial={{ rotate: -180 }}
+                animate={{ rotate: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="text-5xl"
+              >
+                🎮
+              </motion.span>
+              <h1
+                className="text-6xl md:text-7xl font-black tracking-tight"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A855F7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Boggle Party
+              </h1>
+              <motion.span
+                initial={{ rotate: 180 }}
+                animate={{ rotate: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="text-5xl"
+              >
+                🎲
+              </motion.span>
+            </div>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="text-xl text-zinc-600 font-medium max-w-md mx-auto"
             >
-              Boggle Party
-            </h1>
-            <span className="text-5xl">🎲</span>
+              ¡Encuentra las palabras ocultas antes de que se acabe el tiempo!
+            </motion.p>
+          </motion.div>
+
+          {/* Cards container */}
+          <div className="w-full max-w-2xl grid md:grid-cols-2 gap-6">
+            {/* Create Room Card */}
+            <CreateRoomCard />
+
+            {/* Join Room Card */}
+            <JoinRoomCard />
           </div>
-          <p className="text-xl text-zinc-600 font-medium max-w-md mx-auto">
-            ¡Encuentra las palabras ocultas antes de que se acabe el tiempo!
-          </p>
-        </div>
 
-        {/* Cards container */}
-        <div className="w-full max-w-2xl grid md:grid-cols-2 gap-6">
-          {/* Create Room Card */}
-          <CreateRoomCard />
-
-          {/* Join Room Card */}
-          <JoinRoomCard />
-        </div>
-
-        {/* Footer info */}
-        <div className="mt-16 text-center text-zinc-500 text-sm flex items-center gap-6">
-          <span className="flex items-center gap-2">
-            <span>📝</span>
-            <span>Juego en español</span>
-          </span>
-          <span className="flex items-center gap-2">
-            <span>⏱️</span>
-            <span>2-6 minutos por partida</span>
-          </span>
-          <span className="flex items-center gap-2">
-            <span>👥</span>
-            <span>2-8 jugadores</span>
-          </span>
+          {/* Footer info */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="mt-16 text-center text-zinc-500 text-sm flex items-center gap-6"
+          >
+            <span className="flex items-center gap-2">
+              <span>📝</span>
+              <span>Juego en español</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span>⏱️</span>
+              <span>2-6 minutos por partida</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span>👥</span>
+              <span>2-8 jugadores</span>
+            </span>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }
 
@@ -117,7 +135,13 @@ function CreateRoomCard() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border-2 border-indigo-100 p-8 hover:shadow-2xl hover:border-indigo-200 transition-all duration-300">
+    <motion.div
+      initial={{ opacity: 0, y: 30, x: -30 }}
+      animate={{ opacity: 1, y: 0, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.5 }}
+      whileHover={{ scale: 1.02, y: -5 }}
+      className="bg-white rounded-2xl shadow-xl border-2 border-indigo-100 p-8 hover:shadow-2xl hover:border-indigo-200 transition-all duration-300"
+    >
       <div className="text-center mb-6">
         <span className="text-4xl mb-3 block">✨</span>
         <h2 className="text-2xl font-bold text-zinc-900">Crear Sala</h2>
@@ -174,7 +198,7 @@ function CreateRoomCard() {
           )}
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 }
 
@@ -227,7 +251,13 @@ function JoinRoomCard() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border-2 border-purple-100 p-8 hover:shadow-2xl hover:border-purple-200 transition-all duration-300">
+    <motion.div
+      initial={{ opacity: 0, y: 30, x: 30 }}
+      animate={{ opacity: 1, y: 0, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.6 }}
+      whileHover={{ scale: 1.02, y: -5 }}
+      className="bg-white rounded-2xl shadow-xl border-2 border-purple-100 p-8 hover:shadow-2xl hover:border-purple-200 transition-all duration-300"
+    >
       <div className="text-center mb-6">
         <span className="text-4xl mb-3 block">🚀</span>
         <h2 className="text-2xl font-bold text-zinc-900">Unirse a Sala</h2>
@@ -300,6 +330,6 @@ function JoinRoomCard() {
           )}
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 }
