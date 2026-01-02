@@ -35,11 +35,11 @@ export function getPusherClient(): Pusher {
 
 /**
  * Generate channel name for a room
- * @param roomId - Internal room UUID
- * @returns Channel name in format 'game-{roomId}'
+ * @param roomCode - Room code (6-character string like 'JX4XU3')
+ * @returns Channel name in format 'game-{roomCode}'
  */
-export function getRoomChannelName(roomId: string): string {
-  return `game-${roomId}`;
+export function getRoomChannelName(roomCode: string): string {
+  return `game-${roomCode}`;
 }
 
 /**
