@@ -54,6 +54,7 @@ export const PUSHER_EVENTS = {
   WORD_FOUND: "word-found",
   REVEAL_WORD: "reveal-word",
   RESULTS_COMPLETE: "results-complete",
+  REMATCH_REQUESTED: "rematch-requested",
 } as const;
 
 /**

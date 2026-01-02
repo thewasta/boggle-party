@@ -19,6 +19,7 @@ export interface PusherEventHandlers {
   onWordFound?: (data: { playerId: string; playerName: string; word: string; score: number; isUnique: boolean }) => void;
   onRevealWord?: (data: { word: string; player: { id: string; name: string; avatar: string }; score: number; isUnique: boolean }) => void;
   onResultsComplete?: (data: { finalRankings: Array<{ id: string; name: string; avatar: string; score: number }> }) => void;
+  onRematchRequested?: (data: { requestedBy: { id: string; name: string } }) => void;
 }
 
 /**
@@ -114,6 +115,12 @@ export function usePusherChannel(
       if (handlers.onResultsComplete) {
         channel.bind(PUSHER_EVENTS.RESULTS_COMPLETE, (data: unknown) => {
           handlersRef.current.onResultsComplete?.(data as Parameters<NonNullable<typeof handlers.onResultsComplete>>[0]);
+        });
+      }
+
+      if (handlers.onRematchRequested) {
+        channel.bind(PUSHER_EVENTS.REMATCH_REQUESTED, (data: unknown) => {
+          handlersRef.current.onRematchRequested?.(data as Parameters<NonNullable<typeof handlers.onRematchRequested>>[0]);
         });
       }
     } catch (error) {
