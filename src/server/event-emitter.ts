@@ -12,6 +12,7 @@ import type {
   WordFoundEvent,
   RevealWordEvent,
   ResultsCompleteEvent,
+  RematchRequestedEvent,
   Player,
 } from './types';
 
@@ -94,4 +95,13 @@ export async function emitResultsComplete(roomId: string, finalRankings: Array<{
   await triggerEvent(`game-${roomId}`, 'results-complete', {
     finalRankings,
   } satisfies ResultsCompleteEvent);
+}
+
+/**
+ * Emit rematch-requested event
+ */
+export async function emitRematchRequested(roomId: string, requestedBy: { id: string; name: string }): Promise<void> {
+  await triggerEvent(`game-${roomId}`, 'rematch-requested', {
+    requestedBy,
+  } satisfies RematchRequestedEvent);
 }
