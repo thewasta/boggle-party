@@ -4,7 +4,7 @@
 
 **Goal:** Complete Pusher Channels integration for real-time game state synchronization across all clients in a room, including player join/leave, game start/end, and word submission events.
 
-**Architecture:** Server-side Pusher client singleton emits typed events to presence channels (`presence-game-{roomId}`) when game state changes. Client-side React hook subscribes to these channels and updates UI state via type-safe event callbacks.
+**Architecture:** Server-side Pusher client singleton emits typed events to channels (`game-{roomCode}`) when game state changes. Client-side React hook subscribes to these channels and updates UI state via type-safe event callbacks.
 
 **Tech Stack:** Pusher Channels v5.2.0 (server), pusher-js v8.4.0 (client), React 19 hooks, TypeScript 5, Next.js 16 API routes
 
@@ -58,7 +58,7 @@ import type { GameStartedEvent } from '@/server/types';
 
 Add after line 48 (after `roomsManager.startGame()`):
 ```typescript
-await triggerEvent(`presence-game-${room.id}`, 'game-started', {
+await triggerEvent(`game-${room.code}`, 'game-started', {
   startTime: updatedRoom.startTime!,
   duration,
   board,
@@ -118,11 +118,11 @@ export function getPusherClient(): Pusher {
 
 /**
  * Generate channel name for a room
- * @param roomId - Internal room UUID
- * @returns Channel name in format 'presence-game-{roomId}'
+ * @param roomCode - Room code (6-character string like 'JX4XU3')
+ * @returns Channel name in format 'game-{roomCode}'
  */
-export function getRoomChannelName(roomId: string): string {
-  return `presence-game-${roomId}`;
+export function getRoomChannelName(roomCode: string): string {
+  return `game-${roomCode}`;
 }
 
 /**
@@ -188,8 +188,8 @@ import type {
 /**
  * Emit player-joined event
  */
-export async function emitPlayerJoined(roomId: string, player: Player, totalPlayers: number): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'player-joined', {
+export async function emitPlayerJoined(roomCode: string, player: Player, totalPlayers: number): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, 'player-joined', {
     player,
     totalPlayers,
   } satisfies PlayerJoinedEvent);
@@ -198,8 +198,8 @@ export async function emitPlayerJoined(roomId: string, player: Player, totalPlay
 /**
  * Emit player-left event
  */
-export async function emitPlayerLeft(roomId: string, playerId: string, playerName: string, totalPlayers: number): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'player-left', {
+export async function emitPlayerLeft(roomCode: string, playerId: string, playerName: string, totalPlayers: number): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, 'player-left', {
     playerId,
     playerName,
     totalPlayers,
@@ -209,8 +209,8 @@ export async function emitPlayerLeft(roomId: string, playerId: string, playerNam
 /**
  * Emit game-started event
  */
-export async function emitGameStarted(roomId: string, startTime: number, duration: number, board: string[][]): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'game-started', {
+export async function emitGameStarted(roomCode: string, startTime: number, duration: number, board: string[][]): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, 'game-started', {
     startTime,
     duration,
     board,
@@ -220,8 +220,8 @@ export async function emitGameStarted(roomId: string, startTime: number, duratio
 /**
  * Emit game-ended event
  */
-export async function emitGameEnded(roomId: string, endTime: number): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'game-ended', {
+export async function emitGameEnded(roomCode: string, endTime: number): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, 'game-ended', {
     endTime,
   } satisfies GameEndedEvent);
 }
@@ -229,8 +229,8 @@ export async function emitGameEnded(roomId: string, endTime: number): Promise<vo
 /**
  * Emit word-found event (real-time word submission notification)
  */
-export async function emitWordFound(roomId: string, playerId: string, playerName: string, word: string, score: number, isUnique: boolean): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'word-found', {
+export async function emitWordFound(roomCode: string, playerId: string, playerName: string, word: string, score: number, isUnique: boolean): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, 'word-found', {
     playerId,
     playerName,
     word,
@@ -279,7 +279,7 @@ import { emitPlayerJoined } from '@/server/event-emitter';
 
 Replace lines 37-40:
 ```typescript
-await triggerEvent(`presence-game-${room.id}`, 'player-joined', {
+await triggerEvent(`game-${room.code}`, 'player-joined', {
   player,
   totalPlayers: room.players.size,
 } satisfies PlayerJoinedEvent);
@@ -397,7 +397,7 @@ import { emitGameEnded } from '@/server/event-emitter';
 
 Replace lines 31-33:
 ```typescript
-await triggerEvent(`presence-game-${room.id}`, 'game-ended', {
+await triggerEvent(`game-${room.code}`, 'game-ended', {
   endTime: updatedRoom.endTime!,
 } satisfies GameEndedEvent);
 ```
@@ -468,12 +468,12 @@ export interface UsePusherChannelOptions {
 /**
  * Subscribe to a Pusher presence channel and bind event handlers
  *
- * @param roomId - Internal room UUID
+ * @param roomCode - Internal room UUID
  * @param handlers - Event callback functions
  * @param options - Configuration options
  */
 export function usePusherChannel(
-  roomId: string | null,
+  roomCode: string | null,
   handlers: PusherEventHandlers,
   options: UsePusherChannelOptions = {}
 ): void {
@@ -488,7 +488,7 @@ export function usePusherChannel(
   }, [handlers]);
 
   useEffect(() => {
-    if (!enabled || !roomId) {
+    if (!enabled || !roomCode) {
       return;
     }
 
@@ -501,7 +501,7 @@ export function usePusherChannel(
       pusherRef.current = pusher;
 
       // Subscribe to presence channel
-      const channelName = getRoomChannelName(roomId);
+      const channelName = getRoomChannelName(roomCode);
       channel = pusher.subscribe(channelName) as Types.PresenceChannel;
       channelRef.current = channel;
 
@@ -564,7 +564,7 @@ export function usePusherChannel(
         console.log(`[Pusher] Unsubscribed from channel: ${channel.name}`);
       }
     };
-  }, [roomId, enabled]);
+  }, [roomCode, enabled]);
 }
 EOF
 ```
@@ -666,13 +666,13 @@ Add at end of file (before EOF):
  * Emit reveal-word event (results phase - sequential word reveal)
  */
 export async function emitRevealWord(
-  roomId: string,
+  roomCode: string,
   word: string,
   player: { id: string; name: string; avatar: string },
   score: number,
   isUnique: boolean
 ): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'reveal-word', {
+  await triggerEvent(`game-${roomCode}`, 'reveal-word', {
     word,
     player,
     score,
@@ -683,8 +683,8 @@ export async function emitRevealWord(
 /**
  * Emit results-complete event (end of reveal phase)
  */
-export async function emitResultsComplete(roomId: string, finalRankings: Array<{ id: string; name: string; avatar: string; score: number }>): Promise<void> {
-  await triggerEvent(`presence-game-${roomId}`, 'results-complete', {
+export async function emitResultsComplete(roomCode: string, finalRankings: Array<{ id: string; name: string; avatar: string; score: number }>): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, 'results-complete', {
     finalRankings,
   } satisfies ResultsCompleteEvent);
 }

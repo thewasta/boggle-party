@@ -96,7 +96,7 @@ docker compose down -v
 
 ### Real-Time Events (Pusher)
 
-Channel: `presence-game-{roomId}`
+Channel: `game-{roomCode}` where `{roomCode}` is the 6-character room code (e.g., `game-JX4XU3`)
 
 Events:
 - `player-joined` / `player-left`: Update player list
