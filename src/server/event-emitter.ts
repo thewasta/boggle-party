@@ -18,6 +18,7 @@ import type {
 
 /**
  * Emit player-joined event
+ * @param roomId - Room code (6-character string like 'JX4XU3')
  */
 export async function emitPlayerJoined(roomId: string, player: Player, totalPlayers: number): Promise<void> {
   await triggerEvent(`game-${roomId}`, 'player-joined', {
@@ -28,6 +29,7 @@ export async function emitPlayerJoined(roomId: string, player: Player, totalPlay
 
 /**
  * Emit player-left event
+ * @param roomId - Room code (6-character string like 'JX4XU3')
  */
 export async function emitPlayerLeft(roomId: string, playerId: string, playerName: string, totalPlayers: number): Promise<void> {
   await triggerEvent(`game-${roomId}`, 'player-left', {
@@ -39,6 +41,7 @@ export async function emitPlayerLeft(roomId: string, playerId: string, playerNam
 
 /**
  * Emit game-started event
+ * @param roomId - Room code (6-character string like 'JX4XU3')
  */
 export async function emitGameStarted(roomId: string, startTime: number, duration: number, board: string[][]): Promise<void> {
   await triggerEvent(`game-${roomId}`, 'game-started', {
@@ -50,6 +53,7 @@ export async function emitGameStarted(roomId: string, startTime: number, duratio
 
 /**
  * Emit game-ended event
+ * @param roomId - Room code (6-character string like 'JX4XU3')
  */
 export async function emitGameEnded(roomId: string, endTime: number): Promise<void> {
   await triggerEvent(`game-${roomId}`, 'game-ended', {
@@ -59,6 +63,7 @@ export async function emitGameEnded(roomId: string, endTime: number): Promise<vo
 
 /**
  * Emit word-found event (real-time word submission notification)
+ * @param roomId - Room code (6-character string like 'JX4XU3')
  */
 export async function emitWordFound(roomId: string, playerId: string, playerName: string, word: string, score: number, isUnique: boolean): Promise<void> {
   await triggerEvent(`game-${roomId}`, 'word-found', {
@@ -72,6 +77,7 @@ export async function emitWordFound(roomId: string, playerId: string, playerName
 
 /**
  * Emit reveal-word event (results phase - sequential word reveal)
+ * @param roomId - Room code (6-character string like 'JX4XU3')
  */
 export async function emitRevealWord(
   roomId: string,
@@ -90,6 +96,7 @@ export async function emitRevealWord(
 
 /**
  * Emit results-complete event (end of reveal phase)
+ * @param roomId - Room code (6-character string like 'JX4XU3')
  */
 export async function emitResultsComplete(roomId: string, finalRankings: Array<{ id: string; name: string; avatar: string; score: number }>): Promise<void> {
   await triggerEvent(`game-${roomId}`, 'results-complete', {
@@ -99,6 +106,7 @@ export async function emitResultsComplete(roomId: string, finalRankings: Array<{
 
 /**
  * Emit rematch-requested event
+ * @param roomId - Room code (6-character string like 'JX4XU3')
  */
 export async function emitRematchRequested(roomId: string, requestedBy: { id: string; name: string }): Promise<void> {
   await triggerEvent(`game-${roomId}`, 'rematch-requested', {
