@@ -209,6 +209,16 @@ export interface ResultsCompleteEvent {
   }>;
 }
 
+/**
+ * Rematch requested event payload
+ */
+export interface RematchRequestedEvent {
+  requestedBy: {
+    id: string;
+    name: string;
+  };
+}
+
 // ============================================================================
 // Error Types
 // ============================================================================
@@ -219,7 +229,7 @@ export interface ResultsCompleteEvent {
 export class RoomError extends Error {
   constructor(
     message: string,
-    public code: 'ROOM_NOT_FOUND' | 'ROOM_FULL' | 'INVALID_CODE' | 'NOT_HOST' | 'GAME_ALREADY_STARTED'
+    public code: 'ROOM_NOT_FOUND' | 'ROOM_FULL' | 'INVALID_CODE' | 'NOT_HOST' | 'GAME_ALREADY_STARTED' | 'REMATCH_NOT_ALLOWED'
   ) {
     super(message);
     this.name = 'RoomError';
