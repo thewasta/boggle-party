@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useRef, useCallback, useState, useMemo } from 'react';
+import { useRef, useCallback, useState, useMemo, memo } from 'react';
 import type { Cell } from '@/server/types';
 import type { SelectedCell, WordSelection } from '@/types/game';
 import { getAdjacentCells, calculateCellPosition, getCellFromCoordinates } from '@/lib/board-utils';
@@ -23,7 +23,7 @@ interface GameBoardProps {
 const CELL_SIZE = 70;
 const CELL_GAP = 8;
 
-export function GameBoard({
+const GameBoardMemo = function GameBoard({
   board,
   selection,
   onSelectionStart,
@@ -251,4 +251,6 @@ export function GameBoard({
       </div>
     </div>
   );
-}
+};
+
+export const GameBoard = memo(GameBoardMemo);
