@@ -9,7 +9,7 @@ export class GamesRepository {
     const pool = getPool();
     const query = `
       INSERT INTO games (id, room_code, grid_size, duration, status, created_at, host_id, board)
-      VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, COALESCE($5, NOW()), $6, $7)
       RETURNING *
     `;
     const values = [
@@ -17,7 +17,7 @@ export class GamesRepository {
       input.grid_size,
       input.duration,
       input.status,
-      input.created_at,
+      input.created_at || null,
       input.host_id || null,
       input.board ? JSON.stringify(input.board) : null,
     ];

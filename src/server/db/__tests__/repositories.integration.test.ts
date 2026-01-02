@@ -2,6 +2,11 @@ import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import { getPool } from '../connection';
 import { gamesRepository, playersRepository, wordsRepository } from '../repositories';
 
+// Helper to generate unique room codes for parallel tests
+function generateRoomCode(): string {
+  return crypto.randomUUID().slice(0, 6).toUpperCase();
+}
+
 describe('Database Repositories Integration Tests', () => {
   beforeAll(async () => {
     // Ensure database connection
@@ -19,8 +24,9 @@ describe('Database Repositories Integration Tests', () => {
 
   describe('GamesRepository', () => {
     it('should create a new game', async () => {
+      const roomCode = generateRoomCode();
       const game = await gamesRepository.create({
-        room_code: 'ABC123',
+        room_code: roomCode,
         grid_size: 4,
         duration: 120,
         status: 'waiting',
@@ -28,30 +34,32 @@ describe('Database Repositories Integration Tests', () => {
 
       expect(game).toBeDefined();
       expect(game.id).toBeDefined();
-      expect(game.room_code).toBe('ABC123');
+      expect(game.room_code).toBe(roomCode);
       expect(game.grid_size).toBe(4);
       expect(game.duration).toBe(120);
       expect(game.status).toBe('waiting');
     });
 
     it('should find game by room code', async () => {
+      const roomCode = generateRoomCode();
       const created = await gamesRepository.create({
-        room_code: 'XYZ789',
+        room_code: roomCode,
         grid_size: 5,
         duration: 180,
         status: 'waiting',
       });
 
-      const found = await gamesRepository.findByRoomCode('XYZ789');
+      const found = await gamesRepository.findByRoomCode(roomCode);
 
       expect(found).toBeDefined();
       expect(found?.id).toBe(created.id);
-      expect(found?.room_code).toBe('XYZ789');
+      expect(found?.room_code).toBe(roomCode);
     });
 
     it('should update game status', async () => {
+      const roomCode = generateRoomCode();
       const game = await gamesRepository.create({
-        room_code: 'STATUS',
+        room_code: roomCode,
         grid_size: 4,
         duration: 120,
         status: 'waiting',
@@ -68,19 +76,17 @@ describe('Database Repositories Integration Tests', () => {
     });
 
     it('should detect existing room codes', async () => {
-      // Create a game with a specific room code
+      const roomCode = generateRoomCode();
       await gamesRepository.create({
-        room_code: 'UNIQUE1',
+        room_code: roomCode,
         grid_size: 4,
         duration: 120,
         status: 'finished',
       });
 
-      // Check that the code exists
-      const exists = await gamesRepository.roomCodeExists('UNIQUE1');
+      const exists = await gamesRepository.roomCodeExists(roomCode);
       expect(exists).toBe(true);
 
-      // Check that a different code does not exist
       const notExists = await gamesRepository.roomCodeExists('NOTREAL');
       expect(notExists).toBe(false);
     });
@@ -88,8 +94,9 @@ describe('Database Repositories Integration Tests', () => {
 
   describe('PlayersRepository', () => {
     it('should create a player', async () => {
+      const roomCode = generateRoomCode();
       const game = await gamesRepository.create({
-        room_code: 'PLAYER',
+        room_code: roomCode,
         grid_size: 4,
         duration: 120,
         status: 'waiting',
@@ -108,8 +115,9 @@ describe('Database Repositories Integration Tests', () => {
     });
 
     it('should get all players for a game', async () => {
+      const roomCode = generateRoomCode();
       const game = await gamesRepository.create({
-        room_code: 'MULTI',
+        room_code: roomCode,
         grid_size: 4,
         duration: 120,
         status: 'waiting',
@@ -137,8 +145,9 @@ describe('Database Repositories Integration Tests', () => {
 
   describe('WordsRepository', () => {
     it('should record a found word', async () => {
+      const roomCode = generateRoomCode();
       const game = await gamesRepository.create({
-        room_code: 'WORDS',
+        room_code: roomCode,
         grid_size: 4,
         duration: 120,
         status: 'playing',
@@ -168,8 +177,9 @@ describe('Database Repositories Integration Tests', () => {
     });
 
     it('should get all words for a player', async () => {
+      const roomCode = generateRoomCode();
       const game = await gamesRepository.create({
-        room_code: 'LIST',
+        room_code: roomCode,
         grid_size: 4,
         duration: 120,
         status: 'playing',
@@ -211,8 +221,9 @@ describe('Database Repositories Integration Tests', () => {
     });
 
     it('should check if word exists in game (case insensitive)', async () => {
+      const roomCode = generateRoomCode();
       const game = await gamesRepository.create({
-        room_code: 'CHECK',
+        room_code: roomCode,
         grid_size: 4,
         duration: 120,
         status: 'playing',

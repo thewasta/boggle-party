@@ -30,6 +30,9 @@ describe('POST /api/rooms/[code]/results', () => {
     };
 
     vi.mocked(roomsManager.getRoom).mockReturnValue(mockRoom as unknown as Room);
+    vi.mocked(gamesRepository.create).mockResolvedValue({ id: 'game-123' });
+    vi.mocked(playersRepository.create).mockResolvedValue({ id: 'player-db-1' });
+    vi.mocked(wordsRepository.create).mockResolvedValue({});
 
     const request = new Request('http://localhost:3000/api/rooms/ABC123/results', {
       method: 'POST',

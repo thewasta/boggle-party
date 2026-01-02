@@ -1,9 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { POST } from '../route';
 import { NextRequest } from 'next/server';
+import { roomsManager } from '@/server/rooms-manager';
 
 vi.mock('@/server/pusher-client', () => ({
   triggerEvent: vi.fn(),
+}));
+
+vi.mock('@/server/rooms-manager');
+vi.mock('@/server/event-emitter', () => ({
+  emitPlayerJoined: vi.fn(),
 }));
 
 describe('POST /api/rooms/[code]/join', () => {
