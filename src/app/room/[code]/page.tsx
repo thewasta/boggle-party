@@ -27,7 +27,6 @@ export default function WaitingRoomPage({
     playerId: string;
   } | null>(null);
   const [roomData, setRoomData] = useState<{
-    roomId: string;
     initialPlayers: Player[];
     initialHost: Player;
     initialGridSize: GridSize;
@@ -66,7 +65,6 @@ export default function WaitingRoomPage({
 
         if (mounted) {
           setRoomData({
-            roomId: data.room.id,
             initialPlayers: data.room.players,
             initialHost: data.room.host,
             initialGridSize: data.room.gridSize,
@@ -140,7 +138,6 @@ export default function WaitingRoomPage({
   return (
     <WaitingRoomClient
       roomCode={resolvedParams.code}
-      roomId={roomData.roomId}
       initialPlayers={roomData.initialPlayers}
       initialHost={roomData.initialHost}
       initialGridSize={roomData.initialGridSize}
@@ -152,7 +149,6 @@ export default function WaitingRoomPage({
 
 function WaitingRoomClient(props: {
   roomCode: string;
-  roomId: string;
   initialPlayers: Player[];
   initialHost: Player;
   initialGridSize: GridSize;
@@ -180,7 +176,7 @@ function WaitingRoomClient(props: {
     }
   }, [status, props.roomCode, props.currentPlayerId, router]);
 
-  usePusherChannel(props.roomId, {
+  usePusherChannel(props.roomCode, {
     onPlayerJoined: (data) => {
       setPlayers((prev) => {
         const exists = prev.some((p) => p.id === data.player.id);
