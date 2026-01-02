@@ -49,7 +49,8 @@ export default function ResultsPage() {
     );
   }, []);
 
-  usePusherChannel(roomId, {
+  usePusherChannel(roomCode, {
+    enabled: !!roomCode,
     onRevealWord: (data) => {
       setRevealedWords((prev) => [...prev, data]);
       updatePlayerScore(data);
