@@ -30,7 +30,7 @@ export async function POST(
     }
 
     // Notify all players to return to waiting room
-    await emitRematchRequested(room.id, {
+    await emitRematchRequested(room.code, {
       id: room.host.id,
       name: room.host.name,
     });

@@ -56,7 +56,7 @@ export async function POST(
       );
     }
 
-    await emitGameStarted(room.id, updatedRoom.startTime!, duration, board);
+    await emitGameStarted(room.code, updatedRoom.startTime!, duration, board);
 
     return NextResponse.json({
       success: true,

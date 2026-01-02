@@ -34,7 +34,7 @@ export async function POST(
       return apiError('Room not found', 404);
     }
 
-    await emitPlayerJoined(room.id, player, room.players.size);
+    await emitPlayerJoined(room.code, player, room.players.size);
 
     return apiSuccess({
       room: roomsManager.roomToDTO(room),

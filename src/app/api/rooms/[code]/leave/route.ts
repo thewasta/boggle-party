@@ -39,7 +39,7 @@ export async function POST(
 
     // If host left, close the room for everyone
     if (isHost) {
-      await triggerEvent(`game-${room.id}`, 'room-closed', {
+      await triggerEvent(`game-${room.code}`, 'room-closed', {
         reason: 'host-left',
         message: 'El anfitrión abandonó la sala',
       });
@@ -48,7 +48,7 @@ export async function POST(
       return apiSuccess({ message: 'Host left, room closed' });
     }
 
-    await emitPlayerLeft(result.id, validatedData.playerId, playerName, result.players.size);
+    await emitPlayerLeft(result.code, validatedData.playerId, playerName, result.players.size);
 
     return apiSuccess({
       room: roomsManager.roomToDTO(result),

@@ -28,7 +28,7 @@ export async function POST(
       return apiError('Failed to end game', 500);
     }
 
-    await emitGameEnded(room.id, updatedRoom.endTime!);
+    await emitGameEnded(room.code, updatedRoom.endTime!);
 
     return apiSuccess({
       message: 'Game ended',
