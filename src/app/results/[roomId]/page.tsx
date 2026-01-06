@@ -49,27 +49,30 @@ export default function ResultsPage() {
     );
   }, []);
 
-  usePusherChannel(roomCode, {
-    enabled: !!roomCode,
-    onRevealWord: (data) => {
-      setRevealedWords((prev) => [...prev, data]);
-      updatePlayerScore(data);
+  usePusherChannel(
+    roomCode,
+    {
+      onRevealWord: (data) => {
+        setRevealedWords((prev) => [...prev, data]);
+        updatePlayerScore(data);
+      },
+      onResultsComplete: (data) => {
+        setIsRevealComplete(true);
+        setPlayerScores(
+          data.finalRankings.map((p, i) => ({ ...p, position: i + 1 })),
+        );
+      },
+      onRematchRequested: (data) => {
+        if (!isNavigating && roomCode) {
+          setIsNavigating(true);
+          setTimeout(() => {
+            router.push(`/room/${roomCode}?playerId=${playerId}`);
+          }, 500);
+        }
+      },
     },
-    onResultsComplete: (data) => {
-      setIsRevealComplete(true);
-      setPlayerScores(
-        data.finalRankings.map((p, i) => ({ ...p, position: i + 1 })),
-      );
-    },
-    onRematchRequested: (data) => {
-      if (!isNavigating && roomCode) {
-        setIsNavigating(true);
-        setTimeout(() => {
-          router.push(`/room/${roomCode}?playerId=${playerId}`);
-        }, 500);
-      }
-    },
-  });
+    { enabled: !!roomCode },
+  );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: Only run on mount
   useEffect(() => {
