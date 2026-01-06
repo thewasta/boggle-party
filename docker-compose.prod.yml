@@ -11,7 +11,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
-      - DATABASE_URL=${DATABASE_URL:?} # El :? asegura que falle si no está en la UI
+      - DATABASE_URL=${DATABASE_URL}
       - PUSHER_APP_ID=${PUSHER_APP_ID}
       - PUSHER_KEY=${PUSHER_KEY}
       - PUSHER_SECRET=${PUSHER_SECRET}
@@ -22,16 +22,11 @@ services:
     expose:
       - "3000"
     labels:
+      - "coolify.managed=true"
       - "coolify.port=3000"
     depends_on:
       db:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 3000 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
     restart: unless-stopped
 
   db:
