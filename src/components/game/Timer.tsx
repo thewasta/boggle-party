@@ -43,7 +43,7 @@ export function Timer({ timerState }: TimerProps) {
         {/* Timer container */}
         <div className="relative">
           {/* Background ring (SVG) */}
-          <svg className="absolute inset-0 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 w-40 h-40 -rotate-90 opacity-20">
+          <svg className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 -rotate-90 opacity-20">
             <circle
               cx="80"
               cy="80"
