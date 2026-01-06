@@ -1,12 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useTransition, useEffect } from "react";
 import { motion } from "framer-motion";
 import { PageTransition } from "@/components/ui/PageTransition";
 import { FloatingLetters } from "@/components/landing/FloatingLetters";
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const roomCodeFromUrl = searchParams.get("code") || "";
+
   return (
     <PageTransition>
       <div className="min-h-screen bg-[#FDF8F3] relative overflow-hidden">
@@ -68,7 +71,7 @@ export default function Home() {
             <CreateRoomCard />
 
             {/* Join Room Card */}
-            <JoinRoomCard />
+            <JoinRoomCard initialRoomCode={roomCodeFromUrl} />
           </div>
 
           {/* Footer info */}
@@ -202,12 +205,18 @@ function CreateRoomCard() {
   );
 }
 
-function JoinRoomCard() {
+function JoinRoomCard({ initialRoomCode = "" }: { initialRoomCode?: string }) {
   const router = useRouter();
-  const [roomCode, setRoomCode] = useState("");
+  const [roomCode, setRoomCode] = useState(initialRoomCode);
   const [playerName, setPlayerName] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (initialRoomCode) {
+      setRoomCode(initialRoomCode);
+    }
+  }, [initialRoomCode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
