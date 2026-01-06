@@ -11,73 +11,56 @@ const cleanSpanish = (text) => {
 };
 
 function shouldKeep(word) {
-    if (word.length > 8) return false;
+    if (word.length < 3 || word.length > 8) return false;
     if (word.includes('q') && !word.includes('qu')) return false;
     
-
-    const rareEndings = [
-        'isteis', 'asteis', 'ieseis', 'aremos', 'iereis', 'iesemos',
-        'áramos', 'éramos', 'íramos', 'ásemos', 'ésemos', 'ísemos',
-        'abais', 'íais', 'ereis', 'ireis', 'areis', 'aseis',
-        'aban', 'ían', 'aran', 'eran', 'iran', 'asen', 'esen', 'iesen'
+    const verbEndings = [
+        'aremos', 'ereis', 'ireis', 'asteis', 'isteis', 'abamos', 'abais',
+        'arian', 'arias', 'erias', 'erian', 'irias', 'irian',
+        'ieseis', 'aseis', 'isteis', 'ramos', 'semos', 'sese', 'aste',
+        'idles', 'adles', 'edles', 'adme', 'edme', 'idme', 'isico'
     ];
-    if (rareEndings.some(ending => word.endsWith(ending))) return false;
-
-    const rarePrefixes = [
-        'pseudo', 'cuasi', 'infra', 'ultra', 'super', 'hiper',
-        'anti', 'contra', 'extra', 'meta', 'para', 'semi',
-        'macro', 'micro', 'neo', 'proto', 'retro'
+    if (word.length > 5 && verbEndings.some(end => word.endsWith(end))) return false;
+    const technicalSuffixes = [
+        'mente', 'ismo', 'ista', 'logia', 'grafia', 'oide', 'itis', 
+        'tico', 'tiva', 'tivo', 'anza', 'cion', 'sion'
     ];
-    if (rarePrefixes.some(prefix => word.startsWith(prefix) && word.length > 6)) return false;
+        if (word.length >= 7 && technicalSuffixes.some(s => word.endsWith(s))) return false;
 
+    // 3. REGLA DE LA Q (Fundamental)
+    if (word.includes('q') && !word.includes('qu')) return false;
 
-    const rareSuffixes = [
-        'cion', 'sion', 'dad', 'tad', 'miento', 'mento',
-        'ancia', 'encia', 'ismo', 'ista', 'logo', 'fobia',
-        'patia', 'logia', 'itis', 'osis', 'emia'
-    ];
-    if (word.length > 7 && rareSuffixes.some(suffix => word.endsWith(suffix))) {
-        const commonExceptions = ['cancion', 'acion', 'nacion', 'pasion', 'ension'];
-        if (!commonExceptions.some(exc => word.includes(exc))) return false;
+    // 4. FILTRAR POR LETRAS RARAS
+    // 'w', 'k' y 'x' (la x es aceptable pero con moderación)
+    if (/[wk]/.test(word)) return false;
+
+    // 5. EVITAR REPETICIONES RARAS
+    if (/(.)\1/.test(word)) {
+        // Permitir solo 'rr', 'll', 'cc', 'nn', 'ee' (comunes en español)
+        if (!/(rr|ll|cc|nn|ee)/.test(word)) return false;
     }
 
-    // 3. Eliminar palabras con demasiadas consonantes raras juntas
-    if (/(.)\1\1/.test(word)) return false;
-
-    const rareConsonantGroups = /[bcdfghjklmnpqrstvwxyz]{4,}/;
-    if (rareConsonantGroups.test(word)) return false;
-
-    const weirdPatterns = [
-        /[wkx]/, // Letras no comunes en español
-        /[aeiou]{4,}/, // Demasiadas vocales seguidas
-        /^[bcdfghjklmnpqrstvwxyz]{3}/, // 3 consonantes al inicio
-        /[bcdfghjklmnpqrstvwxyz]{3}$/, // 3 consonantes al final
-    ];
-    if (weirdPatterns.some(pattern => pattern.test(word))) return false;
-    const veryRareVerbalForms = /[áéíóú](is|rais|semos|remos)$/;
-    if (veryRareVerbalForms.test(word)) return false;
-
     return true;
+
 }
 
 
 function getFrequencyScore(word) {
     let score = 0;
-    
+    const superCommon = 'aeosrni'; 
+    const common = 'ltdu';
     // Letras comunes en español dan más puntos
-    const commonLetters = 'aeiourlnsdt';
     for (let char of word) {
-        if (commonLetters.includes(char)) score += 2;
+        if (superCommon.includes(char)) score += 3;
+        else if (common.includes(char)) score += 2;
         else score += 1;
     }
-    
-    // Penalizar letras raras
-    if (word.match(/[wkx]/)) score -= 10;
-    
-    // Bonus para palabras de longitud ideal para Boggle
-    if (word.length >= 4 && word.length <= 6) score += 5;
-    
+    if (word.length === 3) score += 8;
+    if (word.length === 4) score += 6;
+    if (word.length === 5) score += 4;
+
     return score;
+
 }
 
 
@@ -99,7 +82,7 @@ rawWords.forEach(word => {
 
 // Convertir de nuevo a array y ordenar
 let finalWords = Array.from(cleanWordsMap.keys());
-const SCORE_THRESHOLD = 10;
+const SCORE_THRESHOLD = 16;
 finalWords = finalWords.filter(word => cleanWordsMap.get(word) >= SCORE_THRESHOLD);
 finalWords.sort();
 
