@@ -73,41 +73,13 @@ export function getCellFromCoordinates(
   const col = Math.floor(x / totalSize);
   const row = Math.floor(y / totalSize);
 
-  if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) {
-    return null;
-  }
+  if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) return null;
 
-  // Check neighboring cells (including diagonals) to find the closest center
-  let closestCell: Cell | null = null;
-  let minDistance = Infinity;
+  const centerX = col * totalSize + cellSize / 2;
+  const centerY = row * totalSize + cellSize / 2;
+  const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+  
+  const hitRadius = cellSize * 0.4; 
 
-  const searchRadius = 1;
-  for (let dr = -searchRadius; dr <= searchRadius; dr++) {
-    for (let dc = -searchRadius; dc <= searchRadius; dc++) {
-      const checkRow = row + dr;
-      const checkCol = col + dc;
-
-      if (checkRow < 0 || checkRow >= gridSize || checkCol < 0 || checkCol >= gridSize) {
-        continue;
-      }
-
-      // Calculate center of this cell
-      const centerX = checkCol * totalSize + cellSize / 2;
-      const centerY = checkRow * totalSize + cellSize / 2;
-
-      // Calculate distance from pointer to cell center
-      const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-
-      // Generous hit radius: cell size + gap means we can select from adjacent cells
-      // This allows diagonal selection to work smoothly
-      const hitRadius = cellSize * 0.7;
-
-      if (distance < hitRadius && distance < minDistance) {
-        minDistance = distance;
-        closestCell = { row: checkRow, col: checkCol };
-      }
-    }
-  }
-
-  return closestCell;
+  return distance < hitRadius ? { row, col } : null;
 }

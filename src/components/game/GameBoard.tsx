@@ -113,19 +113,13 @@ const GameBoardMemo = function GameBoard({
     setHoveredCell(cell);
 
     if (!cell) return;
-
-    // Skip if same as last cell
-    if (lastCellRef.current?.row === cell.row && lastCellRef.current?.col === cell.col) {
-      return;
-    }
-
-    // Add new cell if valid (not already selected and adjacent)
-    if (canAddCell(cell)) {
+    if (lastCellRef.current?.row !== cell.row || lastCellRef.current?.col !== cell.col) {
       lastCellRef.current = cell;
       const selectedCell = getSelectedCell(cell);
       onSelectionMove(selectedCell);
     }
-  }, [isDragging, isLocked, gridSize, canAddCell, getSelectedCell, onSelectionMove]);
+
+  }, [isDragging, isLocked, gridSize, getSelectedCell, onSelectionMove]);
 
   /**
    * Handle pointer up (end selection, submit word)

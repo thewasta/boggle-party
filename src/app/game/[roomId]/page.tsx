@@ -7,7 +7,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CurrentWordDisplay } from "@/components/game/CurrentWordDisplay";
 import { GameBoard } from "@/components/game/GameBoard";
 import { Timer } from "@/components/game/Timer";
@@ -169,26 +169,40 @@ function GameClient(props: {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const gameEndedRef = useRef(false);
+
+  const handleGameEnd = useCallback(async () => {
+    // Si ya hemos procesado el fin del juego, salimos inmediatamente
+    if (gameEndedRef.current) return;
+    
+    gameEndedRef.current = true; // Bloqueamos futuras ejecuciones
+    props.setIsLocked(true);
+
+    console.log("Finalizando juego...");
+
+    // Solo el host notifica al servidor para evitar colisiones
+    if (props.playerId === props.hostId) {
+      try {
+        await fetch(`/api/rooms/${props.roomCode}/end`, { 
+          method: "POST",
+          cache: 'no-store' 
+        });
+      } catch (error) {
+        console.error("Error al cerrar la sala:", error);
+      }
+    }
+
+    // Redirigir a resultados tras un breve delay visual
+    setTimeout(() => {
+      router.push(`/results/${props.roomCode}?playerId=${props.playerId}`);
+    }, 2000);
+  }, [props.roomCode, props.playerId, props.hostId, props.setIsLocked, router]);
+
+
   const { gameState, setGameState, timerState } = useGameSync({
     roomCode: props.roomCode,
     playerId: props.playerId,
-    onGameEnd: async () => {
-      props.setIsLocked(true);
-      // Only host should call the end game endpoint to avoid duplicate events
-      if (props.playerId === props.hostId) {
-        try {
-          await fetch(`/api/rooms/${props.roomCode}/end`, { method: "POST" });
-        } catch (error) {
-          console.error("Failed to end game:", error);
-        }
-      }
-      // Navigate to results page after delay using roomCode
-      setTimeout(
-        () =>
-          router.push(`/results/${props.roomCode}?playerId=${props.playerId}`),
-        2000,
-      );
-    },
+    onGameEnd: handleGameEnd
   });
 
   // Fetch game state on mount
@@ -220,7 +234,13 @@ function GameClient(props: {
     };
 
     fetchGameState();
-  }, [props.roomId, props.playerId, props.roomCode, setGameState, props.setFoundWords]);
+  }, [
+    props.roomId,
+    props.playerId,
+    props.roomCode,
+    setGameState,
+    props.setFoundWords,
+  ]);
 
   /**
    * Handle word submission
@@ -306,7 +326,7 @@ function GameClient(props: {
       gameState?.board,
       props.setSelection,
       props.setValidationStatus,
-    ],
+    ]
   );
 
   /**
@@ -315,17 +335,37 @@ function GameClient(props: {
   const handleSelectionMove = useCallback(
     (cell: SelectedCell) => {
       if (props.isLocked) return;
+      //@ts-ignore
+      props.setSelection((prev) => {
+        // 1. Evitar duplicados (si la celda ya existe, no hacemos nada)
+        const isAlreadySelected = prev.cells.some(
+          //@ts-ignore
+          (c) => c.row === cell.row && c.col === cell.col
+        );
+        if (isAlreadySelected) return prev;
 
-      const letter = gameState?.board[cell.row][cell.col] || "";
-      const newWord = props.selection.currentWord + letter;
+        // 2. Verificar adyacencia con la última celda
+        const lastCell = prev.cells[prev.cells.length - 1];
+        if (lastCell) {
+          const rowDiff = Math.abs(cell.row - lastCell.row);
+          const colDiff = Math.abs(cell.col - lastCell.col);
+          const isAdjacent = rowDiff <= 1 && colDiff <= 1;
 
-      props.setSelection({
-        cells: [...props.selection.cells, cell],
-        currentWord: newWord,
-        isValid: null,
+          // Si no es adyacente, ignoramos el movimiento
+          if (!isAdjacent) return prev;
+        }
+
+        // 3. Añadir la letra legalmente
+        const letter = gameState?.board[cell.row][cell.col] || "";
+        return {
+          ...prev,
+          cells: [...prev.cells, cell],
+          currentWord: prev.currentWord + letter,
+          isValid: null,
+        };
       });
     },
-    [props.isLocked, gameState?.board, props.selection, props.setSelection],
+    [props.isLocked, gameState?.board, props.selection]
   );
 
   /**
