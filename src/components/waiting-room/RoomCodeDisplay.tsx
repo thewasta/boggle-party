@@ -13,7 +13,9 @@ export function RoomCodeDisplay({ roomCode }: RoomCodeDisplayProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    const success = await copyToClipboard(roomCode);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    const inviteLink = `${siteUrl}?code=${roomCode}`;
+    const success = await copyToClipboard(inviteLink);
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
