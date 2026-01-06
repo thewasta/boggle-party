@@ -1,5 +1,5 @@
 import type { GridSize } from './db/schema';
-import { buildTrie, getDictionary } from './dictionary';
+import { getTrie } from './dictionary';
 import { solveBoard, SolveResult } from './solver';
 
 export interface BoardStats {
@@ -85,17 +85,17 @@ export const SPANISH_BOGGLE_DICE_6x6 = [
   ['C', 'A', 'S', 'O', 'I', 'E'],
   ['F', 'U', 'E', 'R', 'A', 'O'],
   ['G', 'A', 'T', 'O', 'S', 'E'],
-  ['H', 'A', 'C', 'E', 'R', 'I'],
-  ['J', 'U', 'E', 'G', 'O', 'A'],
-  ['L', 'U', 'N', 'A', 'S', 'E'],
-  ['M', 'A', 'N', 'O', 'S', 'I'],
-  ['P', 'E', 'R', 'O', 'S', 'A'],
-  ['S', 'O', 'L', 'O', 'A', 'E'],
-  ['T', 'O', 'D', 'O', 'A', 'S'],
-  ['U', 'N', 'O', 'S', 'A', 'E'],
-  ['V', 'I', 'D', 'A', 'S', 'E'],
-  ['Z', 'O', 'N', 'A', 'S', 'E'],
-  ['Y', 'A', 'E', 'O', 'I', 'U'],
+  ['H', 'U', 'E', 'V', 'O', 'S'],
+  ['B', 'R', 'A', 'Z', 'O', 'S'],
+  ['P', 'L', 'A', 'N', 'A', 'S'],
+  ['F', 'I', 'E', 'S', 'T', 'A'],
+  ['G', 'L', 'O', 'B', 'O', 'S'],
+  ['C', 'H', 'I', 'C', 'O', 'S'],
+  ['M', 'U', 'C', 'H', 'O', 'S'],
+  ['X', 'E', 'N', 'O', 'N', 'A'], // Una X para dar juego
+  ['K', 'I', 'L', 'O', 'S', 'A'], // Una K
+  ['Y', 'O', 'G', 'U', 'R', 'T'],
+  ['Z', 'O', 'R', 'R', 'O', 'S'],
 ];
 
 /**
@@ -138,24 +138,29 @@ export function generateBoard(gridSize: GridSize): string[][] {
 }
 
 export async function generateGoodBoard(gridSize: GridSize) {
-  const dictSet = await getDictionary();
-  const trieRoot = buildTrie(dictSet); // Esto hazlo solo una vez y guárdalo en caché
+  const trieRoot = await getTrie();
   
   let board: string[][];
   let results: SolveResult;
   let attempts = 0;
+  const thresholds = {
+    4: { minWords: 15, minLen: 5 },
+    5: { minWords: 30, minLen: 7 },
+    6: { minWords: 50, minLen: 8 }
+  };
+  const currentThreshold = thresholds[gridSize] || thresholds[4];
 
   do {
     board = generateBoard(gridSize);
     results = solveBoard(board, trieRoot);
     attempts++;
-    const minWords = gridSize === 5 ? 40 : 20;
-    const minLen = gridSize === 5 ? 7 : 6;
-
-    if (results.words.length >= minWords && results.maxLen >= minLen) {
-      console.log(`Tablero épico generado en ${attempts} intentos!`);
-      console.log(`Palabras encontradas: ${results.words.length}`);
+    if (results.words.length >= currentThreshold.minWords && 
+      results.maxLen >= currentThreshold.minLen) {
+      console.log(`Tablero ${gridSize}x${gridSize} generado en ${attempts} intentos.`);
       break;
+    }
+    if (attempts === 50) {
+      currentThreshold.minWords = Math.floor(currentThreshold.minWords * 0.7);
     }
   } while (attempts < 100);
 
@@ -194,19 +199,15 @@ export function getBoardStats(board: string[][]): BoardStats {
  * Validate board structure
  */
 export function isValidBoard(board: string[][]): boolean {
-  if (!board || board.length === 0) {
-    return false;
-  }
+  if (!board || board.length === 0) return false;
 
   const size = board.length;
 
   for (const row of board) {
-    if (!row || row.length !== size) {
-      return false;
-    }
+    if (!row || row.length !== size) return false;
 
     for (const cell of row) {
-      if (!cell || !/^[A-ZÑ]$/.test(cell)) {
+      if (!cell || !/^(QU|[A-ZÑ])$/i.test(cell)) {
         return false;
       }
     }

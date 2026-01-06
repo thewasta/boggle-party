@@ -13,7 +13,8 @@ export function buildTrie(words: Iterable<string>): TrieNode {
   const root = new TrieNode();
   for (const word of words) {
     let node = root;
-    for (const char of word.toUpperCase()) {
+    const cleanWord = word.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    for (const char of cleanWord) {
       if (!node.children[char]) node.children[char] = new TrieNode();
       node = node.children[char];
     }
