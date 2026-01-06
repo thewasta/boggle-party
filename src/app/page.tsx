@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import { PageTransition } from "@/components/ui/PageTransition";
 import { FloatingLetters } from "@/components/landing/FloatingLetters";
 
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const roomCodeFromUrl = searchParams.get("code") || "";
 
@@ -97,6 +97,14 @@ export default function Home() {
         </div>
       </div>
     </PageTransition>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#FDF8F3] flex items-center justify-center">Cargando...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
 
