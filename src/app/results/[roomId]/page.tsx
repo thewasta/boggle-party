@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FinalRanking } from "@/components/results/FinalRanking";
 import { ScoreStairs } from "@/components/results/ScoreStairs";
 import { WordReveal } from "@/components/results/WordReveal";
-import { usePusherChannel } from "@/hooks/usePusherChannel";
+import { useSocketRoom } from "@/hooks/useSocketRoom";
 
 export interface PlayerScore {
   id: string;
@@ -49,7 +49,7 @@ export default function ResultsPage() {
     );
   }, []);
 
-  usePusherChannel(
+  useSocketRoom(
     roomCode,
     {
       onRevealWord: (data) => {

@@ -6,7 +6,7 @@ import { GridSizeSelector } from "@/components/waiting-room/GridSizeSelector";
 import { PlayerList } from "@/components/waiting-room/PlayerList";
 import { RoomCodeDisplay } from "@/components/waiting-room/RoomCodeDisplay";
 import { StartGameButton } from "@/components/waiting-room/StartGameButton";
-import { usePusherChannel } from "@/hooks/usePusherChannel";
+import { useSocketRoom } from "@/hooks/useSocketRoom";
 import type { GridSize } from "@/server/db/schema";
 import type { Player } from "@/server/types";
 
@@ -176,7 +176,7 @@ function WaitingRoomClient(props: {
     }
   }, [status, props.roomCode, props.currentPlayerId, router]);
 
-  usePusherChannel(props.roomCode, {
+  useSocketRoom(props.roomCode, {
     onPlayerJoined: (data) => {
       setPlayers((prev) => {
         const exists = prev.some((p) => p.id === data.player.id);

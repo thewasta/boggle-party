@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { usePusherChannel } from './usePusherChannel';
+import { useSocketRoom } from './useSocketRoom';
 import type { GameState, TimerState } from '@/types/game';
 
 interface UseGameSyncOptions {
@@ -132,8 +132,8 @@ export function useGameSync({
     onGameEnd?.();
   }, [onGameEnd]);
 
-  // Subscribe to Pusher events (read-only, no word submission)
-  usePusherChannel(roomCode, {
+  // Subscribe to WebSocket events (read-only, no word submission)
+  useSocketRoom(roomCode, {
     onGameEnded: handleGameEnded,
   });
 
