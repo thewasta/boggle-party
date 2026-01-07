@@ -15,6 +15,3 @@ const wsServer = createWebSocketServer(WS_PORT);
 wsServer.listen(WS_PORT, '0.0.0.0', () => {
   console.log(`WebSocket server listening on port ${WS_PORT}`);
 });
-
-// Export io instance for HTTP server to use
-export { getIo };
