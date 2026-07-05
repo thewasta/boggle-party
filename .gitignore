@@ -52,3 +52,5 @@ next-env.d.ts
 data/*.tmp
 data/temp/
 .pnpm-store
+# Local Pi runtime state
+.atl/
