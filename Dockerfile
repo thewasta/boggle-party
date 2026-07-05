@@ -3,15 +3,15 @@ FROM node:22-alpine AS base
 
 # Install wget for healthchecks and pnpm globally
 RUN apk add --no-cache wget libc6-compat && \
-    npm install -g pnpm
+    npm install -g pnpm@11.5.1
 
 # Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --shamefully-hoist
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
