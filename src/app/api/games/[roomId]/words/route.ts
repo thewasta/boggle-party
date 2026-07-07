@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { roomsManager } from '@/server/rooms-manager';
-import { validateWord } from '@/server/word-validator';
-import { wordSubmissionSchema } from '@/server/validation';
-import { RoomError } from '@/server/types';
-import type { RouteParams } from '@/server/types';
+import { type NextRequest, NextResponse } from "next/server";
+import { roomsManager } from "@/server/rooms-manager";
+import { validateWord } from "@/server/word-validator";
+import { wordSubmissionSchema } from "@/server/validation";
+import { RoomError } from "@/server/types";
+import type { RouteParams } from "@/server/types";
 
 export async function POST(
   request: NextRequest,
-  { params }: RouteParams<{ roomId: string }>
+  { params }: RouteParams<{ roomId: string }>,
 ) {
   try {
     const { roomId } = await params;
@@ -19,11 +19,11 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid request',
+          error: "Invalid request",
           // Zod v4 expone los detalles de validación en `issues`, no en `errors`
           details: validation.error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -34,15 +34,15 @@ export async function POST(
 
     if (!room) {
       return NextResponse.json(
-        { success: false, error: 'Room not found' },
-        { status: 404 }
+        { success: false, error: "Room not found" },
+        { status: 404 },
       );
     }
 
-    if (room.status !== 'playing') {
+    if (room.status !== "playing") {
       return NextResponse.json(
-        { success: false, error: 'Game is not in progress' },
-        { status: 400 }
+        { success: false, error: "Game is not in progress" },
+        { status: 400 },
       );
     }
 
@@ -50,8 +50,15 @@ export async function POST(
 
     if (!player) {
       return NextResponse.json(
-        { success: false, error: 'Player not found in room' },
-        { status: 404 }
+        { success: false, error: "Player not found in room" },
+        { status: 404 },
+      );
+    }
+
+    if (!room.board) {
+      return NextResponse.json(
+        { success: false, error: "Board not initialized" },
+        { status: 400 },
       );
     }
 
@@ -60,6 +67,7 @@ export async function POST(
       path,
       foundWords: player.foundWords,
       gridSize: room.gridSize,
+      board: room.board,
     });
 
     if (!result.valid) {
@@ -68,7 +76,7 @@ export async function POST(
           success: false,
           error: result.reason,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,14 +94,14 @@ export async function POST(
       word: word.toUpperCase(),
     });
   } catch (error) {
-    console.error('Word submission error:', error);
+    console.error("Word submission error:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Internal server error',
+        error: "Internal server error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

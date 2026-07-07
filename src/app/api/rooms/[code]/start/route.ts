@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { roomsManager } from '@/server/rooms-manager';
-import { generateBoard, generateGoodBoard } from '@/server/board-generator';
-import { startGameSchema } from '@/server/validation';
-import { emitGameStarted } from '@/server/event-emitter';
-import type { RouteParams } from '@/server/types';
+import { type NextRequest, NextResponse } from "next/server";
+import { generateGoodBoard } from "@/server/board-generator";
+import { emitGameStarted } from "@/server/event-emitter";
+import { roomsManager } from "@/server/rooms-manager";
+import type { RouteParams } from "@/server/types";
+import { startGameSchema } from "@/server/validation";
 
 export async function POST(
   request: NextRequest,
-  { params }: RouteParams<{ code: string }>
+  { params }: RouteParams<{ code: string }>,
 ) {
   try {
     const { code: roomCode } = await params;
@@ -20,11 +20,11 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid request',
+          error: "Invalid request",
           // Zod v4 expone los detalles de validación en `issues`, no en `errors`
           details: validation.error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,13 +35,14 @@ export async function POST(
 
     if (!room) {
       return NextResponse.json(
-        { success: false, error: 'Room not found' },
-        { status: 404 }
+        { success: false, error: "Room not found" },
+        { status: 404 },
       );
     }
 
     // Generate board
-    const {board, allWords} = await generateGoodBoard(gridSize);
+    const { board, allWords, commonWordCount } =
+      await generateGoodBoard(gridSize);
 
     // Calculate duration
     const duration = roomsManager.getDefaultDuration(gridSize);
@@ -51,8 +52,8 @@ export async function POST(
 
     if (!updatedRoom) {
       return NextResponse.json(
-        { success: false, error: 'Failed to start game' },
-        { status: 500 }
+        { success: false, error: "Failed to start game" },
+        { status: 500 },
       );
     }
 
@@ -60,18 +61,19 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: 'Game started',
+      message: "Game started",
       startTime: updatedRoom.startTime!,
       duration,
       board,
-      totalPossibleWords: allWords.length
+      totalPossibleWords: allWords.length,
+      commonWordCount,
     });
   } catch (error) {
-    console.error('Start game error:', error);
+    console.error("Start game error:", error);
 
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

@@ -52,3 +52,6 @@ next-env.d.ts
 data/*.tmp
 data/temp/
 .pnpm-store
+.atl/*
+.pi/*
+.pi-*/*

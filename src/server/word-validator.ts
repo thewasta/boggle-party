@@ -1,4 +1,4 @@
-import { esValida } from './dictionary';
+import { esValida } from "./dictionary";
 
 export interface Cell {
   row: number;
@@ -55,7 +55,12 @@ export function isValidPath(path: Cell[], gridSize: number): boolean {
 
   // Check bounds
   for (const cell of path) {
-    if (cell.row < 0 || cell.row >= gridSize || cell.col < 0 || cell.col >= gridSize) {
+    if (
+      cell.row < 0 ||
+      cell.row >= gridSize ||
+      cell.col < 0 ||
+      cell.col >= gridSize
+    ) {
       return false;
     }
   }
@@ -91,46 +96,53 @@ export interface WordValidationInput {
   path: Cell[];
   foundWords: { word: string }[];
   gridSize: number;
+  board: string[][];
 }
 
 /**
  * Complete word validation
  * Checks: dictionary, adjacency, path validity, duplicates, length
  */
-export async function validateWord(input: WordValidationInput): Promise<ValidationResult> {
-  const { word, path, foundWords, gridSize } = input;
+export async function validateWord(
+  input: WordValidationInput,
+): Promise<ValidationResult> {
+  const { word, path, foundWords, gridSize, board } = input;
 
   const trimmedWord = word.trim();
   const normalizedWordLower = trimmedWord.toLowerCase();
 
   // Check minimum length
   if (trimmedWord.length < 3) {
-    return { valid: false, score: 0, reason: 'Word too short' };
+    return { valid: false, score: 0, reason: "Word too short" };
   }
 
-  // Check path length matches word length
-  if (path.length !== trimmedWord.length) {
-    return { valid: false, score: 0, reason: 'Path length does not match word length' };
-  }
-
-  // Check path validity (adjacency + no repeats)
+  // Check path validity (adjacency + no repeats + bounds)
   if (!isValidPath(path, gridSize)) {
-    return { valid: false, score: 0, reason: 'Invalid path' };
+    return { valid: false, score: 0, reason: "Invalid path" };
+  }
+
+  // Reconstruct word from board using path (handles QU as single cell)
+  const boardWord = path
+    .map((cell) => board[cell.row][cell.col])
+    .join("")
+    .toUpperCase();
+  if (boardWord !== trimmedWord.toUpperCase()) {
+    return { valid: false, score: 0, reason: "Word does not match board path" };
   }
 
   // Check duplicate submission (case-insensitive)
   if (foundWords.some((w) => w.word.toLowerCase() === normalizedWordLower)) {
-    return { valid: false, score: 0, reason: 'Word already submitted' };
+    return { valid: false, score: 0, reason: "Word already submitted" };
   }
 
   // Check dictionary
   const isValid = await esValida(normalizedWordLower);
   if (!isValid) {
-    return { valid: false, score: 0, reason: 'Word not found in dictionary' };
+    return { valid: false, score: 0, reason: "Word not found in dictionary" };
   }
 
   // Calculate score
   const score = calculateScore(trimmedWord);
 
-  return { valid: true, score, reason: '' };
+  return { valid: true, score, reason: "" };
 }
