@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useRef, useCallback, useState, useMemo, memo } from "react";
+import { useRef, useCallback, useState, useMemo, memo, useEffect } from "react";
 import type { Cell } from "@/server/types";
 import type { SelectedCell, WordSelection } from "@/types/game";
 import {
@@ -14,6 +14,12 @@ import {
   calculateCellPosition,
   getCellFromCoordinates,
 } from "@/lib/board-utils";
+import {
+  MAX_CELL_SIZE,
+  MIN_CELL_SIZE,
+  MAX_GAP,
+  computeBoardDimension,
+} from "@/lib/board-constants";
 
 interface GameBoardProps {
   board: string[][];
@@ -23,9 +29,6 @@ interface GameBoardProps {
   onSelectionEnd: () => void;
   isLocked: boolean;
 }
-
-const CELL_SIZE = 70;
-const CELL_GAP = 8;
 
 const GameBoardMemo = function GameBoard({
   board,
@@ -41,6 +44,45 @@ const GameBoardMemo = function GameBoard({
   const lastCellRef = useRef<Cell | null>(null);
 
   const gridSize = board.length;
+
+  // Dynamic cell dimensions — initialized to max, synced from DOM after render
+  const [cellSize, setCellSize] = useState(MAX_CELL_SIZE);
+  const [gap, setGap] = useState(MAX_GAP);
+
+  // Sync cell dimensions from rendered DOM after mount and on resize
+  useEffect(() => {
+    const measure = () => {
+      const firstCell = boardRef.current?.querySelector(
+        '[data-testid^="board-cell-"]',
+      );
+      if (!firstCell) return;
+      const rect = firstCell.getBoundingClientRect();
+      const measuredSize = Math.round(rect.width);
+      if (measuredSize > 0) {
+        setCellSize(measuredSize);
+      }
+      const gridEl = boardRef.current?.querySelector(".grid");
+      if (!gridEl) return;
+      const computedGap =
+        Number.parseFloat(getComputedStyle(gridEl).gap) || MAX_GAP;
+      setGap(Math.round(computedGap));
+    };
+
+    // Measure after initial layout
+    const raf = requestAnimationFrame(measure);
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(measure, 100);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      clearTimeout(timeoutId);
+    };
+  }, [gridSize]);
 
   // Create lookup for selected cells
   const selectedCellsSet = useMemo(() => {
@@ -72,10 +114,13 @@ const GameBoardMemo = function GameBoard({
   /**
    * Get selected cell with visual position
    */
-  const getSelectedCell = useCallback((cell: Cell): SelectedCell => {
-    const pos = calculateCellPosition(cell.row, cell.col, CELL_SIZE, CELL_GAP);
-    return { ...cell, x: pos.x, y: pos.y };
-  }, []);
+  const getSelectedCell = useCallback(
+    (cell: Cell): SelectedCell => {
+      const pos = calculateCellPosition(cell.row, cell.col, cellSize, gap);
+      return { ...cell, x: pos.x, y: pos.y };
+    },
+    [cellSize, gap],
+  );
 
   /**
    * Handle pointer down (start selection)
@@ -90,7 +135,7 @@ const GameBoardMemo = function GameBoard({
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      const cell = getCellFromCoordinates(x, y, CELL_SIZE, CELL_GAP, gridSize);
+      const cell = getCellFromCoordinates(x, y, cellSize, gap, gridSize);
       if (!cell) return;
 
       setIsDragging(true);
@@ -102,7 +147,7 @@ const GameBoardMemo = function GameBoard({
       // Prevent scrolling on touch
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
     },
-    [isLocked, gridSize, getSelectedCell, onSelectionStart],
+    [isLocked, gridSize, cellSize, gap, getSelectedCell, onSelectionStart],
   );
 
   /**
@@ -118,7 +163,7 @@ const GameBoardMemo = function GameBoard({
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      const cell = getCellFromCoordinates(x, y, CELL_SIZE, CELL_GAP, gridSize);
+      const cell = getCellFromCoordinates(x, y, cellSize, gap, gridSize);
 
       // Update hovered cell for visual feedback (even if null)
       setHoveredCell(cell);
@@ -133,7 +178,15 @@ const GameBoardMemo = function GameBoard({
         onSelectionMove(selectedCell);
       }
     },
-    [isDragging, isLocked, gridSize, getSelectedCell, onSelectionMove],
+    [
+      isDragging,
+      isLocked,
+      gridSize,
+      cellSize,
+      gap,
+      getSelectedCell,
+      onSelectionMove,
+    ],
   );
 
   /**
@@ -171,9 +224,9 @@ const GameBoardMemo = function GameBoard({
     return path;
   }, [selection.cells]);
 
-  // Calculate board dimensions for SVG
-  const boardWidth = gridSize * (CELL_SIZE + CELL_GAP) - CELL_GAP;
-  const boardHeight = gridSize * (CELL_SIZE + CELL_GAP) - CELL_GAP;
+  // Calculate board dimensions for SVG (uses measured cellSize/gap after sync)
+  const boardWidth = computeBoardDimension(gridSize, cellSize, gap);
+  const boardHeight = computeBoardDimension(gridSize, cellSize, gap);
 
   return (
     <div className="relative inline-block" data-testid="game-board">
@@ -211,9 +264,12 @@ const GameBoardMemo = function GameBoard({
         ref={boardRef}
         className="grid bg-white border-4 border-indigo-300 rounded-2xl shadow-2xl p-2 select-none touch-none overscroll-none"
         style={{
-          gridTemplateColumns: `repeat(${gridSize}, ${CELL_SIZE}px)`,
-          gridTemplateRows: `repeat(${gridSize}, ${CELL_SIZE}px)`,
-          gap: `${CELL_GAP}px`,
+          display: "grid",
+          gridTemplateColumns: `repeat(${gridSize}, minmax(${MIN_CELL_SIZE}px, ${MAX_CELL_SIZE}px))`,
+          gridTemplateRows: `repeat(${gridSize}, minmax(${MIN_CELL_SIZE}px, ${MAX_CELL_SIZE}px))`,
+          gap: `${MAX_GAP}px`,
+          width: "fit-content",
+          maxWidth: "100%",
         }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -236,7 +292,7 @@ const GameBoardMemo = function GameBoard({
                 data-testid={`board-cell-${rowIndex}-${colIndex}`}
                 className={`
                   flex items-center justify-center
-                  text-3xl font-black rounded-xl
+                  font-black rounded-xl
                   transition-all duration-150 ease-out
                   relative overflow-hidden
                   ${
@@ -252,7 +308,10 @@ const GameBoardMemo = function GameBoard({
                   ${isLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                   ${!isLocked && !isSelected && !isHovered ? "hover:scale-102 hover:shadow-md" : ""}
                 `}
-                style={{ transformOrigin: "center" }}
+                style={{
+                  fontSize: `clamp(${MIN_CELL_SIZE * 0.45}px, ${cellSize * 0.43}px, ${MAX_CELL_SIZE * 0.45}px)`,
+                  transformOrigin: "center",
+                }}
               >
                 {/* Subtle shine effect for unselected cells */}
                 {!isSelected && !isHovered && (

@@ -2,20 +2,22 @@
 
 import { motion } from "framer-motion";
 import type { SelectedCell } from "@/types/game";
+import { computeBoardDimension } from "@/lib/board-constants";
 
 interface WordPathProps {
   cells: SelectedCell[];
   gridSize: number;
+  /** Rendered cell size in pixels (from DOM measurement) */
+  cellSize: number;
+  /** Rendered gap between cells in pixels (from DOM measurement) */
+  gap: number;
 }
 
-const CELL_SIZE = 70;
-const CELL_GAP = 8;
-
-export function WordPath({ cells, gridSize }: WordPathProps) {
+export function WordPath({ cells, gridSize, cellSize, gap }: WordPathProps) {
   if (cells.length < 2) return null;
 
-  const boardWidth = gridSize * (CELL_SIZE + CELL_GAP) - CELL_GAP;
-  const boardHeight = gridSize * (CELL_SIZE + CELL_GAP) - CELL_GAP;
+  const boardWidth = computeBoardDimension(gridSize, cellSize, gap);
+  const boardHeight = computeBoardDimension(gridSize, cellSize, gap);
 
   // Calculate cell center positions
   const getPosition = (index: number) => {
@@ -23,8 +25,8 @@ export function WordPath({ cells, gridSize }: WordPathProps) {
     // x, y are already calculated in SelectedCell
     // We need to offset by half cell size to center on cell
     return {
-      x: cell.x + CELL_SIZE / 2,
-      y: cell.y + CELL_SIZE / 2,
+      x: cell.x + cellSize / 2,
+      y: cell.y + cellSize / 2,
     };
   };
 
@@ -58,7 +60,7 @@ export function WordPath({ cells, gridSize }: WordPathProps) {
       viewBox={`0 0 ${boardWidth} ${boardHeight}`}
     >
       <defs>
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <filter id="glow-wordpath" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="3" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
@@ -66,7 +68,7 @@ export function WordPath({ cells, gridSize }: WordPathProps) {
           </feMerge>
         </filter>
       </defs>
-      <g filter="url(#glow)">{lines}</g>
+      <g filter="url(#glow-wordpath)">{lines}</g>
     </svg>
   );
 }
