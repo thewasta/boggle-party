@@ -1,12 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Multiplayer E2E', () => {
-  test('should handle 4 players in same room', async ({ browser }) => {
+test.describe("Multiplayer E2E", () => {
+  test("should handle 4 players in same room", async ({ browser }) => {
     // Create room as host
     const hostContext = await browser.newContext();
     const hostPage = await hostContext.newPage();
-    await hostPage.goto('/');
-    await hostPage.fill('input[placeholder="Tu nombre"]', 'HostPlayer');
+    await hostPage.goto("/");
+    await hostPage.fill('input[placeholder="Tu nombre"]', "HostPlayer");
     await hostPage.click('button:has-text("¡Crear Sala!")');
 
     // Get room code
@@ -22,7 +22,7 @@ test.describe('Multiplayer E2E', () => {
       const context = await browser.newContext();
       const page = await context.newPage();
 
-      await page.goto('/');
+      await page.goto("/");
       await page.fill('input[placeholder="CÓDIGO"]', roomCode);
       await page.fill('input[placeholder="Tu nombre"]', `Player${i + 2}`);
       await page.click('button:has-text("¡Unirse!")');
@@ -46,10 +46,14 @@ test.describe('Multiplayer E2E', () => {
     await hostPage.click('button:has-text("¡Empezar Juego!")');
 
     // All players should see countdown
-    await expect(hostPage.locator('text=/^[321¡YA!]$/')).toBeVisible({ timeout: 5000 });
+    await expect(hostPage.locator("text=/^[321¡YA!]$/")).toBeVisible({
+      timeout: 5000,
+    });
 
     for (const player of players) {
-      await expect(player.page.locator('text=/^[321¡YA!]$/')).toBeVisible({ timeout: 5000 });
+      await expect(player.page.locator("text=/^[321¡YA!]$/")).toBeVisible({
+        timeout: 5000,
+      });
     }
 
     // All players should be redirected to game page
@@ -65,12 +69,14 @@ test.describe('Multiplayer E2E', () => {
     }
   });
 
-  test('should update player list in real-time when player joins', async ({ browser }) => {
+  test("should update player list in real-time when player joins", async ({
+    browser,
+  }) => {
     const hostContext = await browser.newContext();
     const hostPage = await hostContext.newPage();
 
-    await hostPage.goto('/');
-    await hostPage.fill('input[placeholder="Tu nombre"]', 'Host');
+    await hostPage.goto("/");
+    await hostPage.fill('input[placeholder="Tu nombre"]', "Host");
     await hostPage.click('button:has-text("¡Crear Sala!")');
 
     const url = hostPage.url();
@@ -85,24 +91,28 @@ test.describe('Multiplayer E2E', () => {
     const playerContext = await browser.newContext();
     const playerPage = await playerContext.newPage();
 
-    await playerPage.goto('/');
+    await playerPage.goto("/");
     await playerPage.fill('input[placeholder="CÓDIGO"]', roomCode);
-    await playerPage.fill('input[placeholder="Tu nombre"]', 'Player2');
+    await playerPage.fill('input[placeholder="Tu nombre"]', "Player2");
     await playerPage.click('button:has-text("¡Unirse!")');
 
     // Host should see 2 players now
-    await expect(hostPage.locator('[data-testid="player-card"]')).toHaveCount(2);
+    await expect(hostPage.locator('[data-testid="player-card"]')).toHaveCount(
+      2,
+    );
 
     await hostContext.close();
     await playerContext.close();
   });
 
-  test('should handle player leaving during waiting phase', async ({ browser }) => {
+  test("should handle player leaving during waiting phase", async ({
+    browser,
+  }) => {
     const hostContext = await browser.newContext();
     const hostPage = await hostContext.newPage();
 
-    await hostPage.goto('/');
-    await hostPage.fill('input[placeholder="Tu nombre"]', 'Host');
+    await hostPage.goto("/");
+    await hostPage.fill('input[placeholder="Tu nombre"]', "Host");
     await hostPage.click('button:has-text("¡Crear Sala!")');
 
     const url = hostPage.url();
@@ -113,29 +123,34 @@ test.describe('Multiplayer E2E', () => {
     const playerContext = await browser.newContext();
     const playerPage = await playerContext.newPage();
 
-    await playerPage.goto('/');
+    await playerPage.goto("/");
     await playerPage.fill('input[placeholder="CÓDIGO"]', roomCode);
-    await playerPage.fill('input[placeholder="Tu nombre"]', 'Player2');
+    await playerPage.fill('input[placeholder="Tu nombre"]', "Player2");
     await playerPage.click('button:has-text("¡Unirse!")');
 
     // Verify 2 players
-    await expect(hostPage.locator('[data-testid="player-card"]')).toHaveCount(2);
+    await expect(hostPage.locator('[data-testid="player-card"]')).toHaveCount(
+      2,
+    );
 
     // Second player leaves (closes tab or navigates away)
     await playerContext.close();
 
     // Host should see 1 player again
-    await expect(hostPage.locator('[data-testid="player-card"]')).toHaveCount(1, { timeout: 3000 });
+    await expect(hostPage.locator('[data-testid="player-card"]')).toHaveCount(
+      1,
+      { timeout: 3000 },
+    );
 
     await hostContext.close();
   });
 
-  test('should sync game start across all players', async ({ browser }) => {
+  test("should sync game start across all players", async ({ browser }) => {
     const hostContext = await browser.newContext();
     const hostPage = await hostContext.newPage();
 
-    await hostPage.goto('/');
-    await hostPage.fill('input[placeholder="Tu nombre"]', 'Host');
+    await hostPage.goto("/");
+    await hostPage.fill('input[placeholder="Tu nombre"]', "Host");
     await hostPage.click('button:has-text("¡Crear Sala!")');
 
     const url = hostPage.url();
@@ -146,9 +161,9 @@ test.describe('Multiplayer E2E', () => {
     const playerContext = await browser.newContext();
     const playerPage = await playerContext.newPage();
 
-    await playerPage.goto('/');
+    await playerPage.goto("/");
     await playerPage.fill('input[placeholder="CÓDIGO"]', roomCode);
-    await playerPage.fill('input[placeholder="Tu nombre"]', 'Player2');
+    await playerPage.fill('input[placeholder="Tu nombre"]', "Player2");
     await playerPage.click('button:has-text("¡Unirse!")');
 
     // Host starts game
@@ -158,8 +173,12 @@ test.describe('Multiplayer E2E', () => {
 
     // Both should see countdown at roughly the same time
     await Promise.all([
-      expect(hostPage.locator('text=/^[321¡YA!]$/')).toBeVisible({ timeout: 5000 }),
-      expect(playerPage.locator('text=/^[321¡YA!]$/')).toBeVisible({ timeout: 5000 }),
+      expect(hostPage.locator("text=/^[321¡YA!]$/")).toBeVisible({
+        timeout: 5000,
+      }),
+      expect(playerPage.locator("text=/^[321¡YA!]$/")).toBeVisible({
+        timeout: 5000,
+      }),
     ]);
 
     // Both should transition to game page

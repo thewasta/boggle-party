@@ -24,7 +24,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText("No error")).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText("¡Ups! Algo salió mal")).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe("ErrorBoundary", () => {
     const { rerender } = render(
       <ErrorBoundary fallback={fallback}>
         <ThrowOnRender shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText("OK")).toBeInTheDocument();
@@ -62,11 +62,11 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(
-      screen.getByText(/Ha ocurrido un error inesperado/)
+      screen.getByText(/Ha ocurrido un error inesperado/),
     ).toBeInTheDocument();
   });
 });

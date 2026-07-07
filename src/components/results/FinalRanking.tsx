@@ -11,7 +11,12 @@ interface FinalRankingProps {
   isHost: boolean;
 }
 
-export function FinalRanking({ playerScores, roomCode, playerId, isHost }: FinalRankingProps) {
+export function FinalRanking({
+  playerScores,
+  roomCode,
+  playerId,
+  isHost,
+}: FinalRankingProps) {
   const winner = playerScores[0];
   const topThree = playerScores.slice(0, 3);
 

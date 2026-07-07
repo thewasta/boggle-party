@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { getDictionaryStats, getDictionary } from '@/server/dictionary';
+import { NextResponse } from "next/server";
+import { getDictionaryStats, getDictionary } from "@/server/dictionary";
 
 export async function GET() {
   const stats = getDictionaryStats();
@@ -8,22 +8,22 @@ export async function GET() {
     try {
       await getDictionary();
       return NextResponse.json({
-        status: 'loaded',
+        status: "loaded",
         ...getDictionaryStats(),
       });
     } catch (error) {
       return NextResponse.json(
         {
-          status: 'error',
-          error: 'Failed to load dictionary',
+          status: "error",
+          error: "Failed to load dictionary",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
   }
 
   return NextResponse.json({
-    status: 'ok',
+    status: "ok",
     ...stats,
   });
 }

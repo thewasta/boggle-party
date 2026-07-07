@@ -3,17 +3,13 @@
  * Handles room creation, joining, leaving, and game state transitions
  */
 
-import { customAlphabet } from 'nanoid';
-import type {
-  Player,
-  Room,
-  RoomStateDTO,
-} from './types';
-import type { GridSize } from '@/server/db/schema';
-import { RoomError } from './types';
-import { gamesRepository } from './db/repositories';
+import { customAlphabet } from "nanoid";
+import type { Player, Room, RoomStateDTO } from "./types";
+import type { GridSize } from "@/server/db/schema";
+import { RoomError } from "./types";
+import { gamesRepository } from "./db/repositories";
 
-const ROOM_CODE_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const ROOM_CODE_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const generateRoomCode = customAlphabet(ROOM_CODE_ALPHABET, 6);
 
 export class RoomsManager {
@@ -41,7 +37,10 @@ export class RoomsManager {
       } catch (error) {
         // Log but continue - if DB is down, we still check in-memory
         // This allows the game to function during DB outages
-        console.warn('Database unavailable for room code check, using in-memory only:', error);
+        console.warn(
+          "Database unavailable for room code check, using in-memory only:",
+          error,
+        );
       }
 
       if (!existsInMemory && !existsInDb) {
@@ -56,11 +55,14 @@ export class RoomsManager {
     try {
       existsInDb = await gamesRepository.roomCodeExists(code);
     } catch (error) {
-      console.warn('Database unavailable for final verification:', error);
+      console.warn("Database unavailable for final verification:", error);
     }
 
     if (existsInMemory || existsInDb) {
-      throw new RoomError('Failed to generate unique room code', 'INVALID_CODE');
+      throw new RoomError(
+        "Failed to generate unique room code",
+        "INVALID_CODE",
+      );
     }
 
     // Create room
@@ -70,7 +72,7 @@ export class RoomsManager {
       host,
       players: new Map([[host.id, host]]),
       gridSize,
-      status: 'waiting',
+      status: "waiting",
       duration: this.getDefaultDuration(gridSize),
       createdAt: new Date(),
     };
@@ -118,21 +120,21 @@ export class RoomsManager {
 
     // Check if room is full (max 8 players)
     if (room.players.size >= 8) {
-      throw new RoomError('Room is full', 'ROOM_FULL');
+      throw new RoomError("Room is full", "ROOM_FULL");
     }
 
     // Check if game already started
-    if (room.status !== 'waiting') {
-      throw new RoomError('Game already started', 'GAME_ALREADY_STARTED');
+    if (room.status !== "waiting") {
+      throw new RoomError("Game already started", "GAME_ALREADY_STARTED");
     }
 
     // Check for duplicate player name
     const nameExists = Array.from(room.players.values()).some(
-      (p) => p.name.toLowerCase() === player.name.toLowerCase()
+      (p) => p.name.toLowerCase() === player.name.toLowerCase(),
     );
 
     if (nameExists) {
-      throw new RoomError('Player name already taken', 'INVALID_CODE');
+      throw new RoomError("Player name already taken", "INVALID_CODE");
     }
 
     // Add player to room
@@ -182,14 +184,15 @@ export class RoomsManager {
 
     // Check minimum players
     if (room.players.size < 2) {
-      throw new RoomError('Need at least 2 players to start', 'INVALID_CODE');
+      throw new RoomError("Need at least 2 players to start", "INVALID_CODE");
     }
 
     // Update room state
-    room.status = 'playing';
+    room.status = "playing";
     room.startTime = Date.now();
     room.duration = duration;
     room.board = board;
+    room.gridSize = board.length as GridSize;
 
     return room;
   }
@@ -204,7 +207,7 @@ export class RoomsManager {
       return null;
     }
 
-    room.status = 'finished';
+    room.status = "finished";
     room.endTime = Date.now();
 
     return room;
@@ -218,21 +221,24 @@ export class RoomsManager {
     const room = this.rooms.get(code);
 
     if (!room) {
-      throw new RoomError('Room not found', 'ROOM_NOT_FOUND');
+      throw new RoomError("Room not found", "ROOM_NOT_FOUND");
     }
 
     // Only host can request rematch
     if (room.host.id !== requesterPlayerId) {
-      throw new RoomError('Only host can request rematch', 'NOT_HOST');
+      throw new RoomError("Only host can request rematch", "NOT_HOST");
     }
 
     // Room must be in finished state
-    if (room.status !== 'finished') {
-      throw new RoomError('Can only rematch from finished state', 'REMATCH_NOT_ALLOWED');
+    if (room.status !== "finished") {
+      throw new RoomError(
+        "Can only rematch from finished state",
+        "REMATCH_NOT_ALLOWED",
+      );
     }
 
     // Reset room state for new game
-    room.status = 'waiting';
+    room.status = "waiting";
     room.board = undefined;
     room.startTime = undefined;
     room.endTime = undefined;
@@ -321,8 +327,10 @@ export class RoomsManager {
    * Clear all rooms (TEST ONLY)
    */
   clearAllRoomsForTesting(): void {
-    if (process.env.NODE_ENV !== 'test') {
-      throw new Error('clearAllRoomsForTesting should only be called in test environment');
+    if (process.env.NODE_ENV !== "test") {
+      throw new Error(
+        "clearAllRoomsForTesting should only be called in test environment",
+      );
     }
 
     this.rooms.clear();
@@ -338,6 +346,6 @@ declare global {
 export const roomsManager = globalThis._roomsManager ?? new RoomsManager();
 
 // Store in globalThis to persist across hot module reload
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   globalThis._roomsManager = roomsManager;
 }

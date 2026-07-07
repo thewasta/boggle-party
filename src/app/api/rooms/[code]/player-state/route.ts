@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { roomsManager } from '@/server/rooms-manager';
-import { apiError } from '@/server/api-utils';
-import type { RouteParams, FoundWord } from '@/server/types';
+import { NextRequest, NextResponse } from "next/server";
+import { roomsManager } from "@/server/rooms-manager";
+import { apiError } from "@/server/api-utils";
+import type { RouteParams, FoundWord } from "@/server/types";
 
 interface PlayerStateResponse {
   startTime: number;
@@ -16,31 +16,31 @@ interface PlayerStateResponse {
 
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams<{ code: string }>
+  { params }: RouteParams<{ code: string }>,
 ) {
   try {
     const { code } = await params;
     const searchParams = request.nextUrl.searchParams;
-    const playerId = searchParams.get('playerId');
+    const playerId = searchParams.get("playerId");
 
     if (!playerId) {
-      return apiError('playerId is required', 400);
+      return apiError("playerId is required", 400);
     }
 
     const room = roomsManager.getRoom(code);
 
     if (!room) {
-      return apiError('Room not found', 404);
+      return apiError("Room not found", 404);
     }
 
-    if (room.status !== 'playing') {
-      return apiError('Game is not in progress', 400);
+    if (room.status !== "playing") {
+      return apiError("Game is not in progress", 400);
     }
 
     const player = room.players.get(playerId);
 
     if (!player) {
-      return apiError('Player not found in room', 404);
+      return apiError("Player not found in room", 404);
     }
 
     const response: PlayerStateResponse = {
@@ -52,12 +52,15 @@ export async function GET(
       score: player.score,
       // Calculate elapsed and remaining time on the server
       elapsed: Math.floor((Date.now() - room.startTime!) / 1000),
-      remaining: Math.max(0, room.duration - Math.floor((Date.now() - room.startTime!) / 1000)),
+      remaining: Math.max(
+        0,
+        room.duration - Math.floor((Date.now() - room.startTime!) / 1000),
+      ),
     };
 
     return NextResponse.json({ success: true, playerState: response });
   } catch (error) {
-    console.error('Error getting player state:', error);
-    return apiError('Failed to get player state', 500);
+    console.error("Error getting player state:", error);
+    return apiError("Failed to get player state", 500);
   }
 }

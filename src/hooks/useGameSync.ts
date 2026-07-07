@@ -3,9 +3,9 @@
  * Handles countdown, timer sync, and game-end transitions
  */
 
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { usePusherChannel } from './usePusherChannel';
-import type { GameState, TimerState } from '@/types/game';
+import { useEffect, useState, useCallback, useRef } from "react";
+import { usePusherChannel } from "./usePusherChannel";
+import type { GameState, TimerState } from "@/types/game";
 
 interface UseGameSyncOptions {
   roomCode: string;
@@ -52,7 +52,10 @@ export function useGameSync({
     }
 
     // If server provided initialRemaining (page reload scenario), use it directly
-    if (gameState.initialRemaining !== undefined && lastInitialRemainingRef.current !== gameState.initialRemaining) {
+    if (
+      gameState.initialRemaining !== undefined &&
+      lastInitialRemainingRef.current !== gameState.initialRemaining
+    ) {
       lastInitialRemainingRef.current = gameState.initialRemaining;
       setIsSynced(true);
       const isExpired = gameState.initialRemaining <= 0;

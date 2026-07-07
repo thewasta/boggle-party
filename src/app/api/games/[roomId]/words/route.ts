@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from "next/server";
 import { roomsManager } from "@/server/rooms-manager";
 import { validateWord } from "@/server/word-validator";
 import { wordSubmissionSchema } from "@/server/validation";
-import { RoomError } from "@/server/types";
 import type { RouteParams } from "@/server/types";
 
 export async function POST(
@@ -66,11 +65,31 @@ export async function POST(
       word,
       path,
       foundWords: player.foundWords,
-      gridSize: room.gridSize,
+      gridSize: room.board.length,
       board: room.board,
     });
 
     if (!result.valid) {
+      // File-based diagnostic logging (survives removeConsole in production)
+      const boardWord = path
+        .map(
+          (c: { row: number; col: number }) =>
+            room.board?.[c.row]?.[c.col] ?? "?",
+        )
+        .join("");
+      const diag = {
+        word,
+        reason: result.reason,
+        gridSize: room.gridSize,
+        boardDim: `${room.board?.length}x${room.board?.[0]?.length}`,
+        boardFirstRow: room.board?.[0]?.join(""),
+        boardWord,
+        path: path
+          .map((c: { row: number; col: number }) => `(${c.row},${c.col})`)
+          .join("→"),
+      };
+      process.stderr.write(`[word-validation] ${JSON.stringify(diag)}\n`);
+
       return NextResponse.json(
         {
           success: false,

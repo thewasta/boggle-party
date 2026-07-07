@@ -1,18 +1,22 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Game Flow E2E', () => {
-  test('should complete full game flow: create → play → results', async ({ page }) => {
+test.describe("Game Flow E2E", () => {
+  test("should complete full game flow: create → play → results", async ({
+    page,
+  }) => {
     // Start on landing page
-    await page.goto('/');
-    await expect(page.getByRole('heading', { name: /boggle party/i })).toBeVisible();
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: /boggle party/i }),
+    ).toBeVisible();
 
     // Create a new room - first enter player name
-    await page.fill('input[placeholder="Tu nombre"]', 'Player1');
+    await page.fill('input[placeholder="Tu nombre"]', "Player1");
     await page.click('button:has-text("¡Crear Sala!")');
 
     // Should redirect to waiting room and show room code
     await expect(page).toHaveURL(/\/room\/[A-Z0-9]{6}/);
-    const roomCode = page.locator('text=/[A-Z0-9]{6}/').first();
+    const roomCode = page.locator("text=/[A-Z0-9]{6}/").first();
     await expect(roomCode).toBeVisible();
 
     // Extract room code from URL
@@ -29,9 +33,9 @@ test.describe('Game Flow E2E', () => {
     const page2 = await context2!.newPage();
 
     // Second player joins the room
-    await page2.goto('/');
+    await page2.goto("/");
     await page2.fill('input[placeholder="CÓDIGO"]', code);
-    await page2.fill('input[placeholder="Tu nombre"]', 'Player2');
+    await page2.fill('input[placeholder="Tu nombre"]', "Player2");
     await page2.click('button:has-text("¡Unirse!")');
 
     // Both players should see each other in waiting room
@@ -43,8 +47,12 @@ test.describe('Game Flow E2E', () => {
     await page.click('button:has-text("¡Empezar Juego!")');
 
     // Countdown should appear on both pages
-    await expect(page.locator('text=/^[321¡YA!]$/')).toBeVisible({ timeout: 5000 });
-    await expect(page2.locator('text=/^[321¡YA!]$/')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("text=/^[321¡YA!]$/")).toBeVisible({
+      timeout: 5000,
+    });
+    await expect(page2.locator("text=/^[321¡YA!]$/")).toBeVisible({
+      timeout: 5000,
+    });
 
     // Wait for countdown to finish and game to start
     await page.waitForURL(/\/game\/.*/, { timeout: 10000 });
@@ -68,28 +76,32 @@ test.describe('Game Flow E2E', () => {
     await context2!.close();
   });
 
-  test('should validate room code on join', async ({ page }) => {
-    await page.goto('/');
+  test("should validate room code on join", async ({ page }) => {
+    await page.goto("/");
 
     // Try to join with invalid room code (need to fill name first)
-    await page.fill('input[placeholder="CÓDIGO"]', 'INVALID');
-    await page.fill('input[placeholder="Tu nombre"]', 'TestPlayer');
+    await page.fill('input[placeholder="CÓDIGO"]', "INVALID");
+    await page.fill('input[placeholder="Tu nombre"]', "TestPlayer");
     await page.click('button:has-text("¡Unirse!")');
 
     // Should show error message
-    await expect(page.locator('text=/sala no encontrada|código inválido/i')).toBeVisible({ timeout: 3000 });
+    await expect(
+      page.locator("text=/sala no encontrada|código inválido/i"),
+    ).toBeVisible({ timeout: 3000 });
   });
 
-  test('should show waiting room with host controls', async ({ page }) => {
-    await page.goto('/');
-    await page.fill('input[placeholder="Tu nombre"]', 'HostPlayer');
+  test("should show waiting room with host controls", async ({ page }) => {
+    await page.goto("/");
+    await page.fill('input[placeholder="Tu nombre"]', "HostPlayer");
     await page.click('button:has-text("¡Crear Sala!")');
 
     // Should be on waiting room
     await expect(page).toHaveURL(/\/room\/[A-Z0-9]{6}/);
 
     // Host should see grid size selector
-    await expect(page.locator('[data-testid="grid-size-selector"]')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="grid-size-selector"]'),
+    ).toBeVisible();
 
     // Host should see start button (disabled initially)
     const startButton = page.locator('button:has-text("¡Empezar Juego!")');
@@ -97,21 +109,25 @@ test.describe('Game Flow E2E', () => {
     await expect(startButton).toBeDisabled();
 
     // Should show room code display
-    await expect(page.locator('[data-testid="room-code-display"]')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="room-code-display"]'),
+    ).toBeVisible();
 
     // Should have copy button
     await expect(page.locator('button:has-text("Copiar")')).toBeVisible();
   });
 
-  test('should copy room code to clipboard', async ({ page }) => {
-    await page.goto('/');
-    await page.fill('input[placeholder="Tu nombre"]', 'CopyPlayer');
+  test("should copy room code to clipboard", async ({ page }) => {
+    await page.goto("/");
+    await page.fill('input[placeholder="Tu nombre"]', "CopyPlayer");
     await page.click('button:has-text("¡Crear Sala!")');
 
     // Click copy button
     await page.click('button[aria-label="Copiar código"]');
 
     // Should show copied feedback
-    await expect(page.locator('text=/copiado|¡copiado!/i')).toBeVisible({ timeout: 2000 });
+    await expect(page.locator("text=/copiado|¡copiado!/i")).toBeVisible({
+      timeout: 2000,
+    });
   });
 });

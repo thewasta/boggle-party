@@ -55,3 +55,8 @@ data/temp/
 .atl/*
 .pi/*
 .pi-*/*
+# Local Pi runtime state
+.atl/
+data/board_*
+openspec/*
+!openspec/config.yaml

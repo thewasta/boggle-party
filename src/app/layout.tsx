@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Boggle Party - Juego de palabras multijugador",
-  description: "Juego de Boggle en español en tiempo real. Únete a una sala y encuentra las palabras ocultas antes de que se acabe el tiempo.",
+  description:
+    "Juego de Boggle en español en tiempo real. Únete a una sala y encuentra las palabras ocultas antes de que se acabe el tiempo.",
 };
 
 export default function RootLayout({

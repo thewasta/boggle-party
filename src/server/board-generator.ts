@@ -3,6 +3,11 @@ import { join } from "node:path";
 import type { GridSize } from "./db/schema";
 import { getTrie } from "./dictionary";
 import { type SolveResult, solveBoard } from "./solver";
+import {
+  arePredefinedBoardsAvailable,
+  getPredefinedBoard,
+  initPredefinedBoards,
+} from "./predefined-boards";
 
 export interface BoardStats {
   totalCells: number;
@@ -160,7 +165,30 @@ export function generateBoard(gridSize: GridSize): string[][] {
   return board;
 }
 
+/** Lazy-init predefined boards on first call (non-blocking after first). */
+let predefinedInitPromise: Promise<void> | null = null;
+
+function ensurePredefinedBoardsInit(): Promise<void> {
+  if (!predefinedInitPromise) {
+    predefinedInitPromise = initPredefinedBoards();
+  }
+  return predefinedInitPromise;
+}
+
 export async function generateGoodBoard(gridSize: GridSize) {
+  // Initialize predefined boards (lazy, cached after first call)
+  await ensurePredefinedBoardsInit();
+
+  // 30% random / 70% predefined (when available)
+  if (arePredefinedBoardsAvailable() && Math.random() >= 0.3) {
+    const result = getPredefinedBoard(gridSize);
+    console.log(
+      `Tablero ${gridSize}x${gridSize} predefinido ` +
+        `(${result.commonWordCount} palabras comunes de ${result.allWords.length} totales).`,
+    );
+    return result;
+  }
+
   const trieRoot = await getTrie();
   const commonWords = loadCommonWords();
 

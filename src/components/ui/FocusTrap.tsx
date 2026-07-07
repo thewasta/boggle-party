@@ -15,7 +15,7 @@ export function FocusTrap({ children, isActive }: FocusTrapProps) {
 
     const container = containerRef.current;
     const focusableElements = container.querySelectorAll(
-      "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+      "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])",
     );
 
     const firstElement = focusableElements[0] as HTMLElement;

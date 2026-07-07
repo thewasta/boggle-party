@@ -102,7 +102,13 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FDF8F3] flex items-center justify-center">Cargando...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FDF8F3] flex items-center justify-center">
+          Cargando...
+        </div>
+      }
+    >
       <HomeContent />
     </Suspense>
   );

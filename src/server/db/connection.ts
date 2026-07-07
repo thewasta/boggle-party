@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from 'pg';
+import { Pool, PoolClient } from "pg";
 
 let pool: Pool | null = null;
 
@@ -12,8 +12,8 @@ export function getPool(): Pool {
     });
 
     // Listen for errors on the pool
-    pool.on('error', (err: Error) => {
-      console.error('Unexpected error on idle client', err);
+    pool.on("error", (err: Error) => {
+      console.error("Unexpected error on idle client", err);
       process.exit(-1);
     });
   }
@@ -25,11 +25,11 @@ export async function testConnection(): Promise<boolean> {
   try {
     const pool = getPool();
     const client = await pool.connect();
-    await client.query('SELECT 1');
+    await client.query("SELECT 1");
     client.release();
     return true;
   } catch (error) {
-    console.error('Database connection test failed:', error);
+    console.error("Database connection test failed:", error);
     return false;
   }
 }

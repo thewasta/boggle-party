@@ -1,23 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { roomsManager } from '@/server/rooms-manager';
-import { emitRevealWord, emitResultsComplete } from '@/server/event-emitter';
-import type { RevealWordData } from '@/server/word-unique-calculator';
+import { NextRequest, NextResponse } from "next/server";
+import { roomsManager } from "@/server/rooms-manager";
+import { emitRevealWord, emitResultsComplete } from "@/server/event-emitter";
+import type { RevealWordData } from "@/server/word-unique-calculator";
 
 const REVEAL_DELAY_MS = 2500;
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ code: string }> }
+  { params }: { params: Promise<{ code: string }> },
 ) {
   const { code } = await params;
   const room = roomsManager.getRoom(code);
 
   if (!room) {
-    return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+    return NextResponse.json({ error: "Room not found" }, { status: 404 });
   }
 
-  if (room.status !== 'finished') {
-    return NextResponse.json({ error: 'Game not finished' }, { status: 400 });
+  if (room.status !== "finished") {
+    return NextResponse.json({ error: "Game not finished" }, { status: 400 });
   }
 
   const body = await request.json();
@@ -46,15 +46,15 @@ async function startRevealSequence(roomCode: string, words: RevealWordData[]) {
         avatar: player.avatar,
       },
       wordData.isUnique ? wordData.score * 2 : wordData.score,
-      wordData.isUnique
+      wordData.isUnique,
     );
 
-    await new Promise(resolve => setTimeout(resolve, REVEAL_DELAY_MS));
+    await new Promise((resolve) => setTimeout(resolve, REVEAL_DELAY_MS));
   }
 
   // Emit results complete event
   const finalRankings = Array.from(room.players.values())
-    .map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
+    .map((p) => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
     .sort((a, b) => b.score - a.score);
 
   await emitResultsComplete(roomCode, finalRankings);

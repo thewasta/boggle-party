@@ -9,7 +9,11 @@ interface PlayAgainButtonProps {
   isHost: boolean;
 }
 
-export function PlayAgainButton({ roomCode, playerId, isHost }: PlayAgainButtonProps) {
+export function PlayAgainButton({
+  roomCode,
+  playerId,
+  isHost,
+}: PlayAgainButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,7 +59,9 @@ export function PlayAgainButton({ roomCode, playerId, isHost }: PlayAgainButtonP
         {isLoading ? (
           <span className="flex items-center gap-3">
             <div className="animate-spin rounded-full h-6 w-6 border-b-3 border-white" />
-            <span>{isHost ? "Preparando revancha..." : "Esperando al anfitrión..."}</span>
+            <span>
+              {isHost ? "Preparando revancha..." : "Esperando al anfitrión..."}
+            </span>
           </span>
         ) : (
           <>

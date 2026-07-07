@@ -7,7 +7,7 @@
 // Type Definitions
 // ============================================================================
 
-export type GameStatus = 'waiting' | 'playing' | 'finished';
+export type GameStatus = "waiting" | "playing" | "finished";
 export type GridSize = 4 | 5 | 6;
 
 // ============================================================================
@@ -55,7 +55,7 @@ export interface GameWordRow {
   player_id: string;
   word: string;
   word_length: number; // length of the word (for scoring analytics)
-  path: Array<{row: number, col: number}> | null; // coordinates path for validation
+  path: Array<{ row: number; col: number }> | null; // coordinates path for validation
   score: number;
   is_unique: boolean;
   found_at: Date;
@@ -100,7 +100,7 @@ export interface CreateWordInput {
   player_id: string;
   word: string;
   word_length: number;
-  path?: Array<{row: number, col: number}> | null;
+  path?: Array<{ row: number; col: number }> | null;
   score: number;
   is_unique: boolean;
   found_at?: Date; // Optional: defaults to NOW() in database

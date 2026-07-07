@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 import type { Player } from "@/server/types";
 import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
@@ -44,7 +44,7 @@ export function PlayerList({
               transition={{
                 duration: 0.3,
                 delay: index * 0.1,
-                ease: 'easeOut'
+                ease: "easeOut",
               }}
               className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200"
               data-testid="player-card"

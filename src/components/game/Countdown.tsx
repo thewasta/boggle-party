@@ -5,22 +5,22 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CountdownProps {
   onComplete: () => void;
 }
 
 export function Countdown({ onComplete }: CountdownProps) {
-  const [count, setCount] = useState<3 | 2 | 1 | 'go'>(3);
+  const [count, setCount] = useState<3 | 2 | 1 | "go">(3);
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (typeof count === 'number') {
+      if (typeof count === "number") {
         if (count === 1) {
-          setCount('go');
+          setCount("go");
         } else {
           setCount((count - 1) as 3 | 2 | 1);
         }
@@ -38,7 +38,7 @@ export function Countdown({ onComplete }: CountdownProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md">
       <AnimatePresence mode="wait">
-        {count === 'go' ? (
+        {count === "go" ? (
           <motion.div
             key="go"
             initial={{ scale: 0, opacity: 0 }}
@@ -50,11 +50,11 @@ export function Countdown({ onComplete }: CountdownProps) {
             <motion.span
               animate={{
                 scale: [1, 1.2, 1],
-                rotate: [0, 5, -5, 0]
+                rotate: [0, 5, -5, 0],
               }}
               transition={{
                 duration: 0.5,
-                rotate: { repeat: 2, duration: 0.2 }
+                rotate: { repeat: 2, duration: 0.2 },
               }}
               className="text-[12rem] font-black text-green-400 drop-shadow-[0_0_60px_rgba(74,222,128,0.6)]"
             >
@@ -99,7 +99,7 @@ export function Countdown({ onComplete }: CountdownProps) {
               transition={{
                 duration: 0.5,
                 repeat: Infinity,
-                repeatDelay: 0.3
+                repeatDelay: 0.3,
               }}
               className="text-[14rem] font-black text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative z-10"
             >

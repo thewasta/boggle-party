@@ -1,5 +1,5 @@
-import { getPool } from '../connection';
-import type { GameWordRow, CreateWordInput } from '../schema';
+import { getPool } from "../connection";
+import type { GameWordRow, CreateWordInput } from "../schema";
 
 export class WordsRepository {
   /**
@@ -32,7 +32,8 @@ export class WordsRepository {
    */
   async findByGameId(gameId: string): Promise<GameWordRow[]> {
     const pool = getPool();
-    const query = 'SELECT * FROM game_words WHERE game_id = $1 ORDER BY found_at ASC';
+    const query =
+      "SELECT * FROM game_words WHERE game_id = $1 ORDER BY found_at ASC";
     const result = await pool.query<GameWordRow>(query, [gameId]);
     return result.rows;
   }
@@ -42,7 +43,8 @@ export class WordsRepository {
    */
   async findByPlayerId(playerId: string): Promise<GameWordRow[]> {
     const pool = getPool();
-    const query = 'SELECT * FROM game_words WHERE player_id = $1 ORDER BY found_at ASC';
+    const query =
+      "SELECT * FROM game_words WHERE player_id = $1 ORDER BY found_at ASC";
     const result = await pool.query<GameWordRow>(query, [playerId]);
     return result.rows;
   }
@@ -52,7 +54,8 @@ export class WordsRepository {
    */
   async countUniqueWords(gameId: string): Promise<number> {
     const pool = getPool();
-    const query = 'SELECT COUNT(*) as count FROM game_words WHERE game_id = $1 AND is_unique = true';
+    const query =
+      "SELECT COUNT(*) as count FROM game_words WHERE game_id = $1 AND is_unique = true";
     const result = await pool.query<{ count: string }>(query, [gameId]);
     return parseInt(result.rows[0].count, 10);
   }
@@ -62,7 +65,8 @@ export class WordsRepository {
    */
   async wordExistsInGame(gameId: string, word: string): Promise<boolean> {
     const pool = getPool();
-    const query = 'SELECT EXISTS(SELECT 1 FROM game_words WHERE game_id = $1 AND LOWER(word) = LOWER($2)) as exists';
+    const query =
+      "SELECT EXISTS(SELECT 1 FROM game_words WHERE game_id = $1 AND LOWER(word) = LOWER($2)) as exists";
     const result = await pool.query<{ exists: boolean }>(query, [gameId, word]);
     return result.rows[0].exists;
   }
@@ -70,9 +74,13 @@ export class WordsRepository {
   /**
    * Get words by length for scoring analytics
    */
-  async findByWordLength(gameId: string, wordLength: number): Promise<GameWordRow[]> {
+  async findByWordLength(
+    gameId: string,
+    wordLength: number,
+  ): Promise<GameWordRow[]> {
     const pool = getPool();
-    const query = 'SELECT * FROM game_words WHERE game_id = $1 AND word_length = $2 ORDER BY found_at ASC';
+    const query =
+      "SELECT * FROM game_words WHERE game_id = $1 AND word_length = $2 ORDER BY found_at ASC";
     const result = await pool.query<GameWordRow>(query, [gameId, wordLength]);
     return result.rows;
   }
@@ -80,7 +88,9 @@ export class WordsRepository {
   /**
    * Get scoring analytics by word length
    */
-  async getScoringAnalytics(gameId: string): Promise<Array<{length: number, count: number, total_score: number}>> {
+  async getScoringAnalytics(
+    gameId: string,
+  ): Promise<Array<{ length: number; count: number; total_score: number }>> {
     const pool = getPool();
     const query = `
       SELECT

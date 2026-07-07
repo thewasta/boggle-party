@@ -1,12 +1,14 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
-const LETTERS = 'B O G G L E P A R T Y'.split(' ');
+const LETTERS = "B O G G L E P A R T Y".split(" ");
 
 export function FloatingLetters() {
-  const [letters, setLetters] = useState<Array<{ id: number; letter: string; x: number; y: number }>>([]);
+  const [letters, setLetters] = useState<
+    Array<{ id: number; letter: string; x: number; y: number }>
+  >([]);
 
   useEffect(() => {
     const positioned = LETTERS.map((letter, i) => ({
@@ -32,7 +34,7 @@ export function FloatingLetters() {
           transition={{
             duration: 3 + Math.random() * 2,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: "easeInOut",
             delay: Math.random() * 2,
           }}
         >

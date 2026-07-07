@@ -1,6 +1,6 @@
-import { getPool } from './connection';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { getPool } from "./connection";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 interface Migration {
   version: string;
@@ -19,7 +19,9 @@ async function getAppliedMigrations(): Promise<Set<string>> {
     )
   `);
 
-  const result = await pool.query<Migration>('SELECT version FROM schema_migrations');
+  const result = await pool.query<Migration>(
+    "SELECT version FROM schema_migrations",
+  );
   return new Set(result.rows.map((row: Migration) => row.version));
 }
 
@@ -29,28 +31,34 @@ async function runMigration(version: string, sql: string): Promise<void> {
   console.log(`Running migration: ${version}`);
 
   try {
-    await pool.query('BEGIN');
+    await pool.query("BEGIN");
 
     // Run migration SQL
     await pool.query(sql);
 
     // Record migration
-    await pool.query('INSERT INTO schema_migrations (version) VALUES ($1)', [version]);
+    await pool.query("INSERT INTO schema_migrations (version) VALUES ($1)", [
+      version,
+    ]);
 
-    await pool.query('COMMIT');
+    await pool.query("COMMIT");
     console.log(`✓ Migration ${version} completed`);
   } catch (error) {
-    await pool.query('ROLLBACK');
+    await pool.query("ROLLBACK");
     console.error(`✗ Migration ${version} failed:`, error);
     throw error;
   }
 }
 
 export async function runMigrations(): Promise<void> {
-  console.log('Checking database migrations...');
+  console.log("Checking database migrations...");
 
   const appliedMigrations = await getAppliedMigrations();
-  const migrationFiles = ['001_initial_schema', '002_add_missing_critical_fields', '003_move_board_to_games'];
+  const migrationFiles = [
+    "001_initial_schema",
+    "002_add_missing_critical_fields",
+    "003_move_board_to_games",
+  ];
 
   for (const version of migrationFiles) {
     if (appliedMigrations.has(version)) {
@@ -58,24 +66,24 @@ export async function runMigrations(): Promise<void> {
       continue;
     }
 
-    const sqlPath = join(__dirname, 'migrations', `${version}.sql`);
-    const sql = readFileSync(sqlPath, 'utf-8');
+    const sqlPath = join(__dirname, "migrations", `${version}.sql`);
+    const sql = readFileSync(sqlPath, "utf-8");
 
     await runMigration(version, sql);
   }
 
-  console.log('Migrations completed');
+  console.log("Migrations completed");
 }
 
 // CLI: Run migrations directly
 if (require.main === module) {
   runMigrations()
     .then(() => {
-      console.log('All migrations completed successfully');
+      console.log("All migrations completed successfully");
       process.exit(0);
     })
     .catch((error) => {
-      console.error('Migration failed:', error);
+      console.error("Migration failed:", error);
       process.exit(1);
     });
 }

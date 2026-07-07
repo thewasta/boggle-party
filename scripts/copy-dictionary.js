@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const dictionary = require('an-array-of-spanish-words');
+const fs = require("fs");
+const path = require("path");
+const dictionary = require("an-array-of-spanish-words");
 
-const outputPath = path.resolve(__dirname, '../data/dictionary.json');
+const outputPath = path.resolve(__dirname, "../data/dictionary.json");
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, JSON.stringify(dictionary, null, 2));
 

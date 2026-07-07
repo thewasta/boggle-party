@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { roomsManager } from '@/server/rooms-manager';
-import { emitRematchRequested } from '@/server/event-emitter';
-import { RoomError } from '@/server/types';
+import { NextRequest, NextResponse } from "next/server";
+import { roomsManager } from "@/server/rooms-manager";
+import { emitRematchRequested } from "@/server/event-emitter";
+import { RoomError } from "@/server/types";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ code: string }> }
+  { params }: { params: Promise<{ code: string }> },
 ) {
   try {
     const { code } = await params;
@@ -14,8 +14,8 @@ export async function POST(
 
     if (!requesterPlayerId) {
       return NextResponse.json(
-        { success: false, error: 'requesterPlayerId is required' },
-        { status: 400 }
+        { success: false, error: "requesterPlayerId is required" },
+        { status: 400 },
       );
     }
 
@@ -24,8 +24,8 @@ export async function POST(
 
     if (!room) {
       return NextResponse.json(
-        { success: false, error: 'Room not found' },
-        { status: 404 }
+        { success: false, error: "Room not found" },
+        { status: 404 },
       );
     }
 
@@ -43,14 +43,14 @@ export async function POST(
     if (error instanceof RoomError) {
       return NextResponse.json(
         { success: false, error: error.message, code: error.code },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Rematch error:', error);
+    console.error("Rematch error:", error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

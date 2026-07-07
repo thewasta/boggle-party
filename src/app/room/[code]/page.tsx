@@ -271,9 +271,7 @@ function WaitingRoomClient(props: {
             <div className="text-center">
               <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-indigo-600 rounded-full">
                 <span className="text-2xl">🎮</span>
-                <h1 className="text-xl font-bold text-white">
-                  Sala de Espera
-                </h1>
+                <h1 className="text-xl font-bold text-white">Sala de Espera</h1>
               </div>
               <RoomCodeDisplay roomCode={props.roomCode} />
             </div>

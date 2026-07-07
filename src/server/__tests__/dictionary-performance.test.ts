@@ -1,12 +1,17 @@
-import { describe, it, expect, beforeAll, afterEach } from 'vitest';
-import { getDictionary, esValida, clearDictionary, getDictionaryStats } from '../dictionary';
+import { describe, it, expect, beforeAll, afterEach } from "vitest";
+import {
+  getDictionary,
+  esValida,
+  clearDictionary,
+  getDictionaryStats,
+} from "../dictionary";
 
-describe('Dictionary Performance Tests', () => {
+describe("Dictionary Performance Tests", () => {
   afterEach(() => {
     clearDictionary();
   });
 
-  it('should load dictionary in reasonable time', async () => {
+  it("should load dictionary in reasonable time", async () => {
     const start = performance.now();
     await getDictionary();
     const loadTime = performance.now() - start;
@@ -16,12 +21,12 @@ describe('Dictionary Performance Tests', () => {
     console.log(`Dictionary loaded in ${loadTime.toFixed(2)}ms`);
   });
 
-  it('should perform fast O(1) lookups', async () => {
+  it("should perform fast O(1) lookups", async () => {
     await getDictionary();
     const stats = getDictionaryStats();
 
     const iterations = 10000;
-    const testWords = ['HOLA', 'CASA', 'PERRO', 'GATO', 'MESA'];
+    const testWords = ["HOLA", "CASA", "PERRO", "GATO", "MESA"];
 
     const start = performance.now();
 
@@ -35,11 +40,13 @@ describe('Dictionary Performance Tests', () => {
 
     expect(perLookup).toBeLessThan(0.1); // Should be much faster than 0.1ms per lookup
 
-    console.log(`${iterations} lookups in ${elapsed.toFixed(2)}ms (${perLookup.toFixed(4)}ms per lookup)`);
+    console.log(
+      `${iterations} lookups in ${elapsed.toFixed(2)}ms (${perLookup.toFixed(4)}ms per lookup)`,
+    );
     console.log(`Dictionary size: ${stats.wordCount} words`);
   });
 
-  it('should handle concurrent access safely', async () => {
+  it("should handle concurrent access safely", async () => {
     const promises = [];
 
     for (let i = 0; i < 10; i++) {

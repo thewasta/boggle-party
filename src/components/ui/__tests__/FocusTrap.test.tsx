@@ -8,7 +8,7 @@ describe("FocusTrap", () => {
       <FocusTrap isActive={true}>
         <button type="button">First</button>
         <button type="button">Second</button>
-      </FocusTrap>
+      </FocusTrap>,
     );
 
     const firstButton = screen.getByText("First");
@@ -20,7 +20,7 @@ describe("FocusTrap", () => {
       <FocusTrap isActive={false}>
         <button type="button">First</button>
         <button type="button">Second</button>
-      </FocusTrap>
+      </FocusTrap>,
     );
 
     const firstButton = screen.getByText("First");
@@ -33,7 +33,7 @@ describe("FocusTrap", () => {
         <button type="button">Button 1</button>
         <button type="button">Button 2</button>
         <button type="button">Button 3</button>
-      </FocusTrap>
+      </FocusTrap>,
     );
 
     expect(screen.getByText("Button 1")).toBeInTheDocument();

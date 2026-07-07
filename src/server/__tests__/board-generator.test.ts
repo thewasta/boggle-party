@@ -109,3 +109,45 @@ describe("generateGoodBoard", () => {
     expect(result.allWords.length).toBeGreaterThan(0);
   }, 30000);
 });
+
+describe("generateGoodBoard with predefined boards", () => {
+  it("should return same shape from predefined board path", async () => {
+    const { generateGoodBoard } = await import("../board-generator");
+
+    for (let i = 0; i < 10; i++) {
+      const result = await generateGoodBoard(4);
+      expect(result).toHaveProperty("board");
+      expect(result).toHaveProperty("allWords");
+      expect(result).toHaveProperty("commonWordCount");
+      expect(Array.isArray(result.board)).toBe(true);
+      expect(Array.isArray(result.allWords)).toBe(true);
+      expect(typeof result.commonWordCount).toBe("number");
+      expect(result.board).toHaveLength(4);
+      expect(result.board[0]).toHaveLength(4);
+    }
+  }, 60000);
+
+  it("should work for all grid sizes", async () => {
+    const { generateGoodBoard } = await import("../board-generator");
+
+    for (const size of [4, 5, 6] as const) {
+      const result = await generateGoodBoard(size);
+      expect(result.board).toHaveLength(size);
+      expect(result.board[0]).toHaveLength(size);
+      expect(result.allWords.length).toBeGreaterThan(0);
+    }
+  }, 60000);
+
+  it("should return valid boards with correct letter patterns", async () => {
+    const { generateGoodBoard } = await import("../board-generator");
+
+    for (let i = 0; i < 5; i++) {
+      const result = await generateGoodBoard(4);
+      for (const row of result.board) {
+        for (const cell of row) {
+          expect(cell).toMatch(/^([A-ZÑ]|QU)$/);
+        }
+      }
+    }
+  }, 30000);
+});

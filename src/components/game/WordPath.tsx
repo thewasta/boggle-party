@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import type { SelectedCell } from '@/types/game';
+import { motion } from "framer-motion";
+import type { SelectedCell } from "@/types/game";
 
 interface WordPathProps {
   cells: SelectedCell[];
@@ -24,7 +24,7 @@ export function WordPath({ cells, gridSize }: WordPathProps) {
     // We need to offset by half cell size to center on cell
     return {
       x: cell.x + CELL_SIZE / 2,
-      y: cell.y + CELL_SIZE / 2
+      y: cell.y + CELL_SIZE / 2,
     };
   };
 
@@ -47,7 +47,7 @@ export function WordPath({ cells, gridSize }: WordPathProps) {
         animate={{ pathLength: 1 }}
         transition={{ duration: 0.2, delay: i * 0.05 }}
         className="drop-shadow-md"
-      />
+      />,
     );
   }
 

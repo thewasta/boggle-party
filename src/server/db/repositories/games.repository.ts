@@ -1,5 +1,5 @@
-import { getPool } from '../connection';
-import type { GameRow, CreateGameInput, GameStatus } from '../schema';
+import { getPool } from "../connection";
+import type { GameRow, CreateGameInput, GameStatus } from "../schema";
 
 export class GamesRepository {
   /**
@@ -31,7 +31,7 @@ export class GamesRepository {
    */
   async findById(id: string): Promise<GameRow | null> {
     const pool = getPool();
-    const query = 'SELECT * FROM games WHERE id = $1';
+    const query = "SELECT * FROM games WHERE id = $1";
     const result = await pool.query<GameRow>(query, [id]);
     return result.rows[0] || null;
   }
@@ -41,7 +41,7 @@ export class GamesRepository {
    */
   async findByRoomCode(roomCode: string): Promise<GameRow | null> {
     const pool = getPool();
-    const query = 'SELECT * FROM games WHERE room_code = $1';
+    const query = "SELECT * FROM games WHERE room_code = $1";
     const result = await pool.query<GameRow>(query, [roomCode]);
     return result.rows[0] || null;
   }
@@ -51,7 +51,7 @@ export class GamesRepository {
    */
   async roomCodeExists(roomCode: string): Promise<boolean> {
     const pool = getPool();
-    const query = 'SELECT 1 FROM games WHERE room_code = $1 LIMIT 1';
+    const query = "SELECT 1 FROM games WHERE room_code = $1 LIMIT 1";
     const result = await pool.query(query, [roomCode]);
     return result.rows.length > 0;
   }
@@ -62,10 +62,10 @@ export class GamesRepository {
   async updateStatus(
     id: string,
     status: GameStatus,
-    timestamps?: { started_at?: Date; ended_at?: Date }
+    timestamps?: { started_at?: Date; ended_at?: Date },
   ): Promise<GameRow> {
     const pool = getPool();
-    let query = 'UPDATE games SET status = $1';
+    let query = "UPDATE games SET status = $1";
     const values: any[] = [status];
     let paramIndex = 2;
 
@@ -93,7 +93,8 @@ export class GamesRepository {
    */
   async incrementWordsFound(id: string): Promise<void> {
     const pool = getPool();
-    const query = 'UPDATE games SET total_words_found = total_words_found + 1 WHERE id = $1';
+    const query =
+      "UPDATE games SET total_words_found = total_words_found + 1 WHERE id = $1";
     await pool.query(query, [id]);
   }
 
@@ -102,7 +103,7 @@ export class GamesRepository {
    */
   async setHost(gameId: string, hostId: string): Promise<GameRow> {
     const pool = getPool();
-    const query = 'UPDATE games SET host_id = $1 WHERE id = $2 RETURNING *';
+    const query = "UPDATE games SET host_id = $1 WHERE id = $2 RETURNING *";
     const result = await pool.query<GameRow>(query, [hostId, gameId]);
     return result.rows[0];
   }
@@ -128,8 +129,8 @@ export class GamesRepository {
   async setBoard(gameId: string, board: string[][]): Promise<GameRow> {
     const pool = getPool();
     const result = await pool.query<GameRow>(
-      'UPDATE games SET board = $1 WHERE id = $2 RETURNING *',
-      [JSON.stringify(board), gameId]
+      "UPDATE games SET board = $1 WHERE id = $2 RETURNING *",
+      [JSON.stringify(board), gameId],
     );
     return result.rows[0];
   }

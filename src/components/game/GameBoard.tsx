@@ -6,10 +6,14 @@
 
 "use client";
 
-import { useRef, useCallback, useState, useMemo, memo } from 'react';
-import type { Cell } from '@/server/types';
-import type { SelectedCell, WordSelection } from '@/types/game';
-import { getAdjacentCells, calculateCellPosition, getCellFromCoordinates } from '@/lib/board-utils';
+import { useRef, useCallback, useState, useMemo, memo } from "react";
+import type { Cell } from "@/server/types";
+import type { SelectedCell, WordSelection } from "@/types/game";
+import {
+  getAdjacentCells,
+  calculateCellPosition,
+  getCellFromCoordinates,
+} from "@/lib/board-utils";
 
 interface GameBoardProps {
   board: string[][];
@@ -46,21 +50,24 @@ const GameBoardMemo = function GameBoard({
   /**
    * Check if a cell can be added to selection (adjacent to last cell)
    */
-  const canAddCell = useCallback((cell: Cell): boolean => {
-    // Can't add already selected cells
-    if (selectedCellsSet.has(`${cell.row},${cell.col}`)) {
-      return false;
-    }
+  const canAddCell = useCallback(
+    (cell: Cell): boolean => {
+      // Can't add already selected cells
+      if (selectedCellsSet.has(`${cell.row},${cell.col}`)) {
+        return false;
+      }
 
-    if (selection.cells.length === 0) {
-      return true; // First cell
-    }
+      if (selection.cells.length === 0) {
+        return true; // First cell
+      }
 
-    const lastCell = selection.cells[selection.cells.length - 1];
-    const adjacent = getAdjacentCells(lastCell, gridSize);
+      const lastCell = selection.cells[selection.cells.length - 1];
+      const adjacent = getAdjacentCells(lastCell, gridSize);
 
-    return adjacent.some((a) => a.row === cell.row && a.col === cell.col);
-  }, [selectedCellsSet, selection.cells, gridSize]);
+      return adjacent.some((a) => a.row === cell.row && a.col === cell.col);
+    },
+    [selectedCellsSet, selection.cells, gridSize],
+  );
 
   /**
    * Get selected cell with visual position
@@ -73,80 +80,93 @@ const GameBoardMemo = function GameBoard({
   /**
    * Handle pointer down (start selection)
    */
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    if (isLocked) return;
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (isLocked) return;
 
-    const rect = boardRef.current?.getBoundingClientRect();
-    if (!rect) return;
+      const rect = boardRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-    const cell = getCellFromCoordinates(x, y, CELL_SIZE, CELL_GAP, gridSize);
-    if (!cell) return;
+      const cell = getCellFromCoordinates(x, y, CELL_SIZE, CELL_GAP, gridSize);
+      if (!cell) return;
 
-    setIsDragging(true);
-    lastCellRef.current = cell;
+      setIsDragging(true);
+      lastCellRef.current = cell;
 
-    const selectedCell = getSelectedCell(cell);
-    onSelectionStart(selectedCell);
+      const selectedCell = getSelectedCell(cell);
+      onSelectionStart(selectedCell);
 
-    // Prevent scrolling on touch
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  }, [isLocked, gridSize, getSelectedCell, onSelectionStart]);
+      // Prevent scrolling on touch
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    },
+    [isLocked, gridSize, getSelectedCell, onSelectionStart],
+  );
 
   /**
    * Handle pointer move (extend selection or backtrack)
    */
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging || isLocked) return;
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging || isLocked) return;
 
-    const rect = boardRef.current?.getBoundingClientRect();
-    if (!rect) return;
+      const rect = boardRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-    const cell = getCellFromCoordinates(x, y, CELL_SIZE, CELL_GAP, gridSize);
+      const cell = getCellFromCoordinates(x, y, CELL_SIZE, CELL_GAP, gridSize);
 
-    // Update hovered cell for visual feedback (even if null)
-    setHoveredCell(cell);
+      // Update hovered cell for visual feedback (even if null)
+      setHoveredCell(cell);
 
-    if (!cell) return;
-    if (lastCellRef.current?.row !== cell.row || lastCellRef.current?.col !== cell.col) {
-      lastCellRef.current = cell;
-      const selectedCell = getSelectedCell(cell);
-      onSelectionMove(selectedCell);
-    }
-
-  }, [isDragging, isLocked, gridSize, getSelectedCell, onSelectionMove]);
+      if (!cell) return;
+      if (
+        lastCellRef.current?.row !== cell.row ||
+        lastCellRef.current?.col !== cell.col
+      ) {
+        lastCellRef.current = cell;
+        const selectedCell = getSelectedCell(cell);
+        onSelectionMove(selectedCell);
+      }
+    },
+    [isDragging, isLocked, gridSize, getSelectedCell, onSelectionMove],
+  );
 
   /**
    * Handle pointer up (end selection, submit word)
    */
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    if (!isDragging) return;
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging) return;
 
-    setIsDragging(false);
-    setHoveredCell(null);
-    lastCellRef.current = null;
+      setIsDragging(false);
+      setHoveredCell(null);
+      lastCellRef.current = null;
 
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    onSelectionEnd();
-  }, [isDragging, onSelectionEnd]);
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      onSelectionEnd();
+    },
+    [isDragging, onSelectionEnd],
+  );
 
   /**
    * Generate SVG path for visual line connecting cells
    */
   const selectionPath = useMemo(() => {
-    if (selection.cells.length < 2) return '';
+    if (selection.cells.length < 2) return "";
 
-    const path = selection.cells.map((cell, i) => {
-      if (i === 0) {
-        return `M ${cell.x} ${cell.y}`;
-      }
-      return `L ${cell.x} ${cell.y}`;
-    }).join(' ');
+    const path = selection.cells
+      .map((cell, i) => {
+        if (i === 0) {
+          return `M ${cell.x} ${cell.y}`;
+        }
+        return `L ${cell.x} ${cell.y}`;
+      })
+      .join(" ");
 
     return path;
   }, [selection.cells]);
@@ -204,7 +224,10 @@ const GameBoardMemo = function GameBoard({
           row.map((letter, colIndex) => {
             const cell = { row: rowIndex, col: colIndex };
             const isSelected = selectedCellsSet.has(`${rowIndex},${colIndex}`);
-            const isHovered = isDragging && hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex;
+            const isHovered =
+              isDragging &&
+              hoveredCell?.row === rowIndex &&
+              hoveredCell?.col === colIndex;
             const isValidNext = isDragging && !isSelected && canAddCell(cell);
 
             return (
@@ -216,19 +239,20 @@ const GameBoardMemo = function GameBoard({
                   text-3xl font-black rounded-xl
                   transition-all duration-150 ease-out
                   relative overflow-hidden
-                  ${isSelected
-                    ? 'bg-indigo-600 text-white shadow-lg scale-105 z-10'
-                    : isHovered && isValidNext
-                      ? 'bg-indigo-400 text-white shadow-lg scale-105'
-                      : isHovered
-                        ? 'bg-indigo-200 text-indigo-900 scale-102'
-                        : 'bg-indigo-100 text-indigo-900'
+                  ${
+                    isSelected
+                      ? "bg-indigo-600 text-white shadow-lg scale-105 z-10"
+                      : isHovered && isValidNext
+                        ? "bg-indigo-400 text-white shadow-lg scale-105"
+                        : isHovered
+                          ? "bg-indigo-200 text-indigo-900 scale-102"
+                          : "bg-indigo-100 text-indigo-900"
                   }
-                  ${!isSelected && !isLocked ? 'hover:bg-indigo-200' : ''}
-                  ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                  ${!isLocked && !isSelected && !isHovered ? 'hover:scale-102 hover:shadow-md' : ''}
+                  ${!isSelected && !isLocked ? "hover:bg-indigo-200" : ""}
+                  ${isLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                  ${!isLocked && !isSelected && !isHovered ? "hover:scale-102 hover:shadow-md" : ""}
                 `}
-                style={{ transformOrigin: 'center' }}
+                style={{ transformOrigin: "center" }}
               >
                 {/* Subtle shine effect for unselected cells */}
                 {!isSelected && !isHovered && (
@@ -241,7 +265,7 @@ const GameBoardMemo = function GameBoard({
                 {letter}
               </div>
             );
-          })
+          }),
         )}
       </div>
     </div>

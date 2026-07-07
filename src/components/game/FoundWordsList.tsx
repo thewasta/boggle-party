@@ -5,8 +5,8 @@
 
 "use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import type { FoundWord } from '@/types/game';
+import { motion, AnimatePresence } from "framer-motion";
+import type { FoundWord } from "@/types/game";
 
 interface FoundWordsListProps {
   words: FoundWord[];
@@ -59,7 +59,7 @@ export function FoundWordsList({ words }: FoundWordsListProps) {
                   transition={{
                     duration: 0.3,
                     delay: index * 0.05,
-                    ease: 'easeOut'
+                    ease: "easeOut",
                   }}
                   className="group flex items-center justify-between px-4 py-3 border-b border-zinc-100 last:border-b-0 hover:bg-zinc-50 transition-colors"
                 >
@@ -70,7 +70,7 @@ export function FoundWordsList({ words }: FoundWordsListProps) {
                   </div>
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: 'auto' }}
+                    animate={{ width: "auto" }}
                     transition={{ duration: 0.5, delay: index * 0.05 }}
                     className="flex-shrink-0"
                   >
@@ -92,7 +92,9 @@ export function FoundWordsList({ words }: FoundWordsListProps) {
             className="px-5 py-4 bg-zinc-50 border-t-2 border-zinc-200"
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-zinc-600 tracking-wide">PUNTUACIÓN</span>
+              <span className="text-sm font-bold text-zinc-600 tracking-wide">
+                PUNTUACIÓN
+              </span>
               <div className="flex items-center gap-2">
                 <motion.div
                   animate={{ scale: [1, 1.2, 1] }}

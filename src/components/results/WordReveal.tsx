@@ -14,7 +14,11 @@ export function WordReveal({ word, delay, isLatest }: WordRevealProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -50, scale: 0.9 }}
-      animate={{ opacity: 1, x: 0, scale: word.isUnique || isLatest ? 1 : 0.95 }}
+      animate={{
+        opacity: 1,
+        x: 0,
+        scale: word.isUnique || isLatest ? 1 : 0.95,
+      }}
       transition={{ duration: 0.5, delay: delay / 1000, ease: "easeOut" }}
       className={`relative rounded-2xl shadow-lg border-2 p-4 overflow-hidden ${
         word.isUnique

@@ -13,7 +13,9 @@ describe("LazyImage", () => {
   });
 
   it("shows loading skeleton initially", () => {
-    const { container } = render(<LazyImage src="/test.jpg" alt="Test image" />);
+    const { container } = render(
+      <LazyImage src="/test.jpg" alt="Test image" />,
+    );
 
     const skeleton = container.querySelector(".bg-gray-200");
     expect(skeleton).toBeInTheDocument();
@@ -21,7 +23,7 @@ describe("LazyImage", () => {
 
   it("applies custom className", () => {
     const { container } = render(
-      <LazyImage src="/test.jpg" alt="Test image" className="custom-class" />
+      <LazyImage src="/test.jpg" alt="Test image" className="custom-class" />,
     );
 
     const wrapper = container.querySelector(".custom-class");
@@ -29,7 +31,9 @@ describe("LazyImage", () => {
   });
 
   it("passes through width and height props", () => {
-    render(<LazyImage src="/test.jpg" alt="Test image" width={100} height={200} />);
+    render(
+      <LazyImage src="/test.jpg" alt="Test image" width={100} height={200} />,
+    );
 
     const img = screen.getByAltText("Test image");
     expect(img).toHaveAttribute("width", "100");

@@ -1,20 +1,23 @@
-import { describe, it, expect } from 'vitest';
-import { getRandomLetter, getLetterDistributionStats } from '../letter-frequencies';
+import { describe, it, expect } from "vitest";
+import {
+  getRandomLetter,
+  getLetterDistributionStats,
+} from "../letter-frequencies";
 
-describe('Letter Frequencies', () => {
-  it('should have Spanish alphabet letters', () => {
+describe("Letter Frequencies", () => {
+  it("should have Spanish alphabet letters", () => {
     const stats = getLetterDistributionStats();
     expect(stats.uniqueLetters).toBe(27);
-    expect(stats.mostFrequent).toBe('E');
+    expect(stats.mostFrequent).toBe("E");
   });
 
-  it('should generate valid letters', () => {
+  it("should generate valid letters", () => {
     const letter = getRandomLetter();
     expect(letter).toMatch(/^[A-ZÑ]$/);
     expect(letter.length).toBe(1);
   });
 
-  it('should favor frequent letters over many selections', () => {
+  it("should favor frequent letters over many selections", () => {
     const samples = 10000;
     const letterCounts: Record<string, number> = {};
 
@@ -24,8 +27,8 @@ describe('Letter Frequencies', () => {
     }
 
     // E should be one of the most common letters
-    const eCount = letterCounts['E'] || 0;
-    const wCount = letterCounts['W'] || 0;
+    const eCount = letterCounts["E"] || 0;
+    const wCount = letterCounts["W"] || 0;
 
     expect(eCount).toBeGreaterThan(wCount * 5);
   });

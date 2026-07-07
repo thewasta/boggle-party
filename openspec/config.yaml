@@ -1,0 +1,16 @@
+# Boggle Party — OpenSpec Configuration
+schema: openspec-v1
+project: boggle-party
+language: typescript
+
+# Test configuration
+tests:
+  runner: vitest
+  command: "pnpm test"
+
+# Strict TDD mode
+strict_tdd: false
+
+# Review budget
+review:
+  max_changed_lines: 400

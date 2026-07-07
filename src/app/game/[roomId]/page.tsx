@@ -174,7 +174,7 @@ function GameClient(props: {
   const handleGameEnd = useCallback(async () => {
     // Si ya hemos procesado el fin del juego, salimos inmediatamente
     if (gameEndedRef.current) return;
-    
+
     gameEndedRef.current = true; // Bloqueamos futuras ejecuciones
     props.setIsLocked(true);
 
@@ -183,9 +183,9 @@ function GameClient(props: {
     // Solo el host notifica al servidor para evitar colisiones
     if (props.playerId === props.hostId) {
       try {
-        await fetch(`/api/rooms/${props.roomCode}/end`, { 
+        await fetch(`/api/rooms/${props.roomCode}/end`, {
           method: "POST",
-          cache: 'no-store' 
+          cache: "no-store",
         });
       } catch (error) {
         console.error("Error al cerrar la sala:", error);
@@ -198,11 +198,10 @@ function GameClient(props: {
     }, 2000);
   }, [props.roomCode, props.playerId, props.hostId, props.setIsLocked, router]);
 
-
   const { gameState, setGameState, timerState } = useGameSync({
     roomCode: props.roomCode,
     playerId: props.playerId,
-    onGameEnd: handleGameEnd
+    onGameEnd: handleGameEnd,
   });
 
   // Fetch game state on mount
@@ -211,7 +210,7 @@ function GameClient(props: {
       try {
         const response = await fetch(
           `/api/rooms/${props.roomCode}/player-state?playerId=${props.playerId}`,
-          { cache: "no-store" }
+          { cache: "no-store" },
         );
         const data = await response.json();
 
@@ -326,7 +325,7 @@ function GameClient(props: {
       gameState?.board,
       props.setSelection,
       props.setValidationStatus,
-    ]
+    ],
   );
 
   /**
@@ -340,7 +339,7 @@ function GameClient(props: {
         // 1. Evitar duplicados (si la celda ya existe, no hacemos nada)
         const isAlreadySelected = prev.cells.some(
           //@ts-ignore
-          (c) => c.row === cell.row && c.col === cell.col
+          (c) => c.row === cell.row && c.col === cell.col,
         );
         if (isAlreadySelected) return prev;
 
@@ -365,7 +364,7 @@ function GameClient(props: {
         };
       });
     },
-    [props.isLocked, gameState?.board, props.selection]
+    [props.isLocked, gameState?.board, props.selection],
   );
 
   /**

@@ -28,7 +28,8 @@ export function ErrorMessage({ error, onRetry }: ErrorMessageProps) {
         </h1>
 
         <p className="text-gray-600 mb-6">
-          Ha ocurrido un error inesperado. Por favor, intenta recargar la página.
+          Ha ocurrido un error inesperado. Por favor, intenta recargar la
+          página.
         </p>
 
         {error?.message && (

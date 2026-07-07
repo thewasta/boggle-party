@@ -2,12 +2,17 @@
  * Board geometry and adjacency utilities for the game board
  */
 
-import type { Cell } from '@/server/types';
+import type { Cell } from "@/server/types";
 
 const GRID_DIRECTIONS = [
-  [-1, -1], [-1, 0], [-1, 1],
-  [0, -1],          [0, 1],
-  [1, -1],  [1, 0], [1, 1],
+  [-1, -1],
+  [-1, 0],
+  [-1, 1],
+  [0, -1],
+  [0, 1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
 ];
 
 /**
@@ -46,7 +51,7 @@ export function calculateCellPosition(
   row: number,
   col: number,
   cellSize: number,
-  gap: number
+  gap: number,
 ): { x: number; y: number } {
   const x = col * (cellSize + gap) + cellSize / 2;
   const y = row * (cellSize + gap) + cellSize / 2;
@@ -65,7 +70,7 @@ export function getCellFromCoordinates(
   y: number,
   cellSize: number,
   gap: number,
-  gridSize: number
+  gridSize: number,
 ): Cell | null {
   const totalSize = cellSize + gap;
 
@@ -78,8 +83,8 @@ export function getCellFromCoordinates(
   const centerX = col * totalSize + cellSize / 2;
   const centerY = row * totalSize + cellSize / 2;
   const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-  
-  const hitRadius = cellSize * 0.4; 
+
+  const hitRadius = cellSize * 0.4;
 
   return distance < hitRadius ? { row, col } : null;
 }

@@ -3,7 +3,7 @@
  * Maps player IDs to session IDs for Pusher presence channels
  */
 
-import type { Player } from './types';
+import type { Player } from "./types";
 
 /**
  * Map player ID to Pusher presence socket ID
@@ -20,7 +20,11 @@ const sessions = new Map<string, PlayerSession>();
 /**
  * Register a player session
  */
-export function registerSession(playerId: string, socketId: string, roomCode: string): void {
+export function registerSession(
+  playerId: string,
+  socketId: string,
+  roomCode: string,
+): void {
   sessions.set(playerId, { playerId, socketId, roomCode });
 }
 
@@ -42,7 +46,7 @@ export function getSession(playerId: string): PlayerSession | undefined {
  * Get all sessions in a room
  */
 export function getSessionsByRoom(roomCode: string): PlayerSession[] {
-  return Array.from(sessions.values()).filter(s => s.roomCode === roomCode);
+  return Array.from(sessions.values()).filter((s) => s.roomCode === roomCode);
 }
 
 /**
@@ -53,5 +57,5 @@ export function clearRoomSessions(roomCode: string): void {
     .filter(([_, session]) => session.roomCode === roomCode)
     .map(([playerId]) => playerId);
 
-  toDelete.forEach(playerId => sessions.delete(playerId));
+  toDelete.forEach((playerId) => sessions.delete(playerId));
 }

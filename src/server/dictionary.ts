@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from "fs";
+import { join } from "path";
 
 let dictionary: Set<string> | null = null;
 let stats = { wordCount: 0, loadedAt: new Date() };
@@ -13,7 +13,10 @@ export function buildTrie(words: Iterable<string>): TrieNode {
   const root = new TrieNode();
   for (const word of words) {
     let node = root;
-    const cleanWord = word.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const cleanWord = word
+      .toUpperCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
     for (const char of cleanWord) {
       if (!node.children[char]) node.children[char] = new TrieNode();
       node = node.children[char];
@@ -27,7 +30,7 @@ let trieCache: TrieNode | null = null;
 
 export async function getTrie(): Promise<TrieNode> {
   if (trieCache) return trieCache;
-  
+
   const words = await getDictionary();
   trieCache = buildTrie(words);
   return trieCache;
@@ -42,8 +45,8 @@ export async function getDictionary(): Promise<Set<string>> {
   }
 
   try {
-    const dictionaryPath = join(process.cwd(), 'data', 'dictionary_clean.json');
-    const fileContent = readFileSync(dictionaryPath, 'utf-8');
+    const dictionaryPath = join(process.cwd(), "data", "dictionary_clean.json");
+    const fileContent = readFileSync(dictionaryPath, "utf-8");
     const words: string[] = JSON.parse(fileContent);
 
     // Store in Set for O(1) lookup
@@ -57,8 +60,8 @@ export async function getDictionary(): Promise<Set<string>> {
     console.log(`Dictionary loaded: ${stats.wordCount} words`);
     return dictionary;
   } catch (error) {
-    console.error('Failed to load dictionary:', error);
-    throw new Error('Dictionary file not found or invalid');
+    console.error("Failed to load dictionary:", error);
+    throw new Error("Dictionary file not found or invalid");
   }
 }
 
@@ -71,7 +74,7 @@ export async function esValida(word: string): Promise<boolean> {
     return false;
   }
 
-  const dict = dictionary || await getDictionary();
+  const dict = dictionary || (await getDictionary());
   return dict.has(word.toLowerCase());
 }
 

@@ -3,7 +3,7 @@
  * Provides type-safe functions for all game events
  */
 
-import { triggerEvent } from './pusher-client';
+import { triggerEvent } from "./pusher-client";
 import type {
   PlayerJoinedEvent,
   PlayerLeftEvent,
@@ -14,14 +14,18 @@ import type {
   ResultsCompleteEvent,
   RematchRequestedEvent,
   Player,
-} from './types';
+} from "./types";
 
 /**
  * Emit player-joined event
  * @param roomId - Room code (6-character string like 'JX4XU3')
  */
-export async function emitPlayerJoined(roomCode: string, player: Player, totalPlayers: number): Promise<void> {
-  await triggerEvent(`game-${roomCode}`, 'player-joined', {
+export async function emitPlayerJoined(
+  roomCode: string,
+  player: Player,
+  totalPlayers: number,
+): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, "player-joined", {
     player,
     totalPlayers,
   } satisfies PlayerJoinedEvent);
@@ -31,8 +35,13 @@ export async function emitPlayerJoined(roomCode: string, player: Player, totalPl
  * Emit player-left event
  * @param roomId - Room code (6-character string like 'JX4XU3')
  */
-export async function emitPlayerLeft(roomCode: string, playerId: string, playerName: string, totalPlayers: number): Promise<void> {
-  await triggerEvent(`game-${roomCode}`, 'player-left', {
+export async function emitPlayerLeft(
+  roomCode: string,
+  playerId: string,
+  playerName: string,
+  totalPlayers: number,
+): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, "player-left", {
     playerId,
     playerName,
     totalPlayers,
@@ -43,8 +52,13 @@ export async function emitPlayerLeft(roomCode: string, playerId: string, playerN
  * Emit game-started event
  * @param roomId - Room code (6-character string like 'JX4XU3')
  */
-export async function emitGameStarted(roomCode: string, startTime: number, duration: number, board: string[][]): Promise<void> {
-  await triggerEvent(`game-${roomCode}`, 'game-started', {
+export async function emitGameStarted(
+  roomCode: string,
+  startTime: number,
+  duration: number,
+  board: string[][],
+): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, "game-started", {
     startTime,
     duration,
     board,
@@ -55,8 +69,11 @@ export async function emitGameStarted(roomCode: string, startTime: number, durat
  * Emit game-ended event
  * @param roomId - Room code (6-character string like 'JX4XU3')
  */
-export async function emitGameEnded(roomCode: string, endTime: number): Promise<void> {
-  await triggerEvent(`game-${roomCode}`, 'game-ended', {
+export async function emitGameEnded(
+  roomCode: string,
+  endTime: number,
+): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, "game-ended", {
     endTime,
   } satisfies GameEndedEvent);
 }
@@ -65,8 +82,15 @@ export async function emitGameEnded(roomCode: string, endTime: number): Promise<
  * Emit word-found event (real-time word submission notification)
  * @param roomId - Room code (6-character string like 'JX4XU3')
  */
-export async function emitWordFound(roomCode: string, playerId: string, playerName: string, word: string, score: number, isUnique: boolean): Promise<void> {
-  await triggerEvent(`game-${roomCode}`, 'word-found', {
+export async function emitWordFound(
+  roomCode: string,
+  playerId: string,
+  playerName: string,
+  word: string,
+  score: number,
+  isUnique: boolean,
+): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, "word-found", {
     playerId,
     playerName,
     word,
@@ -84,9 +108,9 @@ export async function emitRevealWord(
   word: string,
   player: { id: string; name: string; avatar: string },
   score: number,
-  isUnique: boolean
+  isUnique: boolean,
 ): Promise<void> {
-  await triggerEvent(`game-${roomCode}`, 'reveal-word', {
+  await triggerEvent(`game-${roomCode}`, "reveal-word", {
     word,
     player,
     score,
@@ -98,8 +122,16 @@ export async function emitRevealWord(
  * Emit results-complete event (end of reveal phase)
  * @param roomId - Room code (6-character string like 'JX4XU3')
  */
-export async function emitResultsComplete(roomCode: string, finalRankings: Array<{ id: string; name: string; avatar: string; score: number }>): Promise<void> {
-  await triggerEvent(`game-${roomCode}`, 'results-complete', {
+export async function emitResultsComplete(
+  roomCode: string,
+  finalRankings: Array<{
+    id: string;
+    name: string;
+    avatar: string;
+    score: number;
+  }>,
+): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, "results-complete", {
     finalRankings,
   } satisfies ResultsCompleteEvent);
 }
@@ -108,8 +140,11 @@ export async function emitResultsComplete(roomCode: string, finalRankings: Array
  * Emit rematch-requested event
  * @param roomId - Room code (6-character string like 'JX4XU3')
  */
-export async function emitRematchRequested(roomCode: string, requestedBy: { id: string; name: string }): Promise<void> {
-  await triggerEvent(`game-${roomCode}`, 'rematch-requested', {
+export async function emitRematchRequested(
+  roomCode: string,
+  requestedBy: { id: string; name: string },
+): Promise<void> {
+  await triggerEvent(`game-${roomCode}`, "rematch-requested", {
     requestedBy,
   } satisfies RematchRequestedEvent);
 }

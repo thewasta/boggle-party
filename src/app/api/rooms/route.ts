@@ -1,10 +1,15 @@
-import { NextRequest } from 'next/server';
-import { createRoomSchema } from '@/server/validation';
-import { roomsManager } from '@/server/rooms-manager';
-import { handleValidationError, apiSuccess, apiError, getDefaultAvatar } from '@/server/api-utils';
-import type { Player } from '@/server/types';
-import { triggerEvent } from '@/server/pusher-client';
-import type { PlayerJoinedEvent } from '@/server/types';
+import { NextRequest } from "next/server";
+import { createRoomSchema } from "@/server/validation";
+import { roomsManager } from "@/server/rooms-manager";
+import {
+  handleValidationError,
+  apiSuccess,
+  apiError,
+  getDefaultAvatar,
+} from "@/server/api-utils";
+import type { Player } from "@/server/types";
+import { triggerEvent } from "@/server/pusher-client";
+import type { PlayerJoinedEvent } from "@/server/types";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,16 +19,20 @@ export async function POST(request: NextRequest) {
     const player: Player = {
       id: crypto.randomUUID(),
       name: validatedData.playerName.trim(),
-      avatar: validatedData.avatar || getDefaultAvatar(validatedData.playerName),
+      avatar:
+        validatedData.avatar || getDefaultAvatar(validatedData.playerName),
       isHost: true,
       score: 0,
       foundWords: [],
       createdAt: new Date(),
     };
 
-    const room = await roomsManager.createRoom(player, validatedData.gridSize || 4);
+    const room = await roomsManager.createRoom(
+      player,
+      validatedData.gridSize || 4,
+    );
 
-    await triggerEvent(`game-${room.code}`, 'player-joined', {
+    await triggerEvent(`game-${room.code}`, "player-joined", {
       player: room.host,
       totalPlayers: room.players.size,
     } satisfies PlayerJoinedEvent);
@@ -32,13 +41,17 @@ export async function POST(request: NextRequest) {
       room: roomsManager.roomToDTO(room),
       playerId: player.id,
     });
-
   } catch (error) {
-    if (error && typeof error === 'object' && 'name' in error && error.name === 'ZodError') {
+    if (
+      error &&
+      typeof error === "object" &&
+      "name" in error &&
+      error.name === "ZodError"
+    ) {
       return handleValidationError(error);
     }
 
-    console.error('Error creating room:', error);
-    return apiError('Failed to create room', 500);
+    console.error("Error creating room:", error);
+    return apiError("Failed to create room", 500);
   }
 }

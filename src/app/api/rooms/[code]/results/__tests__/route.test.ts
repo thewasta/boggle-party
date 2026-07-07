@@ -1,44 +1,123 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { POST } from '../route';
-import { NextRequest } from 'next/server';
-import { roomsManager } from '@/server/rooms-manager';
-import { gamesRepository, playersRepository, wordsRepository } from '@/server/db/repositories';
-import type { Room } from '@/server/types';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { POST } from "../route";
+import { NextRequest } from "next/server";
+import { roomsManager } from "@/server/rooms-manager";
+import {
+  gamesRepository,
+  playersRepository,
+  wordsRepository,
+} from "@/server/db/repositories";
+import type { Room } from "@/server/types";
 
-vi.mock('@/server/rooms-manager');
-vi.mock('@/server/db/repositories');
+vi.mock("@/server/rooms-manager");
+vi.mock("@/server/db/repositories");
 
-describe('POST /api/rooms/[code]/results', () => {
+describe("POST /api/rooms/[code]/results", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('prepares results with unique word calculation', async () => {
+  it("prepares results with unique word calculation", async () => {
     const mockRoom = {
-      id: 'room-123',
-      code: 'ABC123',
-      status: 'finished' as const,
-      host: { id: 'p1', name: 'Alice', avatar: '🎮', score: 10, foundWords: [], isHost: true, createdAt: new Date() },
+      id: "room-123",
+      code: "ABC123",
+      status: "finished" as const,
+      host: {
+        id: "p1",
+        name: "Alice",
+        avatar: "🎮",
+        score: 10,
+        foundWords: [],
+        isHost: true,
+        createdAt: new Date(),
+      },
       players: new Map([
-        ['p1', { id: 'p1', name: 'Alice', avatar: '🎮', score: 10, foundWords: [{ word: 'HOLA', score: 4, timestamp: 1000 }, { word: 'CASA', score: 4, timestamp: 2000 }], isHost: true, createdAt: new Date() }],
-        ['p2', { id: 'p2', name: 'Bob', avatar: '🎯', score: 4, foundWords: [{ word: 'HOLA', score: 4, timestamp: 1500 }], isHost: false, createdAt: new Date() }],
+        [
+          "p1",
+          {
+            id: "p1",
+            name: "Alice",
+            avatar: "🎮",
+            score: 10,
+            foundWords: [
+              { word: "HOLA", score: 4, timestamp: 1000 },
+              { word: "CASA", score: 4, timestamp: 2000 },
+            ],
+            isHost: true,
+            createdAt: new Date(),
+          },
+        ],
+        [
+          "p2",
+          {
+            id: "p2",
+            name: "Bob",
+            avatar: "🎯",
+            score: 4,
+            foundWords: [{ word: "HOLA", score: 4, timestamp: 1500 }],
+            isHost: false,
+            createdAt: new Date(),
+          },
+        ],
       ]),
       gridSize: 4 as const,
-      board: [['A', 'B'], ['C', 'D']],
+      board: [
+        ["A", "B"],
+        ["C", "D"],
+      ],
       duration: 90,
       createdAt: new Date(),
     };
 
-    vi.mocked(roomsManager.getRoom).mockReturnValue(mockRoom as unknown as Room);
-    vi.mocked(gamesRepository.create).mockResolvedValue({ id: 'game-123', room_code: 'ABC123', grid_size: 4, duration: 90, status: 'finished' as const, created_at: new Date(), started_at: null, ended_at: null, total_words_found: 0, host_id: null, board: null });
-    vi.mocked(playersRepository.create).mockResolvedValue({ id: 'player-db-1', game_id: 'game-123', player_name: 'Alice', avatar: '🎮', is_host: true, final_score: 10, words_found: 2, unique_words_found: 1, joined_at: new Date() });
-    vi.mocked(wordsRepository.create).mockResolvedValue({ id: 'word-1', game_id: 'game-123', player_id: 'player-db-1', word: 'HOLA', word_length: 4, path: null, score: 4, is_unique: true, found_at: new Date() });
-
-    const request = new Request('http://localhost:3000/api/rooms/ABC123/results', {
-      method: 'POST',
+    vi.mocked(roomsManager.getRoom).mockReturnValue(
+      mockRoom as unknown as Room,
+    );
+    vi.mocked(gamesRepository.create).mockResolvedValue({
+      id: "game-123",
+      room_code: "ABC123",
+      grid_size: 4,
+      duration: 90,
+      status: "finished" as const,
+      created_at: new Date(),
+      started_at: null,
+      ended_at: null,
+      total_words_found: 0,
+      host_id: null,
+      board: null,
+    });
+    vi.mocked(playersRepository.create).mockResolvedValue({
+      id: "player-db-1",
+      game_id: "game-123",
+      player_name: "Alice",
+      avatar: "🎮",
+      is_host: true,
+      final_score: 10,
+      words_found: 2,
+      unique_words_found: 1,
+      joined_at: new Date(),
+    });
+    vi.mocked(wordsRepository.create).mockResolvedValue({
+      id: "word-1",
+      game_id: "game-123",
+      player_id: "player-db-1",
+      word: "HOLA",
+      word_length: 4,
+      path: null,
+      score: 4,
+      is_unique: true,
+      found_at: new Date(),
     });
 
-    const response = await POST(request as any, { params: Promise.resolve({ code: 'ABC123' }) });
+    const request = new Request(
+      "http://localhost:3000/api/rooms/ABC123/results",
+      {
+        method: "POST",
+      },
+    );
+
+    const response = await POST(request as any, {
+      params: Promise.resolve({ code: "ABC123" }),
+    });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -46,38 +125,61 @@ describe('POST /api/rooms/[code]/results', () => {
     expect(data.revealSequence.length).toBeGreaterThan(0);
   });
 
-  it('returns 404 for non-existent room', async () => {
+  it("returns 404 for non-existent room", async () => {
     vi.mocked(roomsManager.getRoom).mockReturnValue(null as any);
 
-    const request = new NextRequest('http://localhost:3000/api/rooms/INVALID/results', {
-      method: 'POST',
-    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/rooms/INVALID/results",
+      {
+        method: "POST",
+      },
+    );
 
-    const response = await POST(request, { params: Promise.resolve({ code: 'INVALID' }) });
+    const response = await POST(request, {
+      params: Promise.resolve({ code: "INVALID" }),
+    });
 
     expect(response.status).toBe(404);
   });
 
-  it('returns 400 if game not finished', async () => {
+  it("returns 400 if game not finished", async () => {
     const mockRoom = {
-      id: 'room-456',
-      code: 'ABC123',
-      status: 'playing' as const,
-      host: { id: 'host', name: 'Host', avatar: '🎮', score: 0, foundWords: [], isHost: true, createdAt: new Date() },
+      id: "room-456",
+      code: "ABC123",
+      status: "playing" as const,
+      host: {
+        id: "host",
+        name: "Host",
+        avatar: "🎮",
+        score: 0,
+        foundWords: [],
+        isHost: true,
+        createdAt: new Date(),
+      },
       players: new Map(),
       gridSize: 4 as const,
-      board: [['A', 'B'], ['C', 'D']] as string[][],
+      board: [
+        ["A", "B"],
+        ["C", "D"],
+      ] as string[][],
       duration: 90,
       createdAt: new Date(),
     };
 
-    vi.mocked(roomsManager.getRoom).mockReturnValue(mockRoom as unknown as Room);
+    vi.mocked(roomsManager.getRoom).mockReturnValue(
+      mockRoom as unknown as Room,
+    );
 
-    const request = new Request('http://localhost:3000/api/rooms/ABC123/results', {
-      method: 'POST',
+    const request = new Request(
+      "http://localhost:3000/api/rooms/ABC123/results",
+      {
+        method: "POST",
+      },
+    );
+
+    const response = await POST(request as any, {
+      params: Promise.resolve({ code: "ABC123" }),
     });
-
-    const response = await POST(request as any, { params: Promise.resolve({ code: 'ABC123' }) });
 
     expect(response.status).toBe(400);
   });

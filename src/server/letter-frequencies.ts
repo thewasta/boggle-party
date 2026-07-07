@@ -51,7 +51,9 @@ export function getWeightedLetterArray(): string[] {
   // Scale frequencies to get reasonable total count (~5000)
   const scaleFactor = 5;
 
-  for (const [letter, frequency] of Object.entries(SPANISH_LETTER_FREQUENCIES)) {
+  for (const [letter, frequency] of Object.entries(
+    SPANISH_LETTER_FREQUENCIES,
+  )) {
     const count = Math.round(frequency * scaleFactor);
     for (let i = 0; i < count; i++) {
       weightedLetters.push(letter);
@@ -77,8 +79,8 @@ export function getRandomLetter(): string {
 export function getLetterDistributionStats() {
   return {
     uniqueLetters: Object.keys(SPANISH_LETTER_FREQUENCIES).length,
-    mostFrequent: 'E',
-    leastFrequent: 'W/K',
+    mostFrequent: "E",
+    leastFrequent: "W/K",
     weightedArraySize: getWeightedLetterArray().length,
   };
 }

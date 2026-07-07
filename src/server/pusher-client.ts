@@ -3,7 +3,7 @@
  * Initializes Pusher with environment variables
  */
 
-const Pusher = require('pusher');
+const Pusher = require("pusher");
 
 let pusherInstance: any = null;
 
@@ -31,7 +31,7 @@ export function getPusherClient(): any {
       key: requiredEnvVars.PUSHER_KEY!,
       secret: requiredEnvVars.PUSHER_SECRET!,
       cluster: requiredEnvVars.PUSHER_CLUSTER!,
-      useTLS: process.env.PUSHER_USE_TLS === 'true',
+      useTLS: process.env.PUSHER_USE_TLS === "true",
     });
   }
 
@@ -44,14 +44,19 @@ export function getPusherClient(): any {
 export async function triggerEvent(
   channel: string,
   eventName: string,
-  data: unknown
+  data: unknown,
 ): Promise<void> {
   const pusher = getPusherClient();
 
   try {
     await pusher.trigger(channel, eventName, data);
   } catch (error) {
-    console.error(`Failed to trigger Pusher event ${eventName} on ${channel}:`, error);
-    throw new Error(`Pusher event failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error(
+      `Failed to trigger Pusher event ${eventName} on ${channel}:`,
+      error,
+    );
+    throw new Error(
+      `Pusher event failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   }
 }

@@ -11,7 +11,13 @@ interface LazyImageProps {
   height?: number;
 }
 
-export function LazyImage({ src, alt, className = "", width, height }: LazyImageProps) {
+export function LazyImage({
+  src,
+  alt,
+  className = "",
+  width,
+  height,
+}: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
