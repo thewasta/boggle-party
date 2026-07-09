@@ -44,11 +44,8 @@ services:
     expose:
       - "3001"
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.boggle-ws.rule=PathPrefix(`/socket.io`)"
-      - "traefik.http.routers.boggle-ws.entrypoints=websecure"
-      - "traefik.http.routers.boggle-ws.tls=true"
-      - "traefik.http.services.boggle-ws.loadbalancer.server.port=3002"
+      - "coolify.managed=true"
+      - "coolify.port=3002"
     healthcheck:
       test:
         - CMD
