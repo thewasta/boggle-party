@@ -1,10 +1,10 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
-import { PageTransition } from "@/components/ui/PageTransition";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState, useTransition } from "react";
 import { FloatingLetters } from "@/components/landing/FloatingLetters";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -67,11 +67,11 @@ function HomeContent() {
 
           {/* Cards container */}
           <div className="w-full max-w-2xl grid md:grid-cols-2 gap-6">
-            {/* Create Room Card */}
-            <CreateRoomCard />
-
             {/* Join Room Card */}
             <JoinRoomCard initialRoomCode={roomCodeFromUrl} />
+
+            {/* Create Room Card */}
+            <CreateRoomCard />
           </div>
 
           {/* Footer info */}
@@ -153,9 +153,9 @@ function CreateRoomCard() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, x: -30 }}
+      initial={{ opacity: 0, y: 30, x: 30 }}
       animate={{ opacity: 1, y: 0, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.5 }}
+      transition={{ duration: 0.5, delay: 0.6 }}
       whileHover={{ scale: 1.02, y: -5 }}
       className="bg-white rounded-2xl shadow-xl border-2 border-indigo-100 p-8 hover:shadow-2xl hover:border-indigo-200 transition-all duration-300"
     >
@@ -275,9 +275,9 @@ function JoinRoomCard({ initialRoomCode = "" }: { initialRoomCode?: string }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, x: 30 }}
+      initial={{ opacity: 0, y: 30, x: -30 }}
       animate={{ opacity: 1, y: 0, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.6 }}
+      transition={{ duration: 0.5, delay: 0.5 }}
       whileHover={{ scale: 1.02, y: -5 }}
       className="bg-white rounded-2xl shadow-xl border-2 border-purple-100 p-8 hover:shadow-2xl hover:border-purple-200 transition-all duration-300"
     >
