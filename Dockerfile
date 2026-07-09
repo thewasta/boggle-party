@@ -11,6 +11,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY websocket-server/package.json ./websocket-server/
 RUN pnpm install --frozen-lockfile
 
 # Rebuild the source code only when needed
