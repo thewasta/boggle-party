@@ -1,6 +1,7 @@
 packages:
   - .
   - websocket-server
-allowBuilds:
-  esbuild: true
-  sharp: true
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
