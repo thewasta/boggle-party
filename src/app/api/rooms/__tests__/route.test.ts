@@ -1,23 +1,23 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { POST } from '../route';
-import { NextRequest } from 'next/server';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { POST } from "../route";
+import { NextRequest } from "next/server";
 
-vi.mock('@/server/pusher-client', () => ({
-  triggerEvent: vi.fn(),
+vi.mock("@/server/event-emitter", () => ({
+  emitPlayerJoined: vi.fn().mockResolvedValue(undefined),
 }));
 
-describe('POST /api/rooms', () => {
+describe("POST /api/rooms", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should create a room with valid data', async () => {
-    const request = new NextRequest('http://localhost:3000/api/rooms', {
-      method: 'POST',
+  it("should create a room with valid data", async () => {
+    const request = new NextRequest("http://localhost:3000/api/rooms", {
+      method: "POST",
       body: JSON.stringify({
-        playerName: 'Alice',
-        avatar: '🎮',
-        gridSize: '4',
+        playerName: "Alice",
+        avatar: "🎮",
+        gridSize: "4",
       }),
     });
 
@@ -28,14 +28,14 @@ describe('POST /api/rooms', () => {
     expect(data.success).toBe(true);
     expect(data.room).toBeDefined();
     expect(data.room.code).toHaveLength(6);
-    expect(data.room.host.name).toBe('Alice');
+    expect(data.room.host.name).toBe("Alice");
   });
 
-  it('should validate playerName is required', async () => {
-    const request = new NextRequest('http://localhost:3000/api/rooms', {
-      method: 'POST',
+  it("should validate playerName is required", async () => {
+    const request = new NextRequest("http://localhost:3000/api/rooms", {
+      method: "POST",
       body: JSON.stringify({
-        playerName: '',
+        playerName: "",
       }),
     });
 
@@ -46,11 +46,11 @@ describe('POST /api/rooms', () => {
     expect(data.success).toBe(false);
   });
 
-  it('should assign default avatar if not provided', async () => {
-    const request = new NextRequest('http://localhost:3000/api/rooms', {
-      method: 'POST',
+  it("should assign default avatar if not provided", async () => {
+    const request = new NextRequest("http://localhost:3000/api/rooms", {
+      method: "POST",
       body: JSON.stringify({
-        playerName: 'Bob',
+        playerName: "Bob",
       }),
     });
 

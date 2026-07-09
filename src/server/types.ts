@@ -2,7 +2,7 @@
  * Shared TypeScript types for room and game management
  */
 
-import type { GridSize } from '@/server/db/schema';
+import type { GridSize } from "@/server/db/schema";
 
 // =========================================================================
 // Route Handler Types
@@ -43,7 +43,7 @@ export interface Player {
 /**
  * Room status enum
  */
-export type RoomStatus = 'waiting' | 'playing' | 'finished';
+export type RoomStatus = "waiting" | "playing" | "finished";
 
 /**
  * Represents a game room
@@ -147,7 +147,7 @@ export interface StartGameResponse {
 }
 
 // ============================================================================
-// Pusher Event Types
+// WebSocket Event Types
 // ============================================================================
 
 /**
@@ -229,10 +229,16 @@ export interface RematchRequestedEvent {
 export class RoomError extends Error {
   constructor(
     message: string,
-    public code: 'ROOM_NOT_FOUND' | 'ROOM_FULL' | 'INVALID_CODE' | 'NOT_HOST' | 'GAME_ALREADY_STARTED' | 'REMATCH_NOT_ALLOWED'
+    public code:
+      | "ROOM_NOT_FOUND"
+      | "ROOM_FULL"
+      | "INVALID_CODE"
+      | "NOT_HOST"
+      | "GAME_ALREADY_STARTED"
+      | "REMATCH_NOT_ALLOWED",
   ) {
     super(message);
-    this.name = 'RoomError';
+    this.name = "RoomError";
   }
 }
 
@@ -268,7 +274,7 @@ export interface WordValidationResult {
 }
 
 /**
- * Word found event (for Pusher)
+ * Word found event (for WebSocket)
  */
 export interface WordFoundEvent {
   playerId: string;

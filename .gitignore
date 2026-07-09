@@ -54,3 +54,8 @@ data/temp/
 .pnpm-store
 # Local Pi runtime state
 .atl/
+!.pi/gentle-ai/sdd-preflight.json
+.pi
+.pi-subagents/
+openspec/
+data/board_*.md

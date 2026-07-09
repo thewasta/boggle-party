@@ -1,14 +1,18 @@
-import { NextRequest } from 'next/server';
-import { leaveRoomSchema } from '@/server/validation';
-import { roomsManager } from '@/server/rooms-manager';
-import { handleValidationError, apiSuccess, apiError, handleRoomError } from '@/server/api-utils';
-import { emitPlayerLeft } from '@/server/event-emitter';
-import { triggerEvent } from '@/server/pusher-client';
-import type { RouteParams } from '@/server/types';
+import type { NextRequest } from "next/server";
+import { leaveRoomSchema } from "@/server/validation";
+import { roomsManager } from "@/server/rooms-manager";
+import {
+  handleValidationError,
+  apiSuccess,
+  apiError,
+  handleRoomError,
+} from "@/server/api-utils";
+import { emitPlayerLeft, emitRoomClosed } from "@/server/event-emitter";
+import type { RouteParams } from "@/server/types";
 
 export async function POST(
   request: NextRequest,
-  { params }: RouteParams<{ code: string }>
+  { params }: RouteParams<{ code: string }>,
 ) {
   try {
     const { code } = await params;
@@ -20,43 +24,56 @@ export async function POST(
 
     const room = roomsManager.getRoom(validatedData.roomCode);
     if (!room) {
-      return apiError('Room not found', 404);
+      return apiError("Room not found", 404);
     }
 
     const player = room.players.get(validatedData.playerId);
     if (!player) {
-      return apiError('Player not found in room', 404);
+      return apiError("Player not found in room", 404);
     }
 
     const playerName = player.name;
     const isHost = room.host.id === validatedData.playerId;
-    const result = roomsManager.leaveRoom(validatedData.roomCode, validatedData.playerId);
+    const result = roomsManager.leaveRoom(
+      validatedData.roomCode,
+      validatedData.playerId,
+    );
 
     if (!result) {
       // Room was deleted (no players left)
-      return apiSuccess({ message: 'Room closed' });
+      return apiSuccess({ message: "Room closed" });
     }
 
     // If host left, close the room for everyone
     if (isHost) {
-      await triggerEvent(`game-${room.code}`, 'room-closed', {
-        reason: 'host-left',
-        message: 'El anfitrión abandonó la sala',
-      });
+      await emitRoomClosed(
+        room.code,
+        "host-left",
+        "El anfitrión abandonó la sala",
+      );
       // Delete the room
       roomsManager.deleteRoom(validatedData.roomCode);
-      return apiSuccess({ message: 'Host left, room closed' });
+      return apiSuccess({ message: "Host left, room closed" });
     }
 
-    await emitPlayerLeft(result.code, validatedData.playerId, playerName, result.players.size);
+    await emitPlayerLeft(
+      result.code,
+      validatedData.playerId,
+      playerName,
+      result.players.size,
+    );
 
     return apiSuccess({
       room: roomsManager.roomToDTO(result),
       playerId: validatedData.playerId,
     });
-
   } catch (error) {
-    if (error && typeof error === 'object' && 'name' in error && error.name === 'ZodError') {
+    if (
+      error &&
+      typeof error === "object" &&
+      "name" in error &&
+      error.name === "ZodError"
+    ) {
       return handleValidationError(error);
     }
 
