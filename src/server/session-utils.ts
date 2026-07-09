@@ -1,12 +1,12 @@
 /**
  * Session management utilities
- * Maps player IDs to session IDs for Pusher presence channels
+ * Maps player IDs to session IDs for WebSocket rooms
  */
 
 import type { Player } from "./types";
 
 /**
- * Map player ID to Pusher presence socket ID
+ * Map player ID to WebSocket socket ID
  */
 export interface PlayerSession {
   playerId: string;

@@ -2,8 +2,9 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { POST } from "../route";
 import { NextRequest } from "next/server";
 
-vi.mock("@/server/pusher-client", () => ({
-  triggerEvent: vi.fn(),
+vi.mock("@/server/event-emitter", () => ({
+  emitPlayerLeft: vi.fn().mockResolvedValue(undefined),
+  emitRoomClosed: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe("POST /api/rooms/[code]/leave", () => {

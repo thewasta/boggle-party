@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { createRoomSchema } from "@/server/validation";
 import { roomsManager } from "@/server/rooms-manager";
 import {
@@ -8,8 +8,7 @@ import {
   getDefaultAvatar,
 } from "@/server/api-utils";
 import type { Player } from "@/server/types";
-import { triggerEvent } from "@/server/pusher-client";
-import type { PlayerJoinedEvent } from "@/server/types";
+import { emitPlayerJoined } from "@/server/event-emitter";
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,10 +31,7 @@ export async function POST(request: NextRequest) {
       validatedData.gridSize || 4,
     );
 
-    await triggerEvent(`game-${room.code}`, "player-joined", {
-      player: room.host,
-      totalPlayers: room.players.size,
-    } satisfies PlayerJoinedEvent);
+    await emitPlayerJoined(room.code, room.host, room.players.size);
 
     return apiSuccess({
       room: roomsManager.roomToDTO(room),

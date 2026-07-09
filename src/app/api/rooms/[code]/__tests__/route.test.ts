@@ -3,10 +3,6 @@ import { GET } from "../route";
 import { POST } from "../../route";
 import { NextRequest } from "next/server";
 
-vi.mock("@/server/pusher-client", () => ({
-  triggerEvent: vi.fn(),
-}));
-
 describe("GET /api/rooms/[code]", () => {
   beforeEach(() => {
     vi.clearAllMocks();

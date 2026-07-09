@@ -147,7 +147,7 @@ export interface StartGameResponse {
 }
 
 // ============================================================================
-// Pusher Event Types
+// WebSocket Event Types
 // ============================================================================
 
 /**
@@ -274,7 +274,7 @@ export interface WordValidationResult {
 }
 
 /**
- * Word found event (for Pusher)
+ * Word found event (for WebSocket)
  */
 export interface WordFoundEvent {
   playerId: string;

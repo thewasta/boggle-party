@@ -52,11 +52,10 @@ next-env.d.ts
 data/*.tmp
 data/temp/
 .pnpm-store
-.atl/*
-.pi/*
-.pi-*/*
 # Local Pi runtime state
 .atl/
-data/board_*
-openspec/*
-!openspec/config.yaml
+!.pi/gentle-ai/sdd-preflight.json
+.pi
+.pi-subagents/
+openspec/
+data/board_*.md

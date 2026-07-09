@@ -11,13 +11,13 @@ Boggle Party is a real-time multiplayer Boggle game in Spanish. Players find wor
 - TypeScript 5
 - Tailwind CSS v4
 - Framer Motion for animations
-- Pusher Channels for real-time synchronization
+- Socket.io for real-time synchronization (self-hosted WebSocket server)
 - In-memory Spanish dictionary (7.9MB) for server-side validation
 - Biome for linting and formatting
 
 **Key Architecture:**
 - Centralized server with Next.js API routes handling room creation, board generation, and word validation
-- Pusher for real-time events (player joined/left, game started/ended, word reveals)
+- Self-hosted Socket.io server for real-time events (player joined/left, game started/ended, word reveals)
 - **Shared board per room** (traditional Boggle rules) - all players see the same board and compete to find words
 - Server-side validation prevents cheating
 - Room state stored in server memory (Map structure)
@@ -75,6 +75,7 @@ docker compose down -v
 
 **Services:**
 - `web` - Next.js application on port 3000
+- `websocket` - Socket.io server on ports 3001 (HTTP API) and 3002 (WebSocket)
 - `db` - PostgreSQL 16 on port 5432
 
 ## Package Manager
@@ -94,16 +95,23 @@ docker compose down -v
 3. **Active Game**: Each player gets unique board, 2-4 minute timer depending on grid size, drag-to-select word input
 4. **Results Phase**: Sequential reveal of all found words with animated scoring, unique words get ×2 bonus
 
-### Real-Time Events (Pusher)
+### Real-Time Events (Socket.io)
 
 Channel: `game-{roomCode}` where `{roomCode}` is the 6-character room code (e.g., `game-JX4XU3`)
 
-Events:
-- `player-joined` / `player-left`: Update player list
-- `game-started`: Includes startTime, duration, and unique board for each player
-- `game-ended`: Transition to results screen
-- `reveal-word`: Individual word reveal during scoring sequence
-- `results-complete`: End of reveal, show final ranking
+WebSocket Server:
+- Separate Node.js container running Socket.io
+- HTTP API on port 3001 (internal, Next.js → WebSocket)
+- WebSocket server on port 3002 (public, Client → WebSocket)
+- Events: `player-joined`, `player-left`, `game-started`, `game-ended`, `word-found`, `reveal-word`, `results-complete`, `rematch-requested`
+
+Server Integration:
+- `src/server/websocket-client.ts` - HTTP client for emitting events
+- `src/server/event-emitter.ts` - Typed event emitters
+
+Client Integration:
+- `src/lib/socket.ts` - Socket.io client singleton
+- `src/hooks/useSocketRoom.ts` - React hook for room subscriptions
 
 ### Database & Persistence (Epic 1 & 2 - Completed)
 
@@ -201,15 +209,10 @@ POSTGRES_USER=boggle_user
 POSTGRES_PASSWORD=dev_password_change_me
 DATABASE_URL=postgresql://boggle_user:dev_password_change_me@db:5432/boggle_party
 
-# Pusher
-PUSHER_APP_ID=your_app_id
-PUSHER_KEY=your_key
-PUSHER_SECRET=your_secret
-PUSHER_CLUSTER=your_cluster
-PUSHER_USE_TLS=true
-
-NEXT_PUBLIC_PUSHER_KEY=your_key
-NEXT_PUBLIC_PUSHER_CLUSTER=your_cluster
+# WebSocket Server
+WS_HTTP_URL=http://websocket:3001
+NEXT_PUBLIC_WS_URL=ws://localhost:3002
+CORS_ORIGIN=http://localhost:3000
 ```
 
 ## Project Structure
@@ -223,9 +226,9 @@ src/
 │   └── ...
 ├── components/             # React components
 ├── hooks/                  # Custom React hooks
-│   └── usePusherChannel.ts # Pusher subscription hook
+│   └── useSocketRoom.ts   # Socket.io subscription hook
 ├── lib/                    # Shared utilities
-│   └── pusher.ts          # Pusher client utilities
+│   └── socket.ts          # Socket.io client utilities
 ├── server/                 # Server-side code
 │   ├── db/                # Database layer
 │   │   ├── connection.ts   # PostgreSQL connection pool
@@ -236,12 +239,22 @@ src/
 │   ├── board-generator.ts # Spanish Boggle dice & board generation
 │   ├── dictionary.ts      # Spanish dictionary + Trie structure
 │   ├── solver.ts          # Board solving algorithm (DFS)
-│   ├── event-emitter.ts   # Typed Pusher event emitters
-│   ├── pusher-client.ts   # Pusher server client singleton
+│   ├── event-emitter.ts   # Typed Socket.io event emitters
+│   ├── websocket-client.ts # WebSocket HTTP client
 │   ├── rooms-manager.ts   # In-memory room state management
 │   └── types.ts           # Shared TypeScript types
 ├── types/                  # TypeScript type definitions
 └── styles/                 # Global styles (if needed)
+
+websocket-server/          # Self-hosted Socket.io server
+├── src/
+│   ├── index.ts           # Entry point
+│   ├── websocket.ts       # Socket.io server
+│   ├── http.ts            # Express HTTP API
+│   ├── types.ts           # Event validation schemas
+│   └── config.ts          # Configuration
+├── Dockerfile             # Container build
+└── package.json           # Dependencies
 
 data/
 ├── dictionary.json         # Spanish words dictionary (636K words, 7.9MB)
@@ -252,7 +265,7 @@ docs/
 │   ├── 2025-12-29-boggle-party-epics.md
 │   ├── 2025-12-29-epic-1-docker-infrastructure.md
 │   ├── 2025-12-29-epic-2-database-schema.md
-│   └── 2025-12-30-epic-5-pusher-integration.md
+│   └── 2026-01-06-websocket-migration-plan.md
 └── technical/              # Technical documentation
     ├── board-generator-architecture.md
     └── dictionary-cleaning-script.md
@@ -273,11 +286,11 @@ scripts/
 ## Current Implementation Status
 
 **Completed Epics:**
-- ✅ **Epic 1: Docker & Infrastructure** - Docker Compose setup with web and db services, health check endpoint
+- ✅ **Epic 1: Docker & Infrastructure** - Docker Compose setup with web, websocket, and db services, health check endpoint
 - ✅ **Epic 2: Database Schema** - PostgreSQL schema, migrations, and repositories
 - ✅ **Epic 3: Room Management System** - In-memory room state, join/leave/start/end game
 - ✅ **Epic 4: Dictionary & Word Validation** - Spanish dictionary (636K→154K words), Trie structure, DFS solver
-- ✅ **Epic 5: Pusher Integration** - Real-time events, typed emitters, React hooks
+- ✅ **Epic 5: Socket.io Integration** - Self-hosted WebSocket server, real-time events, typed emitters, React hooks
 - ✅ **Epic 6: Landing & Waiting Room UI** - Landing page, waiting room with real-time player updates
 - ✅ **Epic 7: Active Game Phase** - Interactive game board with drag-to-select, countdown, timer, word validation, and found words list
 - ✅ **Epic 8: Results Phase** - Sequential word reveal with animated scoring and final rankings
@@ -288,11 +301,12 @@ scripts/
 - 🔄 **Epic 11: Testing & Deployment** (~60-70% complete) - Vitest unit tests, Playwright E2E tests, deployment config pending
 
 **Recent Improvements:**
+- **WebSocket Migration:** Replaced Pusher Channels with self-hosted Socket.io server for real-time events
 - **Board Generation:** Migrated from letter frequency formula to specialized Spanish dice
 - **Dictionary Cleaning:** Reduced from 636,598 to 153,894 words (~76%) while maintaining quality
 - **Quality Guaranteed Boards:** Boards validated for minimum word count (20-40 depending on grid size)
 - **Landing Page:** Playful design with warm cream background (#FDF8F3), gradient titles, decorative floating letters
-- **Waiting Room:** Real-time Pusher integration, host controls (grid selector, start game), high-contrast indigo theme
+- **Waiting Room:** Real-time Socket.io integration, host controls (grid selector, start game), high-contrast indigo theme
 - **Active Game:** Drag-to-select word input, 3-2-1 countdown overlay, synchronized timer, visual path rendering, validation feedback
 - **Results Phase:** Animated word reveal with staggered delays, score animations, podium with bouncing trophy
 - **Animations:** Framer Motion integration for smooth transitions, hover states, and micro-interactions
@@ -551,6 +565,6 @@ Current coverage (Epic 11, ~60-70% complete):
 - ✅ Board generation: Spanish dice, quality validation
 - ✅ API routes: rooms, games, words, results
 - ✅ Database: repository integration tests
-- ✅ Pusher: event emission (mocked)
+- ✅ WebSocket: event emission (mocked)
 - ⏳ Load testing: pending
 - ⏳ Code coverage reporting: pending

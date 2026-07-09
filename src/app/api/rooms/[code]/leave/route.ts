@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { leaveRoomSchema } from "@/server/validation";
 import { roomsManager } from "@/server/rooms-manager";
 import {
@@ -7,8 +7,7 @@ import {
   apiError,
   handleRoomError,
 } from "@/server/api-utils";
-import { emitPlayerLeft } from "@/server/event-emitter";
-import { triggerEvent } from "@/server/pusher-client";
+import { emitPlayerLeft, emitRoomClosed } from "@/server/event-emitter";
 import type { RouteParams } from "@/server/types";
 
 export async function POST(
@@ -47,10 +46,11 @@ export async function POST(
 
     // If host left, close the room for everyone
     if (isHost) {
-      await triggerEvent(`game-${room.code}`, "room-closed", {
-        reason: "host-left",
-        message: "El anfitrión abandonó la sala",
-      });
+      await emitRoomClosed(
+        room.code,
+        "host-left",
+        "El anfitrión abandonó la sala",
+      );
       // Delete the room
       roomsManager.deleteRoom(validatedData.roomCode);
       return apiSuccess({ message: "Host left, room closed" });

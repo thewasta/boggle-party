@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@11.5.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  },
   "scripts": {
     "dev": "next dev",
     "dev:test": "dotenv -e .env.test -- next dev -p 3322",
@@ -24,10 +30,9 @@
     "nanoid": "^5.1.6",
     "next": "16.1.1",
     "pg": "^8.16.3",
-    "pusher": "^5.2.0",
-    "pusher-js": "^8.4.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "socket.io-client": "^4.8.3",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.4"
   },
