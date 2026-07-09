@@ -42,7 +42,7 @@ services:
       - HTTP_PORT=3001
       - CORS_ORIGIN=${NEXT_PUBLIC_SITE_URL}
     expose:
-      - "3001"
+      - "3002"
     labels:
       - "coolify.managed=true"
       - "coolify.port=3002"
