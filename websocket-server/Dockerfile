@@ -33,7 +33,7 @@ ENV NODE_ENV=production
 # Expose ports
 # 3001: Internal HTTP API (Next.js → WebSocket)
 # 3002: Public WebSocket (Client → WebSocket)
-EXPOSE 3001 3002
+EXPOSE 3002
 
 # Run the server
 CMD ["node", "dist/index.js"]
