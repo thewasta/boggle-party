@@ -16,9 +16,12 @@ RUN pnpm build
 
 # Production stage
 FROM node:20-alpine
-
+    
 WORKDIR /app
-
+    
+# Install wget for healthchecks
+RUN apk add --no-cache wget
+    
 # Copy built files and dependencies
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
